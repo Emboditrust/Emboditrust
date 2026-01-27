@@ -1,9 +1,10 @@
-// app/api/reports/fake-product/route.ts
+// app/api/reports/fake-product/route.ts - Updated with message creation
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import FakeProductReport from '@/models/FakeProductReport';
 import ProductCode from '@/models/ProductCode';
 import VerificationAttempt from '@/models/VerificationAttempt';
+import Message from '@/models/Message'; // Import Message model
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { CloudinaryService } from '@/utils/cloudinary';
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Create the fake product report
     const report = new FakeProductReport({
       reporterEmail: reportData.reporterEmail?.trim() || undefined,
       reporterPhone: reportData.reporterPhone?.trim() || undefined,
@@ -101,10 +103,54 @@ export async function POST(request: NextRequest) {
 
     await report.save();
 
+    // Create a message from this report
+    let message = null;
+    if (reportData.reporterEmail) {
+      const messageContent = `
+        New counterfeit product report submitted:
+        
+        Product Name: ${reportData.productName}
+        Purchase Location: ${reportData.purchaseLocation}
+        ${reportData.purchaseDate ? `Purchase Date: ${reportData.purchaseDate}` : ''}
+        
+        Reporter Contact:
+        ${reportData.reporterEmail ? `Email: ${reportData.reporterEmail}` : ''}
+        ${reportData.reporterPhone ? `Phone: ${reportData.reporterPhone}` : ''}
+        
+        ${reportData.additionalInfo ? `Additional Information:\n${reportData.additionalInfo}` : ''}
+        
+        ${reportData.qrCodeId ? `QR Code ID: ${reportData.qrCodeId}` : ''}
+        ${reportData.scratchCode ? `Scratch Code: ${reportData.scratchCode}` : ''}
+        
+        Report ID: ${report._id}
+        Submitted via public verification form.
+      `;
+
+      message = new Message({
+        senderId: `report_${report._id}`,
+        senderEmail: reportData.reporterEmail || 'anonymous@emboditrust.com',
+        senderName: reportData.reporterEmail ? 'Product Reporter' : 'Anonymous Reporter',
+        senderRole: 'user',
+        receiverEmail: 'admin@emboditrust.com',
+        subject: `🚨 Counterfeit Report: ${reportData.productName}`,
+        content: messageContent.trim(),
+        relatedReport: report._id,
+        status: 'sent',
+        sentVia: 'system',
+      });
+
+      await message.save();
+
+      // Update report with message ID
+      report.messageId = message._id;
+      await report.save();
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Counterfeit product report submitted successfully',
-      reportId: report._id
+      reportId: report._id,
+      messageId: message?._id
     });
 
   } catch (error: any) {

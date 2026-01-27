@@ -1,4 +1,4 @@
-// models/FakeProductReport.ts
+// models/FakeProductReport.ts - Updated
 import mongoose from 'mongoose';
 
 export interface IFakeProductReport extends mongoose.Document {
@@ -16,6 +16,7 @@ export interface IFakeProductReport extends mongoose.Document {
   priority: 'low' | 'medium' | 'high' | 'critical';
   adminNotes?: string;
   assignedTo?: string;
+  messageId?: mongoose.Types.ObjectId; // Link to Message collection
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,75 +25,80 @@ const FakeProductReportSchema = new mongoose.Schema({
   reporterEmail: {
     type: String,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    required: function(this: IFakeProductReport) {
+      return !this.reporterPhone; // Email required if no phone
+    },
   },
   reporterPhone: {
     type: String,
-    trim: true
+    trim: true,
+    required: function(this: IFakeProductReport) {
+      return !this.reporterEmail; // Phone required if no email
+    },
   },
   productName: {
     type: String,
     required: [true, 'Product name is required'],
-    trim: true
+    trim: true,
   },
   originalProductName: {
     type: String,
-    trim: true
+    trim: true,
   },
   purchaseLocation: {
     type: String,
     required: [true, 'Purchase location is required'],
-    trim: true
+    trim: true,
   },
   purchaseDate: {
-    type: Date
+    type: Date,
   },
   productPhotoUrl: {
     type: String,
-    trim: true
+    trim: true,
   },
   additionalInfo: {
     type: String,
-    trim: true
+    trim: true,
   },
   qrCodeId: {
     type: String,
     trim: true,
-    index: true
+    index: true,
   },
   scratchCode: {
     type: String,
     trim: true,
-    index: true
+    index: true,
   },
   status: {
     type: String,
     enum: ['pending', 'investigating', 'resolved', 'dismissed'],
     default: 'pending',
-    index: true
+    index: true,
   },
   priority: {
     type: String,
     enum: ['low', 'medium', 'high', 'critical'],
     default: 'medium',
-    index: true
+    index: true,
   },
   adminNotes: {
     type: String,
-    trim: true
+    trim: true,
   },
   assignedTo: {
     type: String,
-    trim: true
-  }
+    trim: true,
+  },
+  messageId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Message',
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 });
-
-// Indexes for efficient querying
-FakeProductReportSchema.index({ status: 1, priority: -1, createdAt: -1 });
-FakeProductReportSchema.index({ qrCodeId: 1, scratchCode: 1 });
-FakeProductReportSchema.index({ createdAt: -1 });
 
 export default mongoose.models.FakeProductReport || 
   mongoose.model<IFakeProductReport>('FakeProductReport', FakeProductReportSchema);

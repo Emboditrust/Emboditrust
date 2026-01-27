@@ -1,8 +1,9 @@
+// models/Admin.ts - Updated to handle both types
 import mongoose from 'mongoose';
 
 export interface IAdmin extends mongoose.Document {
   email: string;
-  password: string; // Changed from passwordHash to password
+  password: string;
   name: string;
   role: 'admin';
   lastLogin?: Date;
@@ -19,7 +20,7 @@ const AdminSchema = new mongoose.Schema({
     trim: true,
     match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
   },
-  password: { // Changed from passwordHash to password
+  password: {
     type: String,
     required: [true, 'Password is required'],
   },
@@ -41,4 +42,5 @@ const AdminSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+// Remove any custom _id handling - let MongoDB handle it
 export default mongoose.models.Admin || mongoose.model<IAdmin>('Admin', AdminSchema);
