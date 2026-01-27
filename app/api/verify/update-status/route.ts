@@ -1,4 +1,3 @@
-// app/api/verify/update-status/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import ProductCode from '@/models/ProductCode';
@@ -6,69 +5,55 @@ import ProductCode from '@/models/ProductCode';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
-    const body = await request.json();
-    const { qrCodeId, status, verificationCount, isFirstVerification } = body;
-    
+
+    const { qrCodeId } = await request.json();
+
     if (!qrCodeId) {
       return NextResponse.json(
         { success: false, message: 'QR Code ID is required' },
         { status: 400 }
       );
     }
-    
-    const updateData: any = {
-      lastVerifiedAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    if (status) {
-      updateData.status = status;
-    }
-    
-    if (verificationCount !== undefined) {
-      updateData.verificationCount = verificationCount;
-    }
-    
-    if (isFirstVerification) {
-      updateData.firstVerifiedAt = new Date();
-      if (updateData.verificationCount === undefined) {
-        updateData.verificationCount = 1;
-      }
-    }
-    
+
+    // 🔐 Server owns truth
     const productCode = await ProductCode.findOneAndUpdate(
       { qrCodeId },
-      { $set: updateData },
+      {
+        $inc: { verificationCount: 1 },
+        $set: {
+          lastVerifiedAt: new Date(),
+          status: 'verified'
+        },
+        $setOnInsert: {
+          firstVerifiedAt: new Date()
+        }
+      },
       { new: true }
     );
-    
+
     if (!productCode) {
       return NextResponse.json(
-        { success: false, message: 'Product code not found' },
+        { success: false, message: 'Product not found' },
         { status: 404 }
       );
     }
-    
+
+    const isFirstVerification = productCode.verificationCount === 1;
+
     return NextResponse.json({
       success: true,
-      message: 'Verification status updated',
-      productCode: {
-        qrCodeId: productCode.qrCodeId,
-        status: productCode.status,
-        verificationCount: productCode.verificationCount,
-        firstVerifiedAt: productCode.firstVerifiedAt,
-        lastVerifiedAt: productCode.lastVerifiedAt
-      }
+      isFirstVerification,
+      verificationCount: productCode.verificationCount,
+      status: isFirstVerification ? 'valid' : 'already_used'
     });
-    
+
   } catch (error: any) {
-    console.error('Error updating verification status:', error);
+    console.error('Verification update error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Failed to update status',
-        error: error.message 
+      {
+        success: false,
+        message: 'Verification failed',
+        error: error.message
       },
       { status: 500 }
     );
