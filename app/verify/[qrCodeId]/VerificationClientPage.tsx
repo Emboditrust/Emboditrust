@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Check,
@@ -53,6 +53,31 @@ export default function VerificationClientPage({
   const router = useRouter();
   const { productCode } = verificationData;
 
+  /* ───────────────── Redirect control ───────────────── */
+  const redirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const scheduleRedirectHome = (delay = 3000) => {
+    if (redirectTimeoutRef.current) {
+      clearTimeout(redirectTimeoutRef.current);
+    }
+    redirectTimeoutRef.current = setTimeout(() => {
+      router.replace('/');
+    }, delay);
+  };
+
+  const cancelRedirect = () => {
+    if (redirectTimeoutRef.current) {
+      clearTimeout(redirectTimeoutRef.current);
+      redirectTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      cancelRedirect();
+    };
+  }, []);
+
   /* ───────────────── Verification state ───────────────── */
   const [showScratchDialog, setShowScratchDialog] = useState(true);
   const [scratchCodeInput, setScratchCodeInput] = useState('');
@@ -80,7 +105,7 @@ export default function VerificationClientPage({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
-  /* ───────────────── Auto verify if scratch in URL ───────────────── */
+  /* ───────────────── Auto verify via URL ───────────────── */
   useEffect(() => {
     if (scratchCodeParam) {
       setScratchCodeInput(scratchCodeParam);
@@ -119,10 +144,7 @@ export default function VerificationClientPage({
         setShowScratchDialog(false);
         setShowNotAuthenticDialog(true);
 
-        setTimeout(() => {
-          router.replace('/');
-        }, 2500);
-
+        scheduleRedirectHome(2500);
         return;
       }
 
@@ -151,10 +173,8 @@ export default function VerificationClientPage({
       setShowScratchDialog(false);
       setShowSuccessDialog(true);
 
-      // 🔁 Redirect home after verification
-      setTimeout(() => {
-        router.replace('/');
-      }, 3000);
+      // ⏳ Auto-redirect ONLY if user does nothing
+      scheduleRedirectHome(3000);
 
     } catch (err) {
       console.error(err);
@@ -217,10 +237,8 @@ export default function VerificationClientPage({
 
       setShowReportDialog(false);
 
-      // 🔁 Redirect home after report
-      setTimeout(() => {
-        router.replace('/');
-      }, 2000);
+      // ⏳ Redirect ONLY after successful submission
+      scheduleRedirectHome(2000);
 
     } catch (err) {
       console.error(err);
@@ -276,7 +294,7 @@ export default function VerificationClientPage({
           <X className="h-8 w-8 text-red-600 mx-auto mb-3" />
           <Badge className="bg-red-100 text-red-800">Not Authentic</Badge>
           <p className="mt-2 text-gray-700">
-            This product is not registered in the system.
+            This product is not registered.
           </p>
         </DialogContent>
       </Dialog>
@@ -316,10 +334,13 @@ export default function VerificationClientPage({
               {verificationCount > 1 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
                   <p className="text-sm text-red-700 mb-2">
-                    This product has been verified before. You may report it if you suspect it is fake.
+                    This product has been verified before.
                   </p>
                   <Button
-                    onClick={() => setShowReportDialog(true)}
+                    onClick={() => {
+                      cancelRedirect();
+                      setShowReportDialog(true);
+                    }}
                     className="w-full bg-red-500 text-white"
                   >
                     Report Fake Product
@@ -384,7 +405,9 @@ export default function VerificationClientPage({
             <Input
               type="file"
               accept="image/*"
-              onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])}
+              onChange={(e) =>
+                e.target.files && handleImageUpload(e.target.files[0])
+              }
             />
 
             {imagePreview && (
