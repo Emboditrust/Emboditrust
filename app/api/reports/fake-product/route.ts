@@ -1,10 +1,10 @@
-// app/api/reports/fake-product/route.ts - Updated with message creation
+// app/api/reports/fake-product/route.ts - UPDATED
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import FakeProductReport from '@/models/FakeProductReport';
 import ProductCode from '@/models/ProductCode';
 import VerificationAttempt from '@/models/VerificationAttempt';
-import Message from '@/models/Message'; // Import Message model
+import Message from '@/models/Message';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { CloudinaryService } from '@/utils/cloudinary';
@@ -16,32 +16,51 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     
-    const reportData = {
-      reporterEmail: formData.get('email') as string,
-      reporterPhone: formData.get('phone') as string,
-      productName: formData.get('productName') as string,
-      purchaseLocation: formData.get('purchaseLocation') as string,
-      purchaseDate: formData.get('purchaseDate') as string,
-      additionalInfo: formData.get('additionalInfo') as string,
-      qrCodeId: formData.get('qrCodeId') as string,
-      scratchCode: formData.get('scratchCode') as string,
-      productPhoto: formData.get('productPhoto') as File | null,
-    };
+    // Extract form data - use correct field names
+    const reporterEmail = formData.get('email') as string;
+    const reporterPhone = formData.get('phone') as string;
+    const productName = formData.get('productName') as string;
+    const purchaseLocation = formData.get('purchaseLocation') as string;
+    const additionalInfo = formData.get('additionalInfo') as string;
+    const qrCodeId = formData.get('qrCodeId') as string;
+    const scratchCode = formData.get('scratchCode') as string;
+    const productPhoto = formData.get('productPhoto') as File | null;
 
-    if (!reportData.productName?.trim() || !reportData.purchaseLocation?.trim()) {
+    // Debug logging
+    console.log('Received form data:', {
+      reporterEmail,
+      reporterPhone,
+      productName,
+      purchaseLocation,
+      qrCodeId,
+      scratchCode,
+      hasPhoto: !!productPhoto
+    });
+
+    // Validate required fields
+    if (!productName?.trim() || !purchaseLocation?.trim()) {
       return NextResponse.json(
         { success: false, message: 'Product name and purchase location are required' },
         { status: 400 }
       );
     }
 
+    // Validate at least one contact method
+    if (!reporterEmail?.trim() && !reporterPhone?.trim()) {
+      return NextResponse.json(
+        { success: false, message: 'Either email or phone number is required' },
+        { status: 400 }
+      );
+    }
+
     let productPhotoUrl = '';
     
-    if (reportData.productPhoto) {
+    // Handle image upload if present
+    if (productPhoto && productPhoto.size > 0) {
       try {
-        const bytes = await reportData.productPhoto.arrayBuffer();
+        const bytes = await productPhoto.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        const base64Image = `data:${reportData.productPhoto.type};base64,${buffer.toString('base64')}`;
+        const base64Image = `data:${productPhoto.type};base64,${buffer.toString('base64')}`;
         
         const publicId = `emboditrust/fake-reports/${uuidv4()}`;
         
@@ -54,6 +73,7 @@ export async function POST(request: NextRequest) {
         productPhotoUrl = uploadResult.url;
       } catch (uploadError) {
         console.error('Cloudinary upload error:', uploadError);
+        // Continue without photo if upload fails
       }
     }
 
@@ -64,9 +84,10 @@ export async function POST(request: NextRequest) {
                      'unknown';
     const userAgent = headersList.get('user-agent') || 'unknown';
 
-    if (reportData.qrCodeId) {
+    // Update product code status if qrCodeId exists
+    if (qrCodeId) {
       await ProductCode.findOneAndUpdate(
-        { qrCodeId: reportData.qrCodeId },
+        { qrCodeId: qrCodeId },
         { 
           $set: { 
             status: 'suspected_counterfeit',
@@ -78,8 +99,8 @@ export async function POST(request: NextRequest) {
 
       await VerificationAttempt.create({
         timestamp: new Date(),
-        scannedCode: reportData.qrCodeId,
-        scratchCode: reportData.scratchCode || 'N/A',
+        scannedCode: qrCodeId,
+        scratchCode: scratchCode || 'N/A',
         result: 'suspected_counterfeit',
         ipAddress,
         userAgent
@@ -88,63 +109,62 @@ export async function POST(request: NextRequest) {
 
     // Create the fake product report
     const report = new FakeProductReport({
-      reporterEmail: reportData.reporterEmail?.trim() || undefined,
-      reporterPhone: reportData.reporterPhone?.trim() || undefined,
-      productName: reportData.productName.trim(),
-      purchaseLocation: reportData.purchaseLocation.trim(),
-      purchaseDate: reportData.purchaseDate ? new Date(reportData.purchaseDate) : undefined,
-      additionalInfo: reportData.additionalInfo?.trim() || undefined,
-      qrCodeId: reportData.qrCodeId?.trim() || undefined,
-      scratchCode: reportData.scratchCode?.trim() || undefined,
+      reporterEmail: reporterEmail?.trim() || undefined,
+      reporterPhone: reporterPhone?.trim() || undefined,
+      productName: productName.trim(),
+      purchaseLocation: purchaseLocation.trim(),
+      additionalInfo: additionalInfo?.trim() || undefined,
+      qrCodeId: qrCodeId?.trim() || undefined,
+      scratchCode: scratchCode?.trim() || undefined,
       productPhotoUrl: productPhotoUrl || undefined,
       status: 'pending',
       priority: 'high',
     });
 
     await report.save();
+    console.log('Report saved successfully:', report._id);
 
     // Create a message from this report
     let message = null;
-    if (reportData.reporterEmail) {
-      const messageContent = `
-        New counterfeit product report submitted:
-        
-        Product Name: ${reportData.productName}
-        Purchase Location: ${reportData.purchaseLocation}
-        ${reportData.purchaseDate ? `Purchase Date: ${reportData.purchaseDate}` : ''}
-        
-        Reporter Contact:
-        ${reportData.reporterEmail ? `Email: ${reportData.reporterEmail}` : ''}
-        ${reportData.reporterPhone ? `Phone: ${reportData.reporterPhone}` : ''}
-        
-        ${reportData.additionalInfo ? `Additional Information:\n${reportData.additionalInfo}` : ''}
-        
-        ${reportData.qrCodeId ? `QR Code ID: ${reportData.qrCodeId}` : ''}
-        ${reportData.scratchCode ? `Scratch Code: ${reportData.scratchCode}` : ''}
-        
-        Report ID: ${report._id}
-        Submitted via public verification form.
-      `;
+    const contactEmail = reporterEmail?.trim() || 'anonymous@emboditrust.com';
+    
+    const messageContent = `
+      New counterfeit product report submitted:
+      
+      Product Name: ${productName}
+      Purchase Location: ${purchaseLocation}
+      
+      Reporter Contact:
+      ${reporterEmail ? `Email: ${reporterEmail}` : ''}
+      ${reporterPhone ? `Phone: ${reporterPhone}` : ''}
+      
+      ${additionalInfo ? `Additional Information:\n${additionalInfo}` : ''}
+      
+      ${qrCodeId ? `QR Code ID: ${qrCodeId}` : ''}
+      ${scratchCode ? `Scratch Code: ${scratchCode}` : ''}
+      
+      Report ID: ${report._id}
+      Submitted via public verification form.
+    `;
 
-      message = new Message({
-        senderId: `report_${report._id}`,
-        senderEmail: reportData.reporterEmail || 'anonymous@emboditrust.com',
-        senderName: reportData.reporterEmail ? 'Product Reporter' : 'Anonymous Reporter',
-        senderRole: 'user',
-        receiverEmail: 'admin@emboditrust.com',
-        subject: `🚨 Counterfeit Report: ${reportData.productName}`,
-        content: messageContent.trim(),
-        relatedReport: report._id,
-        status: 'sent',
-        sentVia: 'system',
-      });
+    message = new Message({
+      senderId: `report_${report._id}`,
+      senderEmail: contactEmail,
+      senderName: reporterEmail ? 'Product Reporter' : 'Anonymous Reporter',
+      senderRole: 'user',
+      receiverEmail: 'admin@emboditrust.com',
+      subject: `🚨 Counterfeit Report: ${productName}`,
+      content: messageContent.trim(),
+      relatedReport: report._id,
+      status: 'sent',
+      sentVia: 'system',
+    });
 
-      await message.save();
+    await message.save();
 
-      // Update report with message ID
-      report.messageId = message._id;
-      await report.save();
-    }
+    // Update report with message ID
+    report.messageId = message._id;
+    await report.save();
 
     return NextResponse.json({
       success: true,
@@ -155,119 +175,17 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Error submitting fake product report:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to submit report';
+    if (error.name === 'ValidationError') {
+      errorMessage = 'Validation failed: ' + Object.values(error.errors).map((e: any) => e.message).join(', ');
+    }
+    
     return NextResponse.json(
       { 
         success: false, 
-        message: 'Failed to submit report',
-        error: error.message 
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const page = parseInt(searchParams.get('page') || '1');
-
-    const query: any = {};
-    if (status) query.status = status;
-
-    const reports = await FakeProductReport.find(query)
-      .sort({ createdAt: -1, priority: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
-
-    const total = await FakeProductReport.countDocuments(query);
-
-    return NextResponse.json({
-      success: true,
-      reports,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit)
-    });
-
-  } catch (error: any) {
-    console.error('Error fetching fake product reports:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Failed to fetch reports',
-        error: error.message 
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    const body = await request.json();
-    const { reportId, status, priority, adminNotes, assignedTo } = body;
-
-    if (!reportId) {
-      return NextResponse.json(
-        { success: false, message: 'Report ID is required' },
-        { status: 400 }
-      );
-    }
-
-    const updateData: any = {};
-    if (status) updateData.status = status;
-    if (priority) updateData.priority = priority;
-    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
-    if (assignedTo !== undefined) updateData.assignedTo = assignedTo;
-
-    const report = await FakeProductReport.findByIdAndUpdate(
-      reportId,
-      { $set: updateData },
-      { new: true }
-    ).lean();
-
-    if (!report) {
-      return NextResponse.json(
-        { success: false, message: 'Report not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Report updated successfully',
-      report
-    });
-
-  } catch (error: any) {
-    console.error('Error updating report:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Failed to update report',
+        message: errorMessage,
         error: error.message 
       },
       { status: 500 }
