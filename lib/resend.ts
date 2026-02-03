@@ -148,9 +148,7 @@ export function createEmailTemplate({
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <div class="logo">Emboditrust</div>
-        </div>
+        
         <div class="content">
           <h1 class="title">${title}</h1>
           <div class="message">

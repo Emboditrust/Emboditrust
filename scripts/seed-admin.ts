@@ -22,7 +22,7 @@ async function seedAdmin() {
     }
 
     // Create admin user
-    const password = 'Admin123!';
+    const password = 'TheEmbodimentTechnologies@26';
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const admin = new Admin({
@@ -35,7 +35,7 @@ async function seedAdmin() {
     await admin.save();
     console.log('✅ Admin user created successfully');
     console.log('📧 Email: admin@emboditrust.com');
-    console.log('🔑 Password: Admin123!');
+    console.log('🔑 Password: TheEmbodimentTechnologies@26');
     console.log('⚠️  Change this password after first login!');
 
   } catch (error) {
@@ -45,5 +45,7 @@ async function seedAdmin() {
     await mongoose.disconnect();
   }
 }
+
+//npx ts-node -r tsconfig-paths/register -P scripts/tsconfig.scripts.json scripts/seed-admin.ts
 
 seedAdmin();
