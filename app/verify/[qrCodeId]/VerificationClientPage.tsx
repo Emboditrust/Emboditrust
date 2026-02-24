@@ -404,106 +404,109 @@ export default function VerificationClientPage({
           </DialogContent>
         </Dialog>
 
-        {/* Success Dialog */}
+        {/* Success Dialog with ScrollArea */}
         <Dialog open={showSuccessDialog} onOpenChange={(open) => handleDialogClose(open, setShowSuccessDialog)}>
-          <DialogContent className="sm:max-w-xl border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+          <DialogContent className="sm:max-w-xl border-0 shadow-xl p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
             <button
               onClick={handleXClick}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+              className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </button>
-            <div className="space-y-6">
-              {/* Success Header */}
-              <div className="text-center space-y-4">
-                <div className="mx-auto p-3 bg-green-50 rounded-full w-16 h-16 flex items-center justify-center">
-                  <Check className="h-8 w-8 text-green-600" />
-                </div>
-                <div>
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-4 py-1.5 text-sm font-medium mb-4">
-                    ✅ Verified Authentic
-                  </Badge>
-                  <DialogTitle className="text-xl text-gray-900 mt-4">
-                    Genuine Product Verified
-                  </DialogTitle>
-                  <DialogDescription className="text-gray-600">
-                    This product has been successfully verified as authentic
-                  </DialogDescription>
-                </div>
-              </div>
-
-              {/* Verification Details */}
-              <Card className="border border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-gray-900">
-                    Verification Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Total Scans</div>
-                      <div className="text-2xl font-bold text-gray-900">{verificationCount}</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Status</div>
-                      <div className="text-lg font-bold text-green-600">Authentic</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Your Scan</div>
-                      <div className="text-sm font-medium text-gray-900">Now</div>
-                    </div>
+            
+            <ScrollArea className="max-h-[80vh] w-full">
+              <div className="p-6 space-y-6">
+                {/* Success Header */}
+                <div className="text-center space-y-4">
+                  <div className="mx-auto p-3 bg-green-50 rounded-full w-16 h-16 flex items-center justify-center">
+                    <Check className="h-8 w-8 text-green-600" />
                   </div>
+                  <div>
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-4 py-1.5 text-sm font-medium mb-4">
+                      ✅ Verified Authentic
+                    </Badge>
+                    <DialogTitle className="text-xl text-gray-900 mt-4">
+                      Genuine Product Verified
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      This product has been successfully verified as authentic
+                    </DialogDescription>
+                  </div>
+                </div>
 
-                  {verificationCount > 1 && (
-                    <div className="space-y-3">
-                      <Separator />
-                      <div className="flex items-start space-x-3 p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                        <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <p className="font-medium text-amber-800">
-                            Previously Scanned {verificationCount - 1} Time(s)
-                          </p>
-                          <p className="text-amber-700 mt-1">
-                            This product has been verified before. If you suspect this might be a counterfeit, you can report it.
-                          </p>
-                        </div>
+                {/* Verification Details */}
+                <Card className="border border-gray-200">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-gray-900">
+                      Verification Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 mb-1">Total Scans</div>
+                        <div className="text-2xl font-bold text-gray-900">{verificationCount}</div>
                       </div>
-
-                      {reportUnlockTimer > 0 ? (
-                        <div className="text-center space-y-2">
-                          <Progress value={(5 - reportUnlockTimer) * 20} className="h-2" />
-                          <p className="text-sm text-gray-600">
-                            Report option available in <span className="font-bold">{reportUnlockTimer}s</span>
-                          </p>
-                        </div>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
-                          onClick={() => setShowFakeReportDialog(true)}
-                        >
-                          <AlertTriangle className="h-4 w-4 mr-2" />
-                          Report Suspected Counterfeit
-                        </Button>
-                      )}
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 mb-1">Status</div>
+                        <div className="text-lg font-bold text-green-600">Authentic</div>
+                      </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 mb-1">Your Scan</div>
+                        <div className="text-sm font-medium text-gray-900">Now</div>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
 
-              {/* Back to Home Button */}
-              <div className="flex justify-center pt-4">
-                <Button
-                  onClick={handleBackToHome}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Back to Home
-                </Button>
+                    {verificationCount > 1 && (
+                      <div className="space-y-3">
+                        <Separator />
+                        <div className="flex items-start space-x-3 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <div className="text-sm">
+                            <p className="font-medium text-amber-800">
+                              Previously Scanned {verificationCount - 1} Time(s)
+                            </p>
+                            <p className="text-amber-700 mt-1">
+                              This product has been verified before. If you suspect this might be a counterfeit, you can report it.
+                            </p>
+                          </div>
+                        </div>
+
+                        {reportUnlockTimer > 0 ? (
+                          <div className="text-center space-y-2">
+                            <Progress value={(5 - reportUnlockTimer) * 20} className="h-2" />
+                            <p className="text-sm text-gray-600">
+                              Report option available in <span className="font-bold">{reportUnlockTimer}s</span>
+                            </p>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
+                            onClick={() => setShowFakeReportDialog(true)}
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            Report Suspected Counterfeit
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Back to Home Button */}
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={handleBackToHome}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                  >
+                    <Home className="h-4 w-4 mr-2" />
+                    Back to Home
+                  </Button>
+                </div>
               </div>
-            </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
 
