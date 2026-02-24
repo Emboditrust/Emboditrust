@@ -1,4 +1,6 @@
-'use client';
+ 'use client';
+
+import Link from "next/link";
 
 export default function Hero() {
   const handleJoinWaitlist = () => {
@@ -25,12 +27,11 @@ export default function Hero() {
         </p>
 
         <div className="flex w-full flex-col sm:flex-row gap-4 justify-center items-center">
-          <button
-            onClick={handleJoinWaitlist}
+          <Link href="#contact"
             className="bg-emerald-400 w-full md:w-1/5 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-500 transition-colors duration-300 shadow-lg"
           >
-            Join Waitlist
-          </button>
+            Contact
+          </Link>
           <a
             href="#features"
             className="border-2 w-full md:w-1/5 border-emerald-500 text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-400 hover:border-transparent hover:text-white transition-colors duration-300"

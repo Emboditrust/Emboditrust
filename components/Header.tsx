@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Header() {
@@ -15,7 +16,7 @@ export default function Header() {
     { href: '#features', label: 'Features' },
     { href: '#products', label: 'Products' },
     { href: '#industries', label: 'Industries' },
-    { href: '#contact', label: 'Join Waitlist' },
+    { href: '#contact', label: 'Contact Us' },
   ];
 
   return (
@@ -37,12 +38,11 @@ export default function Header() {
                 {item.label}
               </a>
             ))}
-            <button
-              onClick={handleJoinWaitlist}
+            <Link href="#contact"
               className="bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-500 transition-colors duration-300"
             >
-              Join Waitlist
-            </button>
+              Contact Us
+            </Link>
           </div>
 
           <button

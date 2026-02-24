@@ -53,36 +53,6 @@ export default function VerificationClientPage({
 
   const productCode = verificationData.productCode;
 
-  /* ================= REDIRECT TIMER ================= */
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const redirectRef = useRef<NodeJS.Timeout | null>(null);
-
-  const startCountdown = () => {
-    setCountdown(60);
-    redirectRef.current = setInterval(() => {
-      setCountdown(prev => {
-        if (prev === null) return null;
-        if (prev <= 1) {
-          clearInterval(redirectRef.current!);
-          router.replace('/');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const stopCountdown = () => {
-    if (redirectRef.current) clearInterval(redirectRef.current);
-    setCountdown(null);
-  };
-
-  useEffect(() => () => stopCountdown(), []);
-
-  /* ================= REPORT UNLOCK TIMER ================= */
-  const [reportUnlockTimer, setReportUnlockTimer] = useState(0);
-  const unlockRef = useRef<NodeJS.Timeout | null>(null);
-
   /* ================= STATE ================= */
   const [showScratchDialog, setShowScratchDialog] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -104,6 +74,22 @@ export default function VerificationClientPage({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
+  /* ================= REPORT UNLOCK TIMER ================= */
+  const [reportUnlockTimer, setReportUnlockTimer] = useState(0);
+  const unlockRef = useRef<NodeJS.Timeout | null>(null);
+
+  /* ================= HANDLE DIALOG CLOSE ================= */
+  const handleDialogClose = (open: boolean, setter: (open: boolean) => void) => {
+    if (!open) {
+      router.push('/');
+    }
+    setter(open);
+  };
+
+  const handleXClick = () => {
+    router.push('/');
+  };
+
   /* ================= VERIFY ================= */
   const verifyScratchCode = async () => {
     const sanitizedInput = scratchCodeInput.trim().toUpperCase().replace(/\s/g, '');
@@ -124,7 +110,6 @@ export default function VerificationClientPage({
       if (sanitizedInput !== productCode.scratchCode.toUpperCase()) {
         setShowScratchDialog(false);
         setShowNotAuthenticDialog(true);
-        startCountdown();
         return;
       }
 
@@ -138,7 +123,6 @@ export default function VerificationClientPage({
       setVerificationCount(data.verificationCount);
       setShowScratchDialog(false);
       setShowSuccessDialog(true);
-      startCountdown();
 
       if (data.verificationCount > 1) {
         setReportUnlockTimer(5);
@@ -252,7 +236,7 @@ export default function VerificationClientPage({
         setImagePreview(null);
         
         setShowFakeReportDialog(false);
-        startCountdown();
+        router.push('/');
       } else {
         throw new Error(data.message || 'Report submission failed');
       }
@@ -277,6 +261,10 @@ export default function VerificationClientPage({
     if (code.length <= 4) return code;
     if (code.length <= 8) return `${code.slice(0, 4)}-${code.slice(4)}`;
     return `${code.slice(0, 4)}-${code.slice(4, 8)}-${code.slice(8, 12)}`;
+  };
+
+  const handleBackToHome = () => {
+    router.push('/');
   };
 
   return (
@@ -346,8 +334,15 @@ export default function VerificationClientPage({
         )}
 
         {/* Scratch Code Dialog */}
-        <Dialog open={showScratchDialog} onOpenChange={setShowScratchDialog}>
-          <DialogContent className="sm:max-w-md border-0 shadow-xl">
+        <Dialog open={showScratchDialog} onOpenChange={(open) => handleDialogClose(open, setShowScratchDialog)}>
+          <DialogContent className="sm:max-w-md border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+            <button
+              onClick={handleXClick}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </button>
             <DialogHeader className="space-y-4">
               <div className="mx-auto p-3 bg-cyan-50 rounded-full w-16 h-16 flex items-center justify-center">
                 <Key className="h-8 w-8 text-cyan-600" />
@@ -410,8 +405,15 @@ export default function VerificationClientPage({
         </Dialog>
 
         {/* Success Dialog */}
-        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-          <DialogContent className="sm:max-w-xl border-0 shadow-xl">
+        <Dialog open={showSuccessDialog} onOpenChange={(open) => handleDialogClose(open, setShowSuccessDialog)}>
+          <DialogContent className="sm:max-w-xl border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+            <button
+              onClick={handleXClick}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </button>
             <div className="space-y-6">
               {/* Success Header */}
               <div className="text-center space-y-4">
@@ -419,7 +421,7 @@ export default function VerificationClientPage({
                   <Check className="h-8 w-8 text-green-600" />
                 </div>
                 <div>
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-4 py-1.5 text-sm font-medium">
+                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100 px-4 py-1.5 text-sm font-medium mb-4">
                     ✅ Verified Authentic
                   </Badge>
                   <DialogTitle className="text-xl text-gray-900 mt-4">
@@ -491,34 +493,30 @@ export default function VerificationClientPage({
                 </CardContent>
               </Card>
 
-              {/* Countdown & Actions */}
-              {countdown !== null && (
-                <div className="space-y-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        Redirecting in <span className="font-bold">{countdown}s</span>
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      onClick={() => router.replace('/')}
-                      className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50"
-                    >
-                      <Home className="h-4 w-4 mr-2" />
-                      Return Home
-                    </Button>
-                  </div>
-                </div>
-              )}
+              {/* Back to Home Button */}
+              <div className="flex justify-center pt-4">
+                <Button
+                  onClick={handleBackToHome}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  Back to Home
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
 
         {/* Not Authentic Dialog */}
-        <Dialog open={showNotAuthenticDialog} onOpenChange={setShowNotAuthenticDialog}>
-          <DialogContent className="sm:max-w-md border-0 shadow-xl">
+        <Dialog open={showNotAuthenticDialog} onOpenChange={(open) => handleDialogClose(open, setShowNotAuthenticDialog)}>
+          <DialogContent className="sm:max-w-md border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+            <button
+              onClick={handleXClick}
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </button>
             <div className="text-center space-y-6">
               <div className="mx-auto p-3 bg-red-50 rounded-full w-16 h-16 flex items-center justify-center">
                 <X className="h-8 w-8 text-red-600" />
@@ -535,257 +533,193 @@ export default function VerificationClientPage({
                 </DialogDescription>
               </div>
               
-              {countdown !== null && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4" />
-                    <span>Redirecting in <span className="font-bold">{countdown}s</span></span>
-                  </div>
-                  <Button
-                    onClick={() => router.replace('/')}
-                    className="w-full bg-gray-900 hover:bg-gray-800 text-white"
-                  >
-                    Return to Homepage
-                  </Button>
-                </div>
-              )}
+              <Button
+                onClick={handleBackToHome}
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+              >
+                Back to Home
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
 
         {/* Report Dialog with Scroll Area */}
-        <Dialog open={showFakeReportDialog} onOpenChange={setShowFakeReportDialog}>
-          <DialogContent className="sm:max-w-lg border-0 shadow-xl max-h-[85vh] p-0 overflow-hidden">
-             <ScrollArea className="h-[400px] w-full ">
-            <DialogHeader className="px-6 pt-6 pb-4 border-b">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-red-50 rounded-lg">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
+        <Dialog open={showFakeReportDialog} onOpenChange={(open) => handleDialogClose(open, setShowFakeReportDialog)}>
+          <DialogContent className="sm:max-w-lg border-0 shadow-xl max-h-[85vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
+            <button
+              onClick={handleXClick}
+              className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </button>
+            <ScrollArea className="h-[400px] w-full">
+              <DialogHeader className="px-6 pt-6 pb-4 border-b">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-red-50 rounded-lg">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl text-gray-900">Report Suspected Counterfeit</DialogTitle>
+                    <DialogDescription className="text-gray-600">
+                      Help us fight counterfeits by providing details
+                    </DialogDescription>
+                  </div>
                 </div>
-                <div>
-                  <DialogTitle className="text-xl text-gray-900">Report Suspected Counterfeit</DialogTitle>
-                  <DialogDescription className="text-gray-600">
-                    Help us fight counterfeits by providing details
-                  </DialogDescription>
-                </div>
-              </div>
-            </DialogHeader>
+              </DialogHeader>
 
-            {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              <div className="space-y-6">
-                {/* Product Summary */}
-                <Card className="bg-gray-50 border-gray-200">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-900">
-                      Product Being Reported
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs text-gray-500">Product</Label>
-                        <p className="text-sm font-medium">{productCode.productName}</p>
+              {/* Scrollable content area */}
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="space-y-6">
+                  {/* Product Summary */}
+                  <Card className="bg-gray-50 border-gray-200">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-gray-900">
+                        Product Being Reported
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs text-gray-500">Product</Label>
+                          <p className="text-sm font-medium">{productCode.productName}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-500">Manufacturer</Label>
+                          <p className="text-sm font-medium">{productCode.companyName}</p>
+                        </div>
                       </div>
-                      <div>
-                        <Label className="text-xs text-gray-500">Manufacturer</Label>
-                        <p className="text-sm font-medium">{productCode.companyName}</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs text-gray-500">Batch ID</Label>
+                          <p className="text-sm font-medium">{productCode.batchId}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-500">Code Entered</Label>
+                          <p className="text-sm font-mono bg-white px-2 py-1 rounded border">
+                            {formatScratchCode(scratchCodeInput)}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                          <Mail className="inline h-4 w-4 mr-1 text-gray-500" />
+                          Email Address
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="your.email@example.com"
+                          value={reportData.email}
+                          onChange={(e) =>
+                            setReportData({ ...reportData, email: e.target.value })
+                          }
+                          className="border-gray-300"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                          <Phone className="inline h-4 w-4 mr-1 text-gray-500" />
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          value={reportData.phone}
+                          onChange={(e) =>
+                            setReportData({ ...reportData, phone: e.target.value })
+                          }
+                          className="border-gray-300"
+                        />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs text-gray-500">Batch ID</Label>
-                        <p className="text-sm font-medium">{productCode.batchId}</p>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-500">Code Entered</Label>
-                        <p className="text-sm font-mono bg-white px-2 py-1 rounded border">
-                          {formatScratchCode(scratchCodeInput)}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                        <Mail className="inline h-4 w-4 mr-1 text-gray-500" />
-                        Email Address
+                      <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                        <MapPin className="inline h-4 w-4 mr-1 text-gray-500" />
+                        Purchase Location *
                       </Label>
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="your.email@example.com"
-                        value={reportData.email}
+                        id="location"
+                        placeholder="Store name, address, or online retailer"
+                        value={reportData.purchaseLocation}
                         onChange={(e) =>
-                          setReportData({ ...reportData, email: e.target.value })
+                          setReportData({ ...reportData, purchaseLocation: e.target.value })
                         }
-                        className="border-gray-300"
+                        className="border-amber-300 focus:border-amber-500 focus:ring-amber-200"
+                        required
                       />
+                      <p className="text-xs text-gray-500">
+                        Required to help track counterfeit sources
+                      </p>
                     </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                        <Phone className="inline h-4 w-4 mr-1 text-gray-500" />
-                        Phone Number
+                      <Label htmlFor="additional-info" className="text-sm font-medium text-gray-700">
+                        <Info className="inline h-4 w-4 mr-1 text-gray-500" />
+                        Additional Information
                       </Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        value={reportData.phone}
-                        onChange={(e) =>
-                          setReportData({ ...reportData, phone: e.target.value })
-                        }
-                        className="border-gray-300"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-sm font-medium text-gray-700">
-                      <MapPin className="inline h-4 w-4 mr-1 text-gray-500" />
-                      Purchase Location *
-                    </Label>
-                    <Input
-                      id="location"
-                      placeholder="Store name, address, or online retailer"
-                      value={reportData.purchaseLocation}
-                      onChange={(e) =>
-                        setReportData({ ...reportData, purchaseLocation: e.target.value })
-                      }
-                      className="border-amber-300 focus:border-amber-500 focus:ring-amber-200"
-                      required
-                    />
-                    <p className="text-xs text-gray-500">
-                      Required to help track counterfeit sources
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="additional-info" className="text-sm font-medium text-gray-700">
-                      <Info className="inline h-4 w-4 mr-1 text-gray-500" />
-                      Additional Information
-                    </Label>
-                    <Textarea
-                      id="additional-info"
-                      placeholder="Please provide details about why you suspect this is counterfeit. For example:
+                      <Textarea
+                        id="additional-info"
+                        placeholder="Please provide details about why you suspect this is counterfeit. For example:
 • Where and when did you purchase it?
 • What seems unusual or different from genuine products?
 • Any other concerns or observations?"
-                      value={reportData.additionalInfo}
-                      onChange={(e) =>
-                        setReportData({ ...reportData, additionalInfo: e.target.value })
-                      }
-                      rows={4}
-                      className="border-gray-300 resize-none"
-                    />
-                  </div>
-
-                  {/* <div className="space-y-3">
-                    <Label className="text-sm font-medium text-gray-700">
-                      <Camera className="inline h-4 w-4 mr-1 text-gray-500" />
-                      Product Photo (Optional)
-                    </Label>
-                    
-                    {!imagePreview ? (
-                      <label className="block">
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-amber-400 hover:bg-amber-50 transition-colors cursor-pointer">
-                          <div className="space-y-3">
-                            <Upload className="h-10 w-10 text-gray-400 mx-auto" />
-                            <div>
-                              <p className="text-sm font-medium text-gray-700">Upload product photo</p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Click to select or drag and drop
-                              </p>
-                              <p className="text-xs text-gray-400 mt-2">
-                                Supports JPG, PNG up to 5MB
-                              </p>
-                            </div>
-                          </div>
-                          <input
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                          />
-                        </div>
-                      </label>
-                    ) : (
-                      <div className="space-y-3">
-                        <div className="relative border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                          <img
-                            src={imagePreview}
-                            alt="Product preview"
-                            className="w-full h-64 object-contain"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            className="absolute top-3 right-3 bg-white/90 hover:bg-white shadow-sm"
-                            onClick={removeImage}
-                          >
-                            <X className="h-4 w-4" />
-                            Remove
-                          </Button>
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          Image uploaded successfully. You can remove it if needed.
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-start space-x-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-                      <Info className="h-3 w-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                      <p>
-                        Helpful photos include: product packaging, scratch panel area, 
-                        any suspicious details, or comparison with genuine product if available.
-                      </p>
+                        value={reportData.additionalInfo}
+                        onChange={(e) =>
+                          setReportData({ ...reportData, additionalInfo: e.target.value })
+                        }
+                        rows={4}
+                        className="border-gray-300 resize-none"
+                      />
                     </div>
-                  </div>*/}
-                </div> 
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <DialogFooter className="px-6 py-4 border-t bg-gray-50">
-              <div className="flex flex-col w-full space-y-3 sm:space-y-0 sm:flex-row sm:justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowFakeReportDialog(false);
-                    // Reset form
-                    setReportData({
-                      email: '',
-                      phone: '',
-                      purchaseLocation: '',
-                      additionalInfo: '',
-                      productPhoto: null,
-                    });
-                    setImagePreview(null);
-                  }}
-                  className="w-full sm:w-auto"
-                  disabled={isSubmittingReport}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={submitFakeReport}
-                  disabled={isSubmittingReport || (!reportData.email.trim() && !reportData.phone.trim()) || !reportData.purchaseLocation.trim()}
-                  className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmittingReport ? (
-                    <>
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Report'
-                  )}
-                </Button>
-              </div>
-            </DialogFooter>
+              <DialogFooter className="px-6 py-4 border-t bg-gray-50">
+                <div className="flex flex-col w-full space-y-3 sm:space-y-0 sm:flex-row sm:justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowFakeReportDialog(false);
+                      // Reset form
+                      setReportData({
+                        email: '',
+                        phone: '',
+                        purchaseLocation: '',
+                        additionalInfo: '',
+                        productPhoto: null,
+                      });
+                      setImagePreview(null);
+                    }}
+                    className="w-full sm:w-auto"
+                    disabled={isSubmittingReport}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={submitFakeReport}
+                    disabled={isSubmittingReport || (!reportData.email.trim() && !reportData.phone.trim()) || !reportData.purchaseLocation.trim()}
+                    className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmittingReport ? (
+                      <>
+                        <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Report'
+                    )}
+                  </Button>
+                </div>
+              </DialogFooter>
             </ScrollArea>
           </DialogContent>
         </Dialog>

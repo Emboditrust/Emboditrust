@@ -9,18 +9,15 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Area,
+  AreaChart,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Users,
   Package,
-  Gift,
   TrendingUp,
   Shield,
-  Clock,
-  Wallet,
-  RefreshCw,
 } from "lucide-react";
 import { GoBell } from "react-icons/go";
 import { HiOutlineUserGroup } from "react-icons/hi2";
@@ -38,39 +35,25 @@ export default function DashboardPage() {
   const fetchAll = async () => {
     try {
       setRefreshing(true);
-      const [statsRes, verifsRes, clientsRes, topRes, activityRes] =
-        await Promise.all([
-          fetch("/api/admin/dashboard/stats"),
-          fetch("/api/admin/dashboard/verifications/monthly"),
-          fetch("/api/admin/dashboard/clients/monthly"),
-          fetch("/api/admin/dashboard/clients/top"),
-          fetch("/api/admin/dashboard/activity/recent"),
-        ]);
+      const [
+        statsRes,
+        verifsRes,
+        clientsRes,
+        topRes,
+        activityRes,
+      ] = await Promise.all([
+        fetch("/api/admin/dashboard/stats"),
+        fetch("/api/admin/dashboard/verifications/monthly"),
+        fetch("/api/admin/dashboard/clients/monthly"),
+        fetch("/api/admin/dashboard/clients/top"),
+        fetch("/api/admin/dashboard/activity/recent"),
+      ]);
 
-      if (statsRes.ok) {
-        const json = await statsRes.json();
-        setStats(json.stats);
-      }
-
-      if (verifsRes.ok) {
-        const json = await verifsRes.json();
-        setVerificationsMonthly(json.data || []);
-      }
-
-      if (clientsRes.ok) {
-        const json = await clientsRes.json();
-        setClientsMonthly(json.data || []);
-      }
-
-      if (topRes.ok) {
-        const json = await topRes.json();
-        setTopClients(json.data || []);
-      }
-
-      if (activityRes.ok) {
-        const json = await activityRes.json();
-        setRecentActivity(json.data || []);
-      }
+      if (statsRes.ok) setStats((await statsRes.json()).stats);
+      if (verifsRes.ok) setVerificationsMonthly((await verifsRes.json()).data || []);
+      if (clientsRes.ok) setClientsMonthly((await clientsRes.json()).data || []);
+      if (topRes.ok) setTopClients((await topRes.json()).data || []);
+      if (activityRes.ok) setRecentActivity((await activityRes.json()).data || []);
     } catch (err) {
       console.error("Dashboard fetch error", err);
     } finally {
@@ -79,349 +62,218 @@ export default function DashboardPage() {
     }
   };
 
+  function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="bg-white border rounded-lg shadow-md px-4 py-2">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm font-semibold text-indigo-600">
+        total: {payload[0].value}
+      </p>
+    </div>
+  );
+}
+
+
   useEffect(() => {
     fetchAll();
-
-    // Auto-refresh every 5 minutes
     const interval = setInterval(fetchAll, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
   const StatCard = ({ icon: Icon, label, value, growth, color }: any) => (
-    <Card className="relative overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className={`p-3 rounded-lg  ${color}`}>
-             <Icon className="h-6 w-6 rounded-md " />
-           
+    <Card>
+      <CardContent className="p-6 flex items-start justify-between">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl ${color}`}>
+            <Icon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-sm text-gray-500 mb-1">{label}</p>
-            <h3 className="text-2xl font-bold text-gray-900">
+            <p className="text-sm text-gray-500">{label}</p>
+            <p className="text-2xl font-bold text-gray-900">
               {loading ? "..." : value}
-            </h3>
-          </div>
-          <div>
-            {growth && (
-              <div className="flex items-center gap-1 mt-2">
-                <TrendingUp className="h-4 w-4 text-green-500" />
-                <span className="text-sm font-medium text-green-500">
-                  {growth}
-                </span>
-              </div>
-            )}
+            </p>
           </div>
         </div>
+        {growth && (
+          <span className="text-sm text-green-500 font-medium flex items-center gap-1">
+            <TrendingUp className="w-4 h-4" />
+            {growth}
+          </span>
+        )}
       </CardContent>
     </Card>
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {/* Header */}
-        <header className="bg-white border-b md:block hidden border-gray-200 px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Admin Dashboard
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                System overview and key metrics
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <GoBell className="h-5 w-5 text-gray-600" />
-              </button>
-              <div className="flex items-center gap-3">
-                
-                <img
-                  src="https://github.com/shadcn.png"
-                  alt="Admin User"
-                  className="w-8 h-8 rounded-full grayscale object-cover"
-                />
-                <span className="font-medium text-[14px] text-gray-900">Admin User</span>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b px-8 py-6 hidden md:block">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Admin Dashboard
+            </h2>
+            <p className="text-sm text-gray-500">
+              System overview and key metrics
+            </p>
           </div>
-        </header>
-
-        <div className="p-8">
-          {/* Analytics Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Analytics</h3>
-              <div className="flex gap-2">
-                {["Day", "Week", "Month", "Year"].map((period) => (
-                  <Button
-                    key={period}
-                    variant={selectedPeriod === period ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedPeriod(period)}
-                    className={
-                      selectedPeriod === period
-                        ? "bg-cyan-400 hover:bg-cyan-500 text-white"
-                        : ""
-                    }
-                  >
-                    {period}
-                  </Button>
-                ))}
-              </div>
+          <div className="flex items-center gap-4">
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <GoBell className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="flex items-center gap-3">
+              <img
+                src="https://github.com/shadcn.png"
+                className="w-8 h-8 rounded-full"
+                alt="Admin"
+              />
+              <span className="text-sm font-medium">Admin User</span>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-              <StatCard
-                icon={HiOutlineUserGroup}
-                label="Total Clients"
-                value={stats?.totalClients || "0"}
-                growth="+12"
-                color="text-blue-500 "
-               
-              />
-              <StatCard
-                icon={Package}
-                label="Active Products"
-                value={stats?.activeProducts?.toLocaleString() || "0"}
-                growth="+89"
-                color="text-gray-700"
-              />
-
-              <StatCard
-                icon={Shield}
-                label="Total Verifications"
-                value={stats?.totalVerifications?.toLocaleString() || "0"}
-                growth={
-                  stats?.monthlyGrowth ? `+${stats.monthlyGrowth}%` : "+0%"
-                }
-                color="text-cyan-400"
-              />
-            </div>
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Client Growth</CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">
-                      New clients{" "}
-                      <span className="text-green-500 font-medium">
-                        ↑ +2.45%
-                      </span>
-                    </p>
-                  </div>
-                  <button className="p-2 hover:bg-gray-100 rounded">
-                    <TrendingUp className="h-5 w-5 text-gray-600" />
-                  </button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={clientsMonthly}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="month"
-                      tick={{ fill: "#94A3B8", fontSize: 12 }}
-                    />
-                    <YAxis tick={{ fill: "#94A3B8", fontSize: 12 }} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="total"
-                      stroke="#1e3a8a"
-                      strokeWidth={3}
-                      dot={false}
-                      activeDot={{ r: 6, fill: "#1e3a8a" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Verification Trend</CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Millions{" "}
-                      <span className="text-green-500 font-medium">
-                        ↑ +2.45%
-                      </span>
-                    </p>
-                  </div>
-                  <button className="p-2 hover:bg-gray-100 rounded">
-                    <TrendingUp className="h-5 w-5 text-gray-600" />
-                  </button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={260}>
-                  <LineChart data={verificationsMonthly}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="month"
-                      tick={{ fill: "#94A3B8", fontSize: 12 }}
-                    />
-                    <YAxis tick={{ fill: "#94A3B8", fontSize: 12 }} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="total"
-                      stroke="#6366f1"
-                      strokeWidth={3}
-                      dot={false}
-                      activeDot={{ r: 6, fill: "#6366f1" }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Bottom Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activities</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {loading ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Loading...
-                    </div>
-                  ) : recentActivity.length ? (
-                    recentActivity
-                      .slice(0, 5)
-                      .map((activity: any, idx: number) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 pb-4 border-b last:border-0"
-                        >
-                          <div className="w-1 h-12 bg-indigo-600 rounded-full" />
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm text-gray-900">
-                              {activity.type || "New client registered"}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {activity.companyName ||
-                                activity.details ||
-                                "BeautyTech Ltd"}
-                            </p>
-                          </div>
-                          <span className="text-xs text-gray-400">
-                            {activity.timestamp
-                              ? new Date(
-                                  activity.timestamp
-                                ).toLocaleTimeString()
-                              : "5 min ago"}
-                          </span>
-                        </div>
-                      ))
-                  ) : (
-                    <>
-                      <ActivityItem
-                        title="No  recent activities"
-                        company=""
-                        time=""
-                      />
-                      
-                      
-                      
-                      
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Clients by Verifications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {loading ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Loading...
-                    </div>
-                  ) : topClients.length ? (
-                    topClients.slice(0, 5).map((client: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between pb-4 border-b last:border-0"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-1 h-12 bg-indigo-600 rounded-full" />
-                          <div>
-                            <p className="font-semibold text-sm text-gray-900">
-                              {client.companyName}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {client.productCount || client.manufacturerId}{" "}
-                              active products
-                            </p>
-                          </div>
-                        </div>
-                        <span className="font-bold text-gray-900">
-                          {client.totalVerifications?.toLocaleString() ||
-                            client.verifications?.toLocaleString()}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <>
-                      <ClientItem
-                        name="No data found"
-                        products=""
-                        count=""
-                      />
-                      
-                      
-                     
-                      
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
+      </header>
+
+      <main className="p-8 space-y-8">
+        {/* Analytics */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold">Analytics</h3>
+            <div className="flex gap-2">
+              {["Day", "Week", "Month", "Year"].map((p) => (
+                <Button
+                  key={p}
+                  size="sm"
+                  variant={selectedPeriod === p ? "default" : "outline"}
+                  className={
+                    selectedPeriod === p
+                      ? "bg-cyan-400 text-white hover:bg-cyan-500"
+                      : ""
+                  }
+                  onClick={() => setSelectedPeriod(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatCard
+              icon={HiOutlineUserGroup}
+              label="Total Clients"
+              value={stats?.totalClients || 0}
+              growth="+12"
+              color="bg-blue-50 text-blue-600"
+            />
+            <StatCard
+              icon={Package}
+              label="Active Products"
+              value={stats?.activeProducts || 0}
+              growth="+89"
+              color="bg-gray-100 text-gray-700"
+            />
+            <StatCard
+              icon={Shield}
+              label="Total Verifications"
+              value={stats?.totalVerifications || 0}
+              growth="+2.45%"
+              color="bg-cyan-50 text-cyan-600"
+            />
+          </div>
+        </section>
+
+        {/* Charts */}
+        <section className="grid grid-cols-1 my-6 lg:grid-cols-2 gap-6">
+          {/* Client Growth */}
+          <Card>
+  <CardHeader>
+    <CardTitle>Client Growth</CardTitle>
+    <p className="text-sm text-gray-500">
+      New clients <span className="text-green-500 font-medium">+2.45%</span>
+    </p>
+  </CardHeader>
+
+  <CardContent>
+    <ResponsiveContainer width="100%" height={260}>
+      <AreaChart data={clientsMonthly}>
+        <defs>
+          <linearGradient id="clientGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#2563eb" stopOpacity={0.25} />
+            <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        <XAxis
+          dataKey="month"
+          tick={{ fill: "#94A3B8", fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
+        />
+
+        <YAxis
+          domain={[0, (dataMax: number) => Math.max(dataMax + 2, 5)]}
+          tick={{ fill: "#94A3B8", fontSize: 12 }}
+          axisLine={false}
+          tickLine={false}
+        />
+
+        <Tooltip content={<CustomTooltip />} />
+
+        <Area
+          type="monotone"
+          dataKey="total"
+          stroke="#2563eb"
+          strokeWidth={3}
+          fill="url(#clientGradient)"
+          dot={false}
+          activeDot={{ r: 6, fill: "#2563eb" }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </CardContent>
+</Card>
+
+
+          {/* Verification Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Verification Trend</CardTitle>
+              <p className="text-sm text-gray-500">
+                Millions <span className="text-green-500">+2.45%</span>
+              </p>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={260}>
+                <AreaChart data={verificationsMonthly}>
+                  <defs>
+                    <linearGradient id="verifyGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+
+                  <XAxis dataKey="month" tick={{ fill: "#94A3B8" }} />
+                  <YAxis tick={{ fill: "#94A3B8" }} />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    stroke="#6366f1"
+                    strokeWidth={3}
+                    fill="url(#verifyGradient)"
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </section>
       </main>
     </div>
-  );
-}
 
-function ActivityItem({ title, company, time }: any) {
-  return (
-    <div className="flex items-start gap-3 pb-4 border-b last:border-0">
-      <div className="w-1 h-12 bg-indigo-600 rounded-full" />
-      <div className="flex-1">
-        <p className="font-semibold text-sm text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500">{company}</p>
-      </div>
-      <span className="text-xs text-gray-400">{time}</span>
-    </div>
-  );
-}
-
-function ClientItem({ name, products, count }: any) {
-  return (
-    <div className="flex items-center justify-between pb-4 border-b last:border-0">
-      <div className="flex items-center gap-3">
-        <div className="w-1 h-12 bg-indigo-600 rounded-full" />
-        <div>
-          <p className="font-semibold text-sm text-gray-900">{name}</p>
-          <p className="text-sm text-gray-500">{products}</p>
-        </div>
-      </div>
-      <span className="font-bold text-gray-900">{count}</span>
-    </div>
+    
   );
 }
