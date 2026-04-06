@@ -68,24 +68,24 @@ export async function POST(request: NextRequest) {
       if (process.env.RESEND_API_KEY) {
         // Email to user (confirmation)
         const userEmailHtml = createEmailTemplate({
-          title: 'Message Received - Emboditrust Healthcare',
+          title: 'Message Received - Emboditrust',
           content: `
             <p>Dear ${name},</p>
-            <p>Thank you for contacting Emboditrust Healthcare. We have received your message and our support team will get back to you as soon as possible.</p>
+            <p>Thank you for contacting Emboditrust. We have received your message and our support team will get back to you as soon as possible.</p>
             <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
               <p><strong>Your Message:</strong></p>
               <p>${content.replace(/\n/g, '<br>')}</p>
             </div>
             <p><strong>Reference ID:</strong> MSG-${savedMessage._id.toString().slice(-8).toUpperCase()}</p>
-            <p>Best regards,<br>Emboditrust Healthcare Team</p>
+            <p>Best regards,<br>Emboditrust Team</p>
           `,
         });
         
         const userEmailResult = await sendEmail({
           to: email,
-          subject: 'Message Received - Emboditrust Healthcare',
+          subject: 'Message Received - Emboditrust',
           html: userEmailHtml,
-          from: 'Emboditrust Healthcare <support@emboditrust.com>',
+          from: 'Emboditrust <support@emboditrust.com>',
           replyTo: 'support@emboditrust.com',
         });
         
