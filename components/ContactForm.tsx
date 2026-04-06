@@ -104,7 +104,7 @@ export default function ContactForm() {
               </h3>
               
               <p className="text-gray-600 mb-6">
-                Thank you for contacting Emboditrust Healthcare. We have received your message and our support team will get back to you as soon as possible.
+                Thank you for contacting Emboditrust. We have received your message and our support team will get back to you as soon as possible.
               </p>
               
               {referenceId && (
