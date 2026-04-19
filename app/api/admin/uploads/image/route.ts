@@ -54,10 +54,16 @@ export async function POST(request: NextRequest) {
       url: uploadResult.url,
       publicId: uploadResult.publicId,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Admin image upload error:', error);
+
+    const message =
+      typeof error?.message === 'string' && error.message.trim().length > 0
+        ? error.message
+        : 'Failed to upload image';
+
     return NextResponse.json(
-      { error: 'Internal server error', message: 'Failed to upload image' },
+      { error: 'Internal server error', message },
       { status: 500 }
     );
   }

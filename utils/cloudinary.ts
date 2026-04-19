@@ -1,5 +1,22 @@
 import { v2 as cloudinary } from 'cloudinary';
 
+const REQUIRED_CLOUDINARY_ENV = [
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET',
+] as const;
+
+function getMissingCloudinaryEnv(): string[] {
+  return REQUIRED_CLOUDINARY_ENV.filter((key) => !process.env[key]);
+}
+
+function assertCloudinaryConfigured(): void {
+  const missing = getMissingCloudinaryEnv();
+  if (missing.length > 0) {
+    throw new Error(`Missing Cloudinary environment variables: ${missing.join(', ')}`);
+  }
+}
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,6 +32,8 @@ export class CloudinaryService {
     folder: string = 'emboditrust/uploads'
   ): Promise<{ url: string; publicId: string }> {
     try {
+      assertCloudinaryConfigured();
+
       const result = await cloudinary.uploader.upload(imageData, {
         public_id: publicId,
         folder,
@@ -30,9 +49,15 @@ export class CloudinaryService {
         url: result.secure_url,
         publicId: result.public_id,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Cloudinary upload error:', error);
-      throw new Error('Failed to upload image to Cloudinary');
+
+      const message =
+        typeof error?.message === 'string' && error.message.trim().length > 0
+          ? error.message
+          : 'Failed to upload image to Cloudinary';
+
+      throw new Error(message);
     }
   }
 
