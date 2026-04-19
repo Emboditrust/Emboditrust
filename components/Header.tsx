@@ -6,42 +6,43 @@ import { useState } from 'react';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-  const handleJoinWaitlist = () => {
-    // Redirect directly to Google Form
-    window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSd3Rx0VAHmR8jNddlyjhSVQtosZnURwM2P2gnQDu1puYXH1KQ/viewform';
-  };
-
   const navItems = [
-    { href: '#about', label: 'About Emboditrust' },
-    { href: '#features', label: 'Features' },
-    { href: '#products', label: 'Products' },
+    { href: '#features', label: 'Verification' },
+    { href: '#products', label: 'Templates' },
     { href: '#industries', label: 'Industries' },
-    { href: '#contact', label: 'Contact Us' },
+    { href: '#contact', label: 'Contact' },
   ];
 
   return (
-    <header className="bg-white font-headerAlt shadow-sm fixed w-full top-0 z-50">
-      <nav className="container mx-auto px-6 py-4">
+    <header className="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm">
+      <nav className="container mx-auto px-4 py-4 md:px-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            {/* <div className="w-8 h-8 bg-blue-600 rounded-lg"></div> */}
-            <span className="text-xl font-bold text-gray-800">EmbodiTrust</span>
+            <div className="h-8 w-8 rounded-full bg-emerald-600" />
+            <span className="text-lg font-semibold text-slate-900">EmbodiTrust</span>
           </div>
           
-          <div className="hidden md:flex space-x-8 items-center">
-            {navItems.slice(0, -1).map((item) => (
+          <div className="hidden md:flex space-x-7 items-center">
+            {navItems.slice(0, 3).map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="text-gray-600 hover:text-emerald-500 transition-colors duration-300"
+                className="text-sm text-slate-600 transition-colors duration-300 hover:text-emerald-600"
               >
                 {item.label}
               </a>
             ))}
-            <Link href="#contact"
-              className="bg-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-emerald-500 transition-colors duration-300"
+            <Link
+              href="/admin-login"
+              className="text-sm font-medium text-emerald-600"
             >
-              Contact Us
+              Sign in
+            </Link>
+            <Link
+              href="#contact"
+              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-emerald-500"
+            >
+              Create my protection flow
             </Link>
           </div>
 
@@ -56,30 +57,25 @@ export default function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden mt-4 space-y-4">
+          <div className="mt-4 space-y-4 md:hidden">
             {navItems.map((item) => (
-              item.href === '#contact' ? (
-                <button
-                  key={item.href}
-                  onClick={handleJoinWaitlist}
-                  className="block w-full text-left text-gray-600 hover:text-blue-800 transition-colors duration-300"
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="block text-gray-600 hover:text-blue-600 transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              )
+              <a
+                key={item.href}
+                href={item.href}
+                className="block text-slate-600 transition-colors duration-300 hover:text-emerald-600"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.label}
+              </a>
             ))}
+            <Link href="/admin-login" className="block text-slate-600">Sign in</Link>
+            <Link href="#contact" className="block rounded-full bg-emerald-600 px-4 py-2 text-center font-semibold text-white">
+              Create my protection flow
+            </Link>
           </div>
         )}
       </nav>
     </header>
   );
 }
+

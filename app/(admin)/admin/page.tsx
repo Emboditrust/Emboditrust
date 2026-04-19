@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -66,9 +64,11 @@ export default function DashboardPage() {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="bg-white border rounded-lg shadow-md px-4 py-2">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-sm font-semibold text-indigo-600">
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 px-4 py-3 shadow-[0_18px_40px_-24px_rgba(15,23,42,0.35)] backdrop-blur-sm">
+      <p className="text-xs font-medium uppercase tracking-[0.24em] text-slate-400">
+        {label}
+      </p>
+      <p className="mt-1 text-sm font-semibold text-slate-700">
         total: {payload[0].value}
       </p>
     </div>
@@ -200,10 +200,21 @@ export default function DashboardPage() {
       <AreaChart data={clientsMonthly}>
         <defs>
           <linearGradient id="clientGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2563eb" stopOpacity={0.25} />
-            <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.34} />
+            <stop offset="72%" stopColor="#60a5fa" stopOpacity={0.14} />
+            <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.02} />
           </linearGradient>
+          <linearGradient id="clientStroke" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#7dd3fc" />
+            <stop offset="50%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+          <filter id="clientGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="12" stdDeviation="12" floodColor="#2563eb" floodOpacity="0.18" />
+          </filter>
         </defs>
+
+        <CartesianGrid vertical={false} stroke="#e2e8f0" strokeDasharray="4 8" />
 
         <XAxis
           dataKey="month"
@@ -224,11 +235,14 @@ export default function DashboardPage() {
         <Area
           type="monotone"
           dataKey="total"
-          stroke="#2563eb"
-          strokeWidth={3}
+          stroke="url(#clientStroke)"
+          strokeWidth={4}
           fill="url(#clientGradient)"
           dot={false}
-          activeDot={{ r: 6, fill: "#2563eb" }}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter="url(#clientGlow)"
+          activeDot={{ r: 6, fill: "#ffffff", stroke: "#2563eb", strokeWidth: 3 }}
         />
       </AreaChart>
     </ResponsiveContainer>
@@ -249,22 +263,44 @@ export default function DashboardPage() {
                 <AreaChart data={verificationsMonthly}>
                   <defs>
                     <linearGradient id="verifyGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#818cf8" stopOpacity={0.32} />
+                      <stop offset="72%" stopColor="#6366f1" stopOpacity={0.12} />
+                      <stop offset="100%" stopColor="#c7d2fe" stopOpacity={0.02} />
                     </linearGradient>
+                    <linearGradient id="verifyStroke" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#a5b4fc" />
+                      <stop offset="55%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#4338ca" />
+                    </linearGradient>
+                    <filter id="verifyGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="12" stdDeviation="12" floodColor="#4f46e5" floodOpacity="0.18" />
+                    </filter>
                   </defs>
 
-                  <XAxis dataKey="month" tick={{ fill: "#94A3B8" }} />
-                  <YAxis tick={{ fill: "#94A3B8" }} />
-                  <Tooltip />
+                  <CartesianGrid vertical={false} stroke="#e2e8f0" strokeDasharray="4 8" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fill: "#94A3B8", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: "#94A3B8", fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
                     dataKey="total"
-                    stroke="#6366f1"
-                    strokeWidth={3}
+                    stroke="url(#verifyStroke)"
+                    strokeWidth={4}
                     fill="url(#verifyGradient)"
                     dot={false}
-                    activeDot={{ r: 6 }}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#verifyGlow)"
+                    activeDot={{ r: 6, fill: "#ffffff", stroke: "#4f46e5", strokeWidth: 3 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>

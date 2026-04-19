@@ -298,6 +298,44 @@ export default function CodeGeneratorForm() {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="customSuccessConfig.productDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="A brief description shown on the verification page..."
+                              {...field}
+                              value={field.value || ""}
+                              rows={3}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="customSuccessConfig.productImageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product Image URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="url"
+                              placeholder="https://example.com/product.png"
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 )}
               </TabsContent>

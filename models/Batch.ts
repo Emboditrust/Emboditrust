@@ -13,6 +13,8 @@ export interface IBatch extends mongoose.Document {
     logoUrl?: string;
     companyName?: string;
     productName?: string;
+    productDescription?: string;
+    productImageUrl?: string;
     batchNumber?: string;
     additionalFields?: Record<string, string>;
   };
@@ -58,6 +60,8 @@ const BatchSchema = new mongoose.Schema({
     logoUrl: String,
     companyName: String,
     productName: String,
+    productDescription: String,
+    productImageUrl: String,
     batchNumber: String,
     additionalFields: mongoose.Schema.Types.Mixed,
   },

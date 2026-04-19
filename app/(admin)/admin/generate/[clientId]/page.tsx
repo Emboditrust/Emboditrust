@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,6 +56,8 @@ import {
   RefreshCw,
   AlertTriangle,
   FileImage,
+  Upload,
+  Link2,
 } from "lucide-react";
 import { z } from "zod";
 import Link from "next/link";
@@ -70,6 +72,8 @@ const generationSchema = z.object({
   customBatchNumber: z.string().optional(),
   enableCustomPage: z.boolean().default(false),
   customLogoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  customProductImageUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  customProductDescription: z.string().max(500).optional(),
   additionalInfo: z.string().optional(),
 });
 
@@ -118,6 +122,12 @@ export default function GenerateForClientPage() {
     timeTaken: 0,
     qrSize: '500x500',
   });
+  const [logoInputMode, setLogoInputMode] = useState<'link' | 'upload'>('link');
+  const [productImageInputMode, setProductImageInputMode] = useState<'link' | 'upload'>('link');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingProductImage, setIsUploadingProductImage] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const productImageInputRef = useRef<HTMLInputElement | null>(null);
 
   // Fetch client data on mount
   useEffect(() => {
@@ -159,9 +169,71 @@ export default function GenerateForClientPage() {
       customBatchNumber: '',
       enableCustomPage: false,
       customLogoUrl: '',
+      customProductImageUrl: '',
+      customProductDescription: '',
       additionalInfo: '',
     },
   });
+
+  const logoUrlValue = form.watch('customLogoUrl');
+  const productImageUrlValue = form.watch('customProductImageUrl');
+
+  const uploadBrandingImage = async (
+    file: File,
+    kind: 'logo' | 'product',
+    fieldName: 'customLogoUrl' | 'customProductImageUrl'
+  ) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be 5MB or less');
+      return;
+    }
+
+    const setUploading = kind === 'logo' ? setIsUploadingLogo : setIsUploadingProductImage;
+    setUploading(true);
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+      uploadFormData.append('kind', kind);
+
+      const response = await fetch('/api/admin/uploads/image', {
+        method: 'POST',
+        body: uploadFormData,
+        credentials: 'include',
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || result.error || 'Upload failed');
+      }
+
+      form.setValue(fieldName, result.url, { shouldValidate: true, shouldDirty: true });
+      toast.success(kind === 'logo' ? 'Logo uploaded successfully' : 'Product image uploaded successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Image upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageSelection = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    kind: 'logo' | 'product',
+    fieldName: 'customLogoUrl' | 'customProductImageUrl'
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    await uploadBrandingImage(file, kind, fieldName);
+    event.target.value = '';
+  };
 
   // Helper function to generate HTML for printable labels
  const generatePrintableLabelsHTML = (codes: GeneratedCode[]) => {
@@ -1166,25 +1238,155 @@ body {
                           <FormItem>
                             <FormLabel>Custom Logo URL</FormLabel>
                             <FormControl>
-                              <div className="flex gap-2">
-                                <Input 
-                                  {...field} 
-                                  placeholder="https://client.com/logo.png" 
-                                  disabled={loading}
+                              <div className="space-y-3">
+                                <div className="flex flex-wrap gap-2">
+                                  <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => setLogoInputMode('link')}
+                                    disabled={loading || isUploadingLogo}
+                                    className={logoInputMode === 'link' ? 'border-blue-500 bg-blue-50 text-blue-700' : ''}
+                                  >
+                                    <Link2 className="mr-2 h-4 w-4" />
+                                    Use Link
+                                  </Button>
+                                  <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => {
+                                      setLogoInputMode('upload');
+                                      logoInputRef.current?.click();
+                                    }}
+                                    disabled={loading || isUploadingLogo}
+                                    className={logoInputMode === 'upload' ? 'border-blue-500 bg-blue-50 text-blue-700' : ''}
+                                  >
+                                    {isUploadingLogo ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                    Upload From Library
+                                  </Button>
+                                </div>
+                                {logoInputMode === 'link' ? (
+                                  <Input 
+                                    {...field} 
+                                    placeholder="https://client.com/logo.png" 
+                                    disabled={loading}
+                                  />
+                                ) : (
+                                  <div className="rounded-lg border border-dashed bg-white px-4 py-3 text-sm text-muted-foreground">
+                                    Select an image from your device library. The uploaded image URL will be filled automatically.
+                                  </div>
+                                )}
+                                <input
+                                  ref={logoInputRef}
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(event) => handleImageSelection(event, 'logo', 'customLogoUrl')}
                                 />
-                                <Button 
-                                  type="button" 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => toast.info('Upload to Cloudinary')}
-                                  disabled={loading}
-                                >
-                                  Upload
-                                </Button>
+                                {logoUrlValue ? (
+                                  <div className="rounded-lg border bg-white p-3">
+                                    <div className="mb-2 text-xs font-medium text-muted-foreground">Logo Preview</div>
+                                    <div className="relative h-20 w-40 overflow-hidden rounded-md">
+                                      <img src={logoUrlValue} alt="Logo preview" className="h-full w-full object-contain" />
+                                    </div>
+                                  </div>
+                                ) : null}
                               </div>
                             </FormControl>
                             <FormDescription>
-                              Custom logo for verification success page
+                              Paste an image URL or upload a logo from your device library
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="customProductImageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Image URL</FormLabel>
+                            <FormControl>
+                              <div className="space-y-3">
+                                <div className="flex flex-wrap gap-2">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setProductImageInputMode('link')}
+                                    disabled={loading || isUploadingProductImage}
+                                    className={productImageInputMode === 'link' ? 'border-blue-500 bg-blue-50 text-blue-700' : ''}
+                                  >
+                                    <Link2 className="mr-2 h-4 w-4" />
+                                    Use Link
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setProductImageInputMode('upload');
+                                      productImageInputRef.current?.click();
+                                    }}
+                                    disabled={loading || isUploadingProductImage}
+                                    className={productImageInputMode === 'upload' ? 'border-blue-500 bg-blue-50 text-blue-700' : ''}
+                                  >
+                                    {isUploadingProductImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                    Upload From Library
+                                  </Button>
+                                </div>
+                                {productImageInputMode === 'link' ? (
+                                  <Input
+                                    {...field}
+                                    placeholder="https://client.com/product-image.png"
+                                    disabled={loading}
+                                  />
+                                ) : (
+                                  <div className="rounded-lg border border-dashed bg-white px-4 py-3 text-sm text-muted-foreground">
+                                    Select a product image from your device library. The uploaded image URL will be filled automatically.
+                                  </div>
+                                )}
+                                <input
+                                  ref={productImageInputRef}
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(event) => handleImageSelection(event, 'product', 'customProductImageUrl')}
+                                />
+                                {productImageUrlValue ? (
+                                  <div className="rounded-lg border bg-white p-3">
+                                    <div className="mb-2 text-xs font-medium text-muted-foreground">Product Preview</div>
+                                    <div className="relative h-40 w-full overflow-hidden rounded-md">
+                                      <img src={productImageUrlValue} alt="Product preview" className="h-full w-full object-contain" />
+                                    </div>
+                                  </div>
+                                ) : null}
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              Paste an image URL or upload a product image from your device library
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="customProductDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                {...field}
+                                placeholder="This product has been successfully verified as authentic."
+                                rows={3}
+                                disabled={loading}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Short message shown below the verified heading
                             </FormDescription>
                             <FormMessage />
                           </FormItem>

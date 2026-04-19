@@ -138,12 +138,14 @@ export default async function VerificationPage({
       batchId: batch.batchId,
       productName: batch.productName,
       generationDate: batch.generationDate,
-      quantity: batch.quantity
+      quantity: batch.quantity,
+      customSuccessConfig: batch.customSuccessConfig || null,
     } : null,
     client: client ? {
       companyName: client.companyName,
       registrationNumber: client.registrationNumber,
-      website: client.website
+      website: client.website,
+      logoUrl: client.logoUrl || null,
     } : null
   };
 

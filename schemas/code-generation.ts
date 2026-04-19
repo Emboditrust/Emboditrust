@@ -13,6 +13,8 @@ export const codeGenerationSchema = z.object({
     logoUrl: z.string().url('Invalid URL').optional(),
     companyName: z.string().optional(),
     productName: z.string().optional(),
+    productDescription: z.string().optional(),
+    productImageUrl: z.string().url('Invalid URL').optional(),
     batchNumber: z.string().optional(),
     additionalFields: z.record(z.string(), z.string()).optional(),
 

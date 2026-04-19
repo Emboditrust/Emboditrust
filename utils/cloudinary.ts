@@ -9,11 +9,10 @@ cloudinary.config({
 });
 
 export class CloudinaryService {
-  // Upload QR code image to Cloudinary
-  static async uploadQRCode(
-    imageData: string, // Base64 image
+  static async uploadImage(
+    imageData: string,
     publicId: string,
-    folder: string = 'emboditrust/qr-codes'
+    folder: string = 'emboditrust/uploads'
   ): Promise<{ url: string; publicId: string }> {
     try {
       const result = await cloudinary.uploader.upload(imageData, {
@@ -22,7 +21,7 @@ export class CloudinaryService {
         resource_type: 'image',
         overwrite: true,
         transformation: [
-          { width: 500, height: 500, crop: 'limit' },
+          { width: 1200, height: 1200, crop: 'limit' },
           { quality: 'auto:best' },
         ],
       });
@@ -33,8 +32,17 @@ export class CloudinaryService {
       };
     } catch (error) {
       console.error('Cloudinary upload error:', error);
-      throw new Error('Failed to upload QR code to Cloudinary');
+      throw new Error('Failed to upload image to Cloudinary');
     }
+  }
+
+  // Upload QR code image to Cloudinary
+  static async uploadQRCode(
+    imageData: string, // Base64 image
+    publicId: string,
+    folder: string = 'emboditrust/qr-codes'
+  ): Promise<{ url: string; publicId: string }> {
+    return this.uploadImage(imageData, publicId, folder);
   }
 
   // Upload batch of QR codes
