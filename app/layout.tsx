@@ -6,6 +6,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { ToastProvider } from "@/providers/toast-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NextAuthSessionProvider } from "@/providers/session-provider";
+import CookieConsent from "@/components/CookieConsent";
 
 
 
@@ -31,6 +32,7 @@ export default function RootLayout({
           >
             <QueryProvider>
               {children}
+              <CookieConsent />
               <ToastProvider />
             </QueryProvider>
           </ThemeProvider>

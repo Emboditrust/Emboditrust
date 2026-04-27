@@ -2,76 +2,80 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const navItems = [
-    { href: '#features', label: 'Verification' },
-    { href: '#products', label: 'Templates' },
-    { href: '#industries', label: 'Industries' },
+    { href: '#features', label: 'Features' },
+    { href: '#products', label: 'Products' },
+    { href: '#industries', label: 'Solutions' },
     { href: '#contact', label: 'Contact' },
   ];
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm">
-      <nav className="container mx-auto px-4 py-4 md:px-6">
+    <header className="fixed top-0 z-50 w-full border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm">
+      <nav className="container mx-auto px-4 py-4 md:px-8">
         <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-emerald-600" />
-            <span className="text-lg font-semibold text-slate-900">EmbodiTrust</span>
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600" />
+            <span className="text-lg font-bold text-white">EmbodiTrust</span>
           </div>
           
-          <div className="hidden md:flex space-x-7 items-center">
-            {navItems.slice(0, 3).map((item) => (
+          <div className="hidden md:flex space-x-8 items-center">
+            {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="text-sm text-slate-600 transition-colors duration-300 hover:text-emerald-600"
+                className="text-lg font-bold text-slate-300 transition-colors duration-300 hover:text-emerald-400"
               >
                 {item.label}
               </a>
             ))}
+          </div>
+
+          <div className="hidden md:flex items-center space-x-4">
             <Link
               href="/admin-login"
-              className="text-sm font-medium text-emerald-600"
+              className="text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors"
             >
               Sign in
             </Link>
             <Link
               href="#contact"
-              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-emerald-500"
+              className="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-lg text-sm font-semibold text-white transition-colors duration-300"
             >
-              Create my protection flow
+              Get Started
             </Link>
           </div>
 
           <button
-            className="md:hidden"
+            className="md:hidden text-white"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {isMenuOpen && (
-          <div className="mt-4 space-y-4 md:hidden">
+          <div className="mt-4 space-y-4 pb-4 md:hidden border-t border-slate-800 pt-4">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="block text-slate-600 transition-colors duration-300 hover:text-emerald-600"
+                className="block text-slate-300 hover:text-emerald-400 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
               </a>
             ))}
-            <Link href="/admin-login" className="block text-slate-600">Sign in</Link>
-            <Link href="#contact" className="block rounded-full bg-emerald-600 px-4 py-2 text-center font-semibold text-white">
-              Create my protection flow
-            </Link>
+            <div className="flex flex-col gap-2 pt-2">
+              <Link href="/admin-login" className="text-slate-300 text-sm">Sign in</Link>
+              <Link href="#contact" className="block bg-emerald-600 hover:bg-emerald-500 px-5 py-2 text-center rounded-lg font-semibold text-white text-sm">
+                Get Started
+              </Link>
+            </div>
           </div>
         )}
       </nav>

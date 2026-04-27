@@ -156,8 +156,7 @@ const SMSVerificationSchema = new Schema<ISMSVerification>(
     },
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
-      index: true
+      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000)
     },
     completedAt: {
       type: Date,

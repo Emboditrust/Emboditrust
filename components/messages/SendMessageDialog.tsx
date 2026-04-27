@@ -155,10 +155,10 @@ export default function SendMessageDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="border border-[#d7dde6] bg-white/95 text-[#0b1c2e] sm:max-w-[600px] dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 dark:text-[#f3f4f6]">
         <DialogHeader>
-          <DialogTitle>{replyTo ? 'Reply to Message' : 'Send New Message'}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900 dark:text-slate-100">{replyTo ? 'Reply to Message' : 'Send New Message'}</DialogTitle>
+          <DialogDescription className="text-slate-600 dark:text-slate-300">
             {replyTo
               ? `Replying to ${replyTo.senderName} (${replyTo.senderEmail})`
               : 'Send a message to a client or user'}
@@ -179,6 +179,7 @@ export default function SendMessageDialog({
                 }
                 required
                 disabled={!!replyTo}
+                className="border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232]"
               />
             </div>
 
@@ -192,6 +193,7 @@ export default function SendMessageDialog({
                   setFormData({ ...formData, subject: e.target.value })
                 }
                 required
+                className="border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232]"
               />
             </div>
 
@@ -206,12 +208,12 @@ export default function SendMessageDialog({
                 }
                 rows={8}
                 required
-                className="resize-none"
+                className="resize-none border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232]"
               />
             </div>
             
             {admin && (
-              <div className="text-sm text-gray-500 p-2 bg-gray-50 rounded">
+              <div className="rounded border border-[#d7dde6] bg-slate-50 p-2 text-sm text-slate-600 dark:border-[#5a5a5a] dark:bg-[#2f2f2f] dark:text-slate-300">
                 <p className="flex items-center gap-2">
                   <User className="h-3 w-3" />
                   <span>Sending as: <strong>{admin.name}</strong> &lt;{admin.email}&gt;</span>
@@ -224,6 +226,7 @@ export default function SendMessageDialog({
             <Button
               type="button"
               variant="outline"
+              className="border-[#c8d1dd] bg-white/95 hover:bg-slate-100 dark:border-[#5b5b5b] dark:bg-[#323232] dark:hover:bg-[#444]"
               onClick={() => {
                 onOpenChange(false);
                 setFormData({ receiverEmail: '', subject: '', content: '' });
@@ -235,7 +238,7 @@ export default function SendMessageDialog({
             <Button 
               type="submit" 
               disabled={loading || !admin}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white"
+              className="bg-[#032434] text-white hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
             >
               {loading ? (
                 <>

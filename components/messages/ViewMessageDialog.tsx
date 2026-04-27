@@ -71,10 +71,10 @@ export default function ViewMessageDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto border border-[#d7dde6] bg-white/95 text-[#0b1c2e] sm:max-w-[800px] dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 dark:text-[#f3f4f6]">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
               {message.subject}
               {message.report && (
                 <FileWarning className="h-5 w-5 text-orange-500" />
@@ -82,54 +82,54 @@ export default function ViewMessageDialog({
             </DialogTitle>
             {message.report && (
               <Link href={`/dashboard/reports/${message.report._id}`}>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" className="border-[#c8d1dd] bg-white/95 hover:bg-slate-100 dark:border-[#5b5b5b] dark:bg-[#323232] dark:hover:bg-[#444]">
                   View Full Report
                 </Button>
               </Link>
             )}
           </div>
-          <DialogDescription>
+          <DialogDescription className="text-slate-600 dark:text-slate-300">
             Message details {message.report && 'with counterfeit report'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Message Header */}
-          <div className="space-y-4">
+          <div className="space-y-4 rounded-xl border border-[#d7dde6] bg-white/80 p-4 dark:border-[#5a5a5a] dark:bg-[#323232]/80">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <div className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-300">
                   <User className="h-3 w-3" />
                   From
                 </div>
                 <div>
-                  <div className="font-medium">{message.senderName}</div>
-                  <div className="text-sm text-gray-500">{message.senderEmail || 'No email provided'}</div>
+                  <div className="font-medium text-slate-900 dark:text-slate-100">{message.senderName}</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-300">{message.senderEmail || 'No email provided'}</div>
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-300">
                   <Mail className="h-3 w-3" />
                   To
                 </div>
                 <div>
-                  <div className="font-medium">{message.receiverName || 'N/A'}</div>
-                  <div className="text-sm text-gray-500">{message.receiverEmail}</div>
+                  <div className="font-medium text-slate-900 dark:text-slate-100">{message.receiverName || 'N/A'}</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-300">{message.receiverEmail}</div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <div className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-300">
                   <Calendar className="h-3 w-3" />
                   Date
                 </div>
-                <div className="text-sm">{formatDate(message.createdAt)}</div>
+                <div className="text-sm text-slate-800 dark:text-slate-100">{formatDate(message.createdAt)}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-sm font-medium text-gray-500">Status</div>
-                <div className="text-sm">
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-300">Status</div>
+                <div className="text-sm text-slate-800 dark:text-slate-100">
                   {message.status === 'read' ? 'Read' : 
                    message.status === 'delivered' ? 'Delivered' : 
                    message.status === 'failed' ? 'Failed to send' : 'Sent'}
@@ -145,20 +145,20 @@ export default function ViewMessageDialog({
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-orange-500" />
-                  <h3 className="font-semibold">Counterfeit Report Details</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">Counterfeit Report Details</h3>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-300">
                       <Package className="h-3 w-3" />
                       Product Name
                     </div>
-                    <div className="font-medium">{reportDetails.productName}</div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">{reportDetails.productName}</div>
                   </div>
                   
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-500">Report Status</div>
+                    <div className="text-sm font-medium text-slate-500 dark:text-slate-300">Report Status</div>
                     <Badge variant={
                       reportDetails.status === 'resolved' ? 'default' :
                       reportDetails.status === 'investigating' ? 'secondary' :
@@ -169,17 +169,17 @@ export default function ViewMessageDialog({
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-sm font-medium text-slate-500 dark:text-slate-300">
                       <MapPin className="h-3 w-3" />
                       Purchase Location
                     </div>
-                    <div>{reportDetails.purchaseLocation}</div>
+                    <div className="text-slate-800 dark:text-slate-100">{reportDetails.purchaseLocation}</div>
                   </div>
                   
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-500">Priority</div>
+                    <div className="text-sm font-medium text-slate-500 dark:text-slate-300">Priority</div>
                     <Badge className={getPriorityColor(reportDetails.priority)}>
                       {reportDetails.priority.charAt(0).toUpperCase() + reportDetails.priority.slice(1)}
                     </Badge>
@@ -188,8 +188,8 @@ export default function ViewMessageDialog({
                 
                 {reportDetails.additionalInfo && (
                   <div className="space-y-1">
-                    <div className="text-sm font-medium text-gray-500">Additional Information</div>
-                    <div className="text-sm bg-gray-50 p-3 rounded">{reportDetails.additionalInfo}</div>
+                    <div className="text-sm font-medium text-slate-500 dark:text-slate-300">Additional Information</div>
+                    <div className="rounded bg-slate-100 p-3 text-sm text-slate-700 dark:bg-[#2f2f2f] dark:text-slate-200">{reportDetails.additionalInfo}</div>
                   </div>
                 )}
               </div>
@@ -200,9 +200,9 @@ export default function ViewMessageDialog({
 
           {/* Message Content */}
           <div className="space-y-3">
-            <div className="text-sm font-medium text-gray-500">Message Content</div>
+            <div className="text-sm font-medium text-slate-500 dark:text-slate-300">Message Content</div>
             <div className="prose prose-sm max-w-none">
-              <div className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md">
+              <div className="whitespace-pre-wrap rounded-md bg-slate-100 p-4 text-slate-700 dark:bg-[#2f2f2f] dark:text-slate-200">
                 {message.content}
               </div>
             </div>
@@ -213,12 +213,13 @@ export default function ViewMessageDialog({
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
+              className="border-[#c8d1dd] bg-white/95 hover:bg-slate-100 dark:border-[#5b5b5b] dark:bg-[#323232] dark:hover:bg-[#444]"
               onClick={() => onOpenChange(false)}
             >
               Close
             </Button>
             {message.senderRole !== 'admin' && (
-              <Button onClick={onReply}>
+              <Button onClick={onReply} className="bg-[#032434] text-white hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]">
                 <Reply className="h-4 w-4 mr-2" />
                 Reply
               </Button>

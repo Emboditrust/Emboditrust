@@ -1,506 +1,707 @@
+'use client';
+
 import Link from 'next/link';
-import {
-  Activity,
-  ArrowRight,
-  BadgeCheck,
-  ChevronRight,
-  Globe,
-  MapPin,
-  MessageSquare,
-  Shield,
-  Sparkles,
-  Star,
-  type LucideIcon,
-} from 'lucide-react';
-import Header from '@/components/Header';
-import ToolsSection from '@/components/ToolsSection';
+import { useState, useEffect } from 'react';
 import ContactForm from '@/components/ContactForm';
-import Footer from '@/components/Footer';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ArrowRight,
+  Moon,
+  Plus,
+  ShieldCheck,
+  Sun,
+  UsersRound,
+  Building2,
+  CircleHelp,
+} from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { TbBrandLivewire } from 'react-icons/tb';
 
-const trustCards: { title: string; description: string; icon: LucideIcon }[] = [
+const featureRows = [
   {
-    title: 'Active Monitoring',
-    description: 'Track live scans and verify every product interaction instantly.',
-    icon: Activity,
+    title: 'Your Verification Intelligence Agent',
+    description:
+      'EmbodiTrust works as an autonomous verification agent: it watches product scans, flags suspicious behavior patterns, and tracks trust signals across your regions on autopilot.',
+    reverse: false,
   },
   {
-    title: 'Zero Guesswork',
-    description: 'Buyers and field teams see clear authenticity outcomes at once.',
-    icon: BadgeCheck,
+    title: 'Auto-Generated Risk Topics and Queries',
+    description:
+      'No manual setup. EmbodiTrust generates counterfeit risk topics from your brand and product context, then continuously evaluates scan behavior and anomaly paths.',
+    reverse: true,
   },
   {
-    title: 'Anti-Counterfeit Alerts',
-    description: 'Spot suspicious code use, repeat scans, and market anomalies early.',
-    icon: Shield,
+    title: 'Real-World Output and Evidence',
+    description:
+      'Capture every verification outcome, suspicious attempt, and hotspot signal. See exactly where interventions are needed and which channels are leaking trust.',
+    reverse: false,
   },
   {
-    title: 'Consumer Trust Loop',
-    description: 'Turn successful scans into education, offers, and feedback.',
-    icon: Sparkles,
+    title: 'Measure, Compare, Then Grow',
+    description:
+      'Every verification flow powers analytics. Track Authenticity Health, Suspicious Share, trust trend movement, and campaign outcomes from one dashboard.',
+    reverse: true,
   },
 ];
 
-const showcaseCards = [
+const agentCards = [
   {
-    label: 'Secure QR labels',
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80',
+    title: 'Case Builder',
+    description:
+      'Turns suspicious scan signals into ready-to-action investigation cases for your operations and compliance team.',
   },
   {
-    label: 'Scratch-and-verify codes',
-    image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=600&q=80',
+    title: 'UGC Agent',
+    description:
+      'Finds brand-relevant community conversations and suggests trust-safe responses that improve brand confidence.',
   },
   {
-    label: 'SMS verification flows',
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    label: 'Fraud analytics dashboard',
-    image: 'https://images.unsplash.com/photo-1551281044-8b35a4f91754?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    label: 'Retail scan journeys',
-    image: 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=600&q=80',
+    title: 'Content Optimizer',
+    description:
+      'Improves post-scan education and authenticity content so buyers get clearer verification guidance.',
   },
 ];
 
-const deepFeatures = [
+const industries = [
+  { name: 'Travel', kind: 'travel' as const },
+  { name: 'Ecommerce', kind: 'commerce' as const },
+  { name: 'Finance', kind: 'finance' as const },
+  { name: 'Healthcare', kind: 'health' as const },
+  { name: 'Automotive', kind: 'auto' as const },
+  { name: 'Education', kind: 'education' as const },
+  { name: 'Real Estate', kind: 'real-estate' as const },
+  { name: 'Legal', kind: 'legal' as const },
+  { name: 'SaaS', kind: 'saas' as const },
+  { name: 'Crypto', kind: 'crypto' as const },
+];
+
+const faqsLeft = [
   {
-    eyebrow: 'Guided rollout',
-    title: 'Step-by-step guidance for rollout',
-    description:
-      'Launch verification campaigns with structured code generation, activation, monitoring, and response steps.',
-    image:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+    question: 'What is EmbodiTrust?',
+    answer: 'EmbodiTrust is a verification intelligence platform that helps brands and manufacturers prevent counterfeiting and ensure product authenticity. It uses QR and scratch codes with real-time verification capabilities, combined with AI-powered fraud detection, to track every product scan and identify suspicious patterns. The system works by storing hashed codes, performing instant verification via a fast, server-side API call, and flagging anomalies like geolocation mismatches or brute-force attempts.'
   },
   {
-    eyebrow: 'Post-scan rewards',
-    title: 'Rewards and education after every genuine scan',
-    description:
-      'Use successful authentications to trigger loyalty benefits, product education, or support flows.',
-    image:
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
+    question: 'Who is EmbodiTrust for?',
+    answer: `EmbodiTrust is designed for brands and manufacturers serious about supply chain authenticity and loss prevention. It's ideal for companies subject to NAFDAC or other regulatory compliance requirements, enterprises experiencing significant counterfeiting losses, distributors needing real-time visibility into product flows, and teams that need to identify and investigate suspicious verification patterns. Any brand with a physical product can benefit from EmbodiTrust's intelligence engine.`
   },
   {
-    eyebrow: 'Fraud detection',
-    title: 'Real-time fraud signal detection',
-    description:
-      'Repeated failures, risky locations, and unusual frequency patterns are escalated immediately.',
-    image:
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+    question: 'What is the Verification Intelligence Engine?',
+    answer: `The Verification Intelligence Engine is EmbodiTrust's autonomous monitoring system. It works by: (1) Accepting fast, server-side API calls when products are scanned; (2) Instantly checking code status(active, used, suspected_fake, or invalid); (3) Logging every verification attempt with metadata (IP, geolocation, user agent); (4) Detecting suspicious patterns like failed attempt spikes, geolocation mismatches, and duplicate "already used" scans; (5) Generating automated alerts for your admin team to investigate. The engine runs continuously without manual intervention.`
   },
   {
-    eyebrow: 'Market mapping',
-    title: 'Map counterfeit pressure across markets',
-    description:
-      'Identify where investigations are needed with geolocation trends and historical verification logs.',
-    image:
-      'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
+    question: 'How is EmbodiTrust different from basic QR validators?',
+    answer: `Most QR validators only check if a code exists and is valid. EmbodiTrust goes beyond: it detects counterfeit patterns in real-time (geolocation mismatches, brute-force attempts, suspicious IP patterns), stores hashed codes, so even a database breach doesn't expose raw codes, implements rate limiting (100 req/min globally, 5 failed attempts/min per IP) to prevent attacks, and provides a complete audit trail in the verification_attempts collection. Your team gets a dashboard showing KPIs, heatmaps, and suspicious activity alerts for investigation.`
   },
   {
-    eyebrow: 'Verified feedback',
-    title: 'Collect verified buyer feedback',
-    description:
-      'Capture sentiment and experience data only from real purchasers after successful verification.',
-    image:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    eyebrow: 'Team coordination',
-    title: 'Coordinate with compliance and operations',
-    description:
-      'Give internal teams the context they need to react quickly to threats and protect revenue.',
-    image:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+    question: `What is EmbodiTrust's roadmap and long-term vision?`,
+    answer: `EmbodiTrust is building a full verification agent ecosystem. Currently live is the Verification Intelligence Engine (core verification and fraud detection). Coming in 2026: (1) Case Builder – automatically turns suspicious signals into investigation cases for your ops team; (2) UGC Agent – finds brand-relevant community conversations and suggests trust-safe responses; (3) Content Optimizer – improves post-scan education to give buyers clearer verification guidance. The vision is to make verification autonomous and continuous, not a one-time check.`
   },
 ];
 
-const examples = [
+const faqsRight = [
   {
-    label: 'Pharma serialization campaigns',
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80',
+    question: 'Which verification channels does EmbodiTrust support?',
+    answer: 'EmbodiTrust supports two verification channels: (1) QR codes – customers scan a QR code embedded on the product or packaging; (2) Scratch codes – customers manually enter a 12-character alphanumeric code (e.g., ABC4H8K2M9X01) from a scratch-off panel. Both channels feed into the same verification API endpoint (/api/verify), which sanitizes input, looks up the code, checks its status, logs the verification attempt, and returns an instant response (valid, invalid, already_used, or suspected_counterfeit).'
   },
   {
-    label: 'FMCG retail authenticity checks',
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=600&q=80',
+    question: 'How do topics and risk queries work?',
+    answer: `Topics are custom verification scenarios defined for your brand and products (e.g., "Genuine Electronics from Authorized Distributor"). Risk queries are automatically generated evaluation rules that check verification behavior against those topics—without manual setup required. For example: a query might flag "multiple 'already used' scans from different IPs on the same code" as a counterfeit signal, or "code verified from Nigeria and then US within 30 minutes" as geolocation anomaly. The engine generates these queries from your brand context and continuously evaluates them.`
   },
   {
-    label: 'Import verification programs',
-    image: 'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=600&q=80',
+    question: 'How does EmbodiTrust generate risk queries?',
+    answer: 'EmbodiTrust generates risk queries by analyzing: (1) Your brand and product context (industry, typical geographies, expected scan volumes); (2) The verification data it collects (code status, verification timestamps, IP locations, failed attempt patterns); (3) Industry-known counterfeiting tactics (replay attacks, brute-force code guessing, geolocation spoofing). The system then creates automated rules—no manual configuration needed—that continuously scan incoming verification attempts and flag outliers. For example, if 50 codes from a single batch suddenly fail verification from a single IP in quick succession, that triggers a "failed attempt spike" alert.'
   },
+  // {
+  //   question: 'How does EmbodiTrust collect and organize suspicious evidence?',
+  //   answer: `EmbodiTrust maintains two collections: (1) codes collection – stores each unique code with: _id, hashedCode, status, batchId, createdAt, firstVerifiedAt, firstVerifiedFromIP (hashed), and firstVerifiedLocation. (2) verification_attempts collection – logs every scan with: timestamp, scannedCode, result (status returned), ipAddress (hashed), userAgent, and approximateLocation. This dual structure lets you track both the lifecycle of a single code and the aggregate traffic patterns. Admins see a "Suspicious Activity" section in the dashboard listing flagged events (geolocation mismatches, failed spikes, duplicate "already used" scans) with evidence links.`
+  // },
   {
-    label: 'Distributor stock investigations',
-    image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=600&q=80',
+    question: 'How do we get started with EmbodiTrust?',
+    answer: `Getting started is simple: (1) Sign up and book a demo at emboditrust.com; (2) Work with our team to define your brand context (products, geographies, compliance needs); (3) Receive API credentials for the /api/verify endpoint and admin dashboard access; (4) Generate your first batch of codes (with 3-letter brand prefix, 6 random chars, 3-digit Luhn checksum mod 36); (5) Distribute codes on products (as QR or scratch); (6) Monitor verification activity and suspicious alerts in your dashboard. The entire setup takes less than a week. Our team provides onboarding and training for your ops and compliance staff.`
   },
-  {
-    label: 'Consumer loyalty redemption flows',
-    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=600&q=80',
-  },
-];
-
-const testimonials = [
-  {
-    rating: '4.9 out of 5',
-    text: 'EmbodiTrust helped us reduce fake product complaints and gave our field team immediate evidence for investigations.',
-    author: 'Operations Lead, Pharma Brand',
-  },
-  {
-    rating: '5.0 out of 5',
-    text: 'The verification journey is simple for buyers and the analytics are strong enough for weekly compliance reviews.',
-    author: 'Compliance Manager, FMCG Group',
-  },
-  {
-    rating: '4.8 out of 5',
-    text: 'We finally have a clean view of suspicious scan clusters across multiple regions without manual reconciliation.',
-    author: 'Distribution Director, Consumer Goods Company',
-  },
-  {
-    rating: '4.9 out of 5',
-    text: 'The post-scan engagement flow gave us both authenticity proof and a better channel to reach real customers.',
-    author: 'Growth Lead, Retail Network',
-  },
-];
-
-const insightCards = [
-  {
-    tag: 'FIELD GUIDE',
-    title: 'How to stop counterfeit products with better verification design',
-    tone: 'bg-rose-100',
-  },
-  {
-    tag: 'PLAYBOOK',
-    title: 'How to connect product authentication to loyalty campaigns',
-    tone: 'bg-orange-100',
-  },
-  {
-    tag: 'VIDEO',
-    title: 'Best practices for onboarding field teams into verification workflows',
-    tone: 'bg-slate-100',
-  },
-  {
-    tag: 'VIDEO',
-    title: 'How to use scan anomalies to identify diversion early',
-    tone: 'bg-slate-100',
-  },
-  {
-    tag: 'VIDEO',
-    title: 'Launching a pharma verification flow without slowing packaging',
-    tone: 'bg-slate-100',
-  },
-];
-
-const faqs = [
-  'What is product authentication?',
-  'What is the difference between verification and traceability?',
-  'How do I choose the right code format for my products?',
-  'How far back should verification history be stored?',
-  'What does a counterfeit hotspot signal mean?',
-  'What response actions can be triggered after a suspicious scan?',
-  'Is it worth pairing verification with loyalty campaigns?',
-  'Should I use a different flow for pharmacies and retail stores?',
-  'What makes EmbodiTrust effective for brand protection?',
 ];
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && theme === 'dark';
+
   return (
-    <main className="min-h-screen bg-[#f7f8fb] text-slate-900">
-      <Header />
+    <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes heroGlow {
+          0%, 100% {
+            filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3));
+          }
+          50% {
+            filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.6));
+          }
+        }
+        @keyframes sectionFloat {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-3px);
+          }
+        }
+        @keyframes sheenSweep {
+          0% {
+            transform: translateX(-130%);
+            opacity: 0;
+          }
+          20% {
+            opacity: 0.35;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            transform: translateX(180%);
+            opacity: 0;
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.6s ease-out forwards;
+        }
+        .animate-slide-in-right {
+          animation: slideInRight 0.8s ease-out forwards;
+        }
+        .animate-hero-glow {
+          animation: heroGlow 3s ease-in-out infinite;
+        }
+        .illustration-reveal {
+          animation: fadeInUp 1s ease-out 0.3s forwards;
+          opacity: 0;
+        }
+        .section-intro-pill {
+          position: relative;
+          overflow: hidden;
+          animation: fadeInUp 0.7s ease-out forwards, sectionFloat 4.8s ease-in-out infinite;
+          opacity: 0;
+        }
+        .section-intro-pill::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          width: 42%;
+          background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+          animation: sheenSweep 3.8s ease-in-out infinite;
+          pointer-events: none;
+        }
+        .bg-texture {
+          background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .dark .bg-texture {
+          background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+      <div className="sticky top-0 z-50 mx-auto w-full max-w-6xl px-5 pt-4 md:px-8 md:pt-5">
+        <header className="rounded-xl border border-[#d7dde6] bg-white/95 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95">
+          <div className="flex h-14 items-center justify-between px-4 md:h-16 md:px-5">
+            <Link href="/" className="flex items-center gap-2.5 text-base font-bold md:text-lg">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">E</span>
+              <span>EmbodiTrust</span>
+            </Link>
 
-      <section className="pt-24 md:pt-28">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="overflow-hidden rounded-[28px] bg-[#edf3ff] px-6 py-8 md:px-10 md:py-12">
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-              <div className="max-w-xl space-y-5">
-                <h1 className="text-4xl font-semibold leading-tight text-slate-900 md:text-[56px] md:leading-[1.02]">
-                  This verification platform helps you stop counterfeits in real time.
-                </h1>
-                <p className="text-base leading-7 text-slate-600 md:text-lg">
-                  EmbodiTrust protects every product identity, gives buyers instant confidence,
-                  and gives your team live intelligence on suspicious activity.
-                </p>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button asChild size="lg" className="rounded-full bg-emerald-600 px-6 text-white hover:bg-emerald-500">
-                    <Link href="#contact">Create my protection flow</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline" className="rounded-full border-slate-300 bg-white px-6">
-                    <Link href="#features">Upload my use case</Link>
-                  </Button>
-                </div>
-                <div className="space-y-2 text-sm text-slate-600">
-                  <p className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-emerald-600" />Works across web and SMS verification</p>
-                  <p className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-emerald-600" />Built for national distribution networks</p>
-                </div>
-              </div>
+            <nav className="hidden items-center gap-6 text-lg font-bold text-slate-700 dark:text-slate-200 md:flex">
+              <Link href="#engine" className="hover:text-slate-900 dark:hover:text-white">Engine</Link>
+              <Link href="#agent-team" className="hover:text-slate-900 dark:hover:text-white">Agents</Link>
+              <Link href="#industry" className="hover:text-slate-900 dark:hover:text-white">Industries</Link>
+              <Link href="#faqs" className="hover:text-slate-900 dark:hover:text-white">FAQs</Link>
+              <Link href="#contact" className="hover:text-slate-900 dark:hover:text-white">Contact</Link>
+            </nav>
 
-              <div className="relative mx-auto w-full max-w-[430px]">
-                <div className="rounded-[28px] border border-white/70 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
-                  <div className="rounded-[22px] border border-slate-100 bg-slate-50 p-4">
-                    <div className="mb-4 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Live Verification</p>
-                        <p className="text-lg font-semibold text-slate-900">Batch EV-24018</p>
-                      </div>
-                      <Badge className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-700 hover:bg-emerald-100">
-                        Authentic
-                      </Badge>
-                    </div>
-
-                    <img
-                      src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
-                      alt="Product verification interface preview"
-                      className="h-52 w-full rounded-2xl object-cover"
-                    />
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-2xl bg-white p-4 shadow-sm">
-                        <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Location</p>
-                        <p className="mt-1 text-sm font-medium text-slate-900">Lagos Mainland</p>
-                      </div>
-                      <div className="rounded-2xl bg-white p-4 shadow-sm">
-                        <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Status</p>
-                        <p className="mt-1 text-sm font-medium text-slate-900">Low risk signal</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute -left-4 bottom-6 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-lg">
-                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Resolved scans</p>
-                  <p className="text-2xl font-semibold text-emerald-700">11.5k</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 md:py-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-6 flex items-center justify-center gap-2 text-center text-xl font-medium text-emerald-700 md:text-2xl">
-            <Globe className="h-5 w-5" />
-            <span>31,203 verifications completed today</span>
-          </div>
-          <div className="grid gap-4 md:grid-cols-4">
-            {trustCards.map((card) => {
-              const Icon = card.icon;
-
-              return (
-                <Card key={card.title} className="rounded-2xl border-slate-200 bg-white shadow-sm">
-                  <CardHeader className="gap-3 p-5">
-                    <Icon className="h-5 w-5 text-slate-900" />
-                    <CardTitle className="text-base">{card.title}</CardTitle>
-                    <p className="text-sm leading-6 text-slate-500">{card.description}</p>
-                  </CardHeader>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <ToolsSection />
-
-      <section id="products" className="bg-white py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-8 text-center">
-            <p className="text-sm text-slate-500">Choose the verification surface that matches your market.</p>
-            <h2 className="mt-2 text-3xl font-semibold text-slate-900 md:text-4xl">Trusted verification templates</h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-5">
-            {showcaseCards.map((item, index) => (
-              <Card key={item.label} className={`overflow-hidden rounded-2xl border-slate-200 ${index === 2 ? 'bg-emerald-600 text-white' : 'bg-slate-50'} shadow-sm`}>
-                <CardContent className="p-4">
-                  <div className="mb-3 overflow-hidden rounded-2xl">
-                    <img src={item.image} alt={item.label} className="h-40 w-full object-cover" />
-                  </div>
-                  <p className="text-center text-sm font-medium">{item.label}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-semibold text-slate-900 md:text-4xl">Way beyond a verification website...</h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {deepFeatures.map((feature, index) => (
-              <Card
-                key={feature.title}
-                className={`overflow-hidden rounded-2xl border-slate-200 shadow-sm ${index % 3 === 0 ? 'bg-emerald-50' : index % 3 === 1 ? 'bg-amber-50' : 'bg-slate-50'}`}
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 transition-colors hover:bg-slate-100 dark:border-[#666666] dark:bg-[#444444] dark:text-slate-100 dark:hover:bg-[#505050]"
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               >
-                <CardContent className="p-5">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">{feature.eyebrow}</p>
-                  <h3 className="text-xl font-semibold text-slate-900">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p>
-                  <Link href="#contact" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-emerald-700">
-                    Learn more <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <img
-                    src={feature.image}
-                    alt={feature.title}
-                    className="mt-5 h-44 w-full rounded-2xl object-cover"
-                  />
-                </CardContent>
-              </Card>
-            ))}
+                {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+              </button>
+              <Link href="#contact" className="rounded-md bg-[#042333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:text-white dark:hover:bg-[#6a6a6a]">Book a Demo</Link>
+              {/*
+              <Link href="/admin-login" className="rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700">
+                Admin Log In
+              </Link>
+              */}
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-5 px-5 pb-16 pt-12 md:grid-cols-2 md:px-4 md:pb-20 md:pt-16">
+        <div>
+          <TypeWriter 
+            text={['Make Your Products', 'Discoverable', 'As Verified Originals']}
+            className="text-5xl font-black leading-[0.95] md:text-7xl"
+          />
+          <p className="mt-6 max-w-md animate-fade-in-up text-base leading-7 text-slate-600 dark:text-slate-300 md:text-lg" style={{ animationDelay: '0.3s' }}>
+            EmbodiTrust helps teams measure, monitor, and improve verification confidence across every channel in the supply chain.
+          </p>
+
+          <div className="mt-6 flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+            <Link href="#contact" className="rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]">Get a Demo</Link>
+            <Link href="#engine" className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200 dark:hover:text-white">
+              Explore Capabilities <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            {/*
+            <Link href="/admin-login" className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700">
+              Admin Log In <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            */}
+          </div>
+        </div>
+
+        <div className="relative illustration-reveal">
+          <div className="absolute -left-6 top-8 h-40 w-40 rounded-full bg-[#ffd8df] blur-2xl animate-hero-glow" />
+          <div className="absolute -right-6 bottom-8 h-40 w-40 rounded-full bg-[#c4f4f2] blur-2xl animate-hero-glow" style={{ animationDelay: '0.5s' }} />
+          <div className="relative   p-4  md:p-6 overflow-hidden">
+            <img 
+              src="/illustrations/engineer (1).svg" 
+              alt="Product verification and authentication"
+              className="w-full h-auto rounded-xl object-cover"
+            />
           </div>
         </div>
       </section>
 
-      <section id="industries" className="bg-emerald-900 py-12 text-white md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <section className="mx-auto w-full max-w-4xl px-5 pb-14 text-center md:px-8 md:pb-20">
+        <h2 className="text-3xl font-black leading-tight md:text-5xl">
+          50% of counterfeit incidents can be
+          <br />
+          prevented with active verification by 2028.
+        </h2>
+        <p className="mt-2 text-base text-slate-600 dark:text-slate-300">EmbodiTrust Industry Benchmark</p>
+
+        <div className="mx-auto mt-7 max-w-xl rounded-xl border border-[#cfd7e3] bg-white p-6 text-left shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]">
+          <div className="flex items-center gap-3">
+            <img
+              src="/illustrations/man-with-long-hair-avatar.svg"
+              alt="EmbodiTrust Product Team avatar"
+              className="h-16 w-16  rounded-full object-cover"
+            />
             <div>
-              <p className="mb-3 text-sm text-white/70">Protect markets with verified product experiences</p>
-              <h2 className="text-3xl font-semibold md:text-4xl">Get the visibility you need with professional verification examples</h2>
-              <p className="mt-4 max-w-md text-sm leading-6 text-white/75">
-                Use tested scan journeys, alert flows, and engagement patterns that work across regulated supply chains.
-              </p>
-              <Button asChild className="mt-6 rounded-full bg-emerald-400 text-slate-900 hover:bg-emerald-300">
-                <Link href="#contact">Start your protection flow</Link>
-              </Button>
-              <div className="mt-8 flex items-center gap-2 text-emerald-300">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} className="h-4 w-4 fill-current" />
-                ))}
-                <span className="ml-2 text-sm text-white/80">4.8 out of 5 based on partner reviews</span>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {examples.map((item) => (
-                <Card key={item.label} className="overflow-hidden rounded-2xl border-0 bg-white text-slate-900 shadow-sm">
-                  <CardContent className="p-4">
-                    <img src={item.image} alt={item.label} className="h-48 w-full rounded-xl object-cover" />
-                    <p className="mt-3 text-sm font-medium">{item.label}</p>
-                  </CardContent>
-                </Card>
-              ))}
+              <p className="text-lg font-bold">EmbodiTrust Product Team</p>
+              <p className="text-md text-slate-500 dark:text-slate-300">Product & Verification Intelligence</p>
             </div>
           </div>
+          <p className="mt-2  text-md leading-6 text-slate-700 dark:text-slate-200">
+            Verification should not stop at a successful scan. Teams need continuous monitoring, anomaly detection,
+            and action-ready evidence to protect customers and revenue.
+          </p>
         </div>
       </section>
 
-      <section className="bg-white py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-semibold text-slate-900 md:text-4xl">92% of customers recommend us</h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-4">
-            {testimonials.map((item) => (
-              <Card key={item.author} className="rounded-2xl border-slate-200 bg-white shadow-sm">
-                <CardContent className="p-5">
-                  <p className="text-sm font-semibold text-slate-900">{item.rating}</p>
-                  <div className="mt-2 flex gap-1 text-emerald-500">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Star key={index} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-6 text-slate-600">{item.text}</p>
-                  <p className="mt-4 text-sm font-medium text-slate-500">{item.author}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <section id="engine" className="mx-auto w-full max-w-6xl px-5 pb-10 text-center md:px-8 md:pb-12">
+        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+          <TbBrandLivewire className="h-6 w-6" />
+          Live
         </div>
+        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+          Verification Intelligence Engine<span className="text-rose-500">.</span>
+        </h3>
+        <p className="mt-2 text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>Verification signals and authenticity evidence you can trust.</p>
       </section>
 
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-8 flex items-center justify-between gap-4">
-            <h2 className="text-3xl font-semibold text-slate-900 md:text-4xl">Need some expert advice?</h2>
-            <Link href="#contact" className="text-sm font-medium text-emerald-700">See more tips</Link>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            {insightCards.slice(0, 2).map((card) => (
-              <Card key={card.title} className={`rounded-2xl border-slate-200 ${card.tone} shadow-sm`}>
-                <CardContent className="p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">{card.tag}</p>
-                  <h3 className="mt-3 max-w-md text-2xl font-semibold text-slate-900">{card.title}</h3>
-                  <div className="mt-5 h-40 rounded-2xl bg-white/70" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {insightCards.slice(2).map((card) => (
-              <Card key={card.title} className={`rounded-2xl border-slate-200 ${card.tone} shadow-sm`}>
-                <CardContent className="p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-rose-500">{card.tag}</p>
-                  <h3 className="mt-3 text-lg font-semibold text-slate-900">{card.title}</h3>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-12 md:py-16">
-        <div className="container mx-auto max-w-5xl px-4 md:px-6">
-          <div className="mb-8 text-center">
-            <h2 className="text-3xl font-semibold text-slate-900 md:text-4xl">Frequently Asked Questions</h2>
-          </div>
-
-          <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
-            {faqs.map((question) => (
-              <details key={question} className="group px-5 py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-sm font-medium text-slate-900 md:text-base">
-                  <span>{question}</span>
-                  <span className="text-slate-400 transition group-open:rotate-45">+</span>
-                </summary>
-                <p className="pt-3 text-sm leading-6 text-slate-600">
-                  EmbodiTrust combines secure code management, verification, and response intelligence so brands can protect distribution networks without adding friction to buyers.
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-6">
-          <Card className="overflow-hidden rounded-[28px] border-slate-200 bg-emerald-50 shadow-sm">
-            <CardContent className="grid gap-6 p-6 md:grid-cols-[1fr_340px] md:p-8">
-              <div className="flex flex-col justify-center">
-                <h2 className="text-3xl font-semibold text-slate-900 md:text-4xl">
-                  Join over <span className="text-emerald-600">31,203</span> protected product journeys.
-                </h2>
-                <p className="mt-3 max-w-md text-sm leading-6 text-slate-600">
-                  Start now and give your team the systems needed to verify, monitor, and respond faster.
-                </p>
-              <Button asChild className="mt-6 w-fit rounded-full bg-emerald-600 text-white hover:bg-emerald-500">
-                  <Link href="#contact">Create my protection flow</Link>
-                </Button>
+      <section className="mx-auto w-full max-w-6xl px-5 pb-12 md:px-8 md:pb-20">
+        <div className="space-y-7">
+          {featureRows.map((row, index) => (
+            <article
+              key={row.title}
+              className={`grid items-center gap-6 rounded-2xl p-4 md:grid-cols-2 md:gap-8 md:p-6 transition-all duration-700 ${index % 2 === 1 ? 'bg-[#c9f1ef] dark:bg-[#44514f]' : 'dark:bg-[#3a3a3a]/35'}`}
+              style={{
+                animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.15}s forwards`,
+                opacity: 0,
+              }}
+            >
+              <div className={row.reverse ? 'md:order-2' : ''}>
+                <h4 className="text-2xl font-black leading-tight md:text-4xl">{row.title}</h4>
+                <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">{row.description}</p>
               </div>
-
-              <div className="rounded-[24px] bg-white p-4">
-                <img
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80"
-                  alt="EmbodiTrust customer"
-                  className="h-64 w-full rounded-[20px] object-cover"
-                />
+              <div className={row.reverse ? 'md:order-1' : ''}>
+                <div className="transition-all duration-500">
+                  <FeatureIllustration variant={index} />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section id="contact" className="pb-12">
-        <ContactForm />
+      <section id="agent-team" className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20">
+        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+          <UsersRound className="h-6 w-6" />
+          Roadmap
+        </div>
+        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+          Your Verification Agent Team<span className="text-rose-500">.</span>
+        </h3>
+        <p className="mx-auto mt-3 max-w-3xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>
+          The future of trust operations is autonomous. We are building verification agents to support enterprise teams.
+        </p>
+
+        <div className="mt-10 space-y-8 text-left">
+          {agentCards.map((card, idx) => (
+            <article 
+              key={card.title} 
+              className={`grid items-center gap-6 md:grid-cols-2 transition-all duration-700 ${idx % 2 === 1 ? 'md:[&>div:first-child]:order-2 md:[&>div:last-child]:order-1' : ''}`}
+              style={{
+                animation: `fadeInUp 0.8s ease-out ${0.3 + idx * 0.15}s forwards`,
+                opacity: 0,
+              }}
+            >
+              <div className="rounded-3xl bg-transparent p-3 transition-transform duration-500 hover:scale-105">
+                <AgentIllustration variant={idx} />
+              </div>
+              <div>
+                <h4 className="mt-4 text-3xl font-black md:text-4xl">{card.title}</h4>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">{card.description}</p>
+                <Link href="#contact" className="mt-4 inline-block rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-slate-400/50 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a] dark:hover:shadow-black/30">
+                  Learn More
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <Footer />
+      <section id="industry" className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20">
+        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+          <Building2 className="h-6 w-6" />
+          Industry Solutions
+        </div>
+        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+          Verification Intelligence For Every Industry<span className="text-rose-500">.</span>
+        </h3>
+        <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>
+          EmbodiTrust serves forward-looking brands that are serious about winning product trust.
+        </p>
+
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {industries.map((item) => {
+            return (
+              <article key={item.name} className="rounded-xl border border-[#d3dbe7] bg-white p-4 text-left shadow-sm transition-colors dark:border-[#575757] dark:bg-[#3d3d3d]">
+                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-md bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-200">
+                  <IndustryTileIcon kind={item.kind} />
+                </div>
+                <h4 className="text-base font-bold">{item.name}</h4>
+                <p className="mt-1 inline-flex items-center gap-1 text-sm text-slate-600 dark:text-slate-300">
+                  Learn More <ArrowRight className="h-3.5 w-3.5" />
+                </p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section id="faqs" className="mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24">
+        <div className="section-intro-pill mx-auto mb-4 inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+          <CircleHelp className="h-6 w-6" />
+          FAQs
+        </div>
+        <h3 className="text-center text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+          Read The FAQs<span className="text-rose-500">.</span>
+        </h3>
+
+        <div className="mt-10 grid gap-x-10 gap-y-2 md:grid-cols-2">
+          <FaqColumn items={faqsLeft} />
+          <FaqColumn items={faqsRight} />
+        </div>
+      </section>
+
+      <ContactForm />
+
+      <footer id="demo" className="bg-[#032434] text-white transition-colors dark:bg-[#2f2f2f]">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] md:px-8 md:py-12">
+          <div>
+            <div className="flex items-center gap-2 text-3xl font-black">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-sm font-black text-[#032434]">E</span>
+              EmbodiTrust
+            </div>
+            <p className="mt-3 text-slate-200">Measure and grow your product authenticity visibility.</p>
+          </div>
+
+          <div className="flex items-end gap-4 text-sm text-slate-200">
+            <Link href="#" className="hover:text-white">Privacy Policy</Link>
+            <Link href="#" className="hover:text-white">Terms & Conditions</Link>
+            <Link href="#" className="hover:text-white">Cookie Policy</Link>
+            <Link href="#" className="hover:text-white">Contact</Link>
+          </div>
+        </div>
+      </footer>
     </main>
+  );
+}
+
+function FaqColumn({ items }: { items: Array<{ question: string; answer: string }> }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className="divide-y divide-[#cfd7e3] border-t border-[#cfd7e3] dark:divide-[#585858] dark:border-[#585858]">
+      {items.map((item) => (
+        <div key={item.question}>
+          <button
+            type="button"
+            onClick={() => setExpanded(expanded === item.question ? null : item.question)}
+            className="flex w-full items-center justify-between py-3 text-left text-sm font-semibold text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+          >
+            <span>{item.question}</span>
+            <Plus
+              className={`h-4 w-4 text-slate-500 dark:text-slate-300 transition-transform duration-300 ${
+                expanded === item.question ? 'rotate-45 transform' : ''
+              }`}
+            />
+          </button>
+          {expanded === item.question && (
+            <div className="overflow-hidden pb-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <p className="text-xs leading-6 text-slate-600 dark:text-slate-300">{item.answer}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TypeWriter({ text, className }: { text: string[]; className: string }) {
+  const [displayText, setDisplayText] = useState('');
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentLineIndex < text.length) {
+      const line = text[currentLineIndex];
+      
+      if (currentCharIndex < line.length) {
+        const timer = setTimeout(() => {
+          setDisplayText(prev => prev + line[currentCharIndex]);
+          setCurrentCharIndex(prev => prev + 1);
+        }, 30);
+        
+        return () => clearTimeout(timer);
+      } else {
+        // Move to next line
+        const timer = setTimeout(() => {
+          setDisplayText(prev => prev + '\n');
+          setCurrentLineIndex(prev => prev + 1);
+          setCurrentCharIndex(0);
+        }, 200);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentLineIndex, currentCharIndex, text]);
+
+  return (
+    <h1 className={className}>
+      {displayText.split('\n').map((line, idx) => (
+        <span key={idx}>
+          {line}
+          {idx < text.length - 1 && <br />}
+        </span>
+      ))}
+      {currentLineIndex < text.length && <span className="animate-pulse">|</span>}
+    </h1>
+  );
+}
+
+function FeatureIllustration({ variant }: { variant: number }) {
+  const illustrations = [
+    {
+      src: '/illustrations/creative-work.svg',
+      alt: 'Team collaborating on verification intelligence',
+    },
+    {
+      src: '/illustrations/businessman-with-a-suitcase.svg',
+      alt: 'Engineer reviewing automated risk queries',
+    },
+    {
+      src: '/illustrations/sales.svg',
+      alt: 'Operational team working with verification evidence',
+    },
+    {
+      src: '/illustrations/shaking-hands (1).svg',
+      alt: 'Business growth driven by authenticity insights',
+    },
+  ];
+
+  const illustration = illustrations[variant] ?? illustrations[0];
+
+  return (
+    <img
+      src={illustration.src}
+      alt={illustration.alt}
+      className="h-auto w-full max-h-[24rem] object-contain contrast-125 saturate-125 transition-transform duration-500 hover:scale-[1.02] md:max-h-[30rem]"
+      loading="lazy"
+    />
+  );
+}
+
+function AgentIllustration({ variant }: { variant: number }) {
+  if (variant === 0) {
+    return (
+      <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
+        <ellipse cx="138" cy="128" rx="104" ry="84" fill="#ff4d4f" opacity="0.9" />
+        <ellipse cx="166" cy="160" rx="88" ry="52" fill="#c7f1ef" />
+        <circle cx="142" cy="90" r="24" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+        <rect x="96" y="116" width="98" height="62" rx="20" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+      </svg>
+    );
+  }
+
+  if (variant === 1) {
+    return (
+      <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
+        <ellipse cx="200" cy="126" rx="108" ry="84" fill="#a6a7ff" />
+        <path d="M140 172 C170 102, 232 92, 256 156" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+        <circle cx="192" cy="96" r="22" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
+      <ellipse cx="166" cy="134" rx="96" ry="80" fill="#c9d2df" />
+      <path d="M112 174 C128 114, 200 108, 220 168" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+      <circle cx="170" cy="94" r="22" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function IndustryTileIcon({
+  kind,
+}: {
+  kind:
+    | 'travel'
+    | 'commerce'
+    | 'finance'
+    | 'health'
+    | 'auto'
+    | 'education'
+    | 'real-estate'
+    | 'legal'
+    | 'saas'
+    | 'crypto';
+}) {
+  const common = {
+    stroke: '#0d1f31',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    fill: 'none',
+  };
+
+  return (
+    <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" aria-hidden="true">
+      {kind === 'travel' && (
+        <>
+          <path d="M3 14H17" {...common} />
+          <path d="M4 11L10 6L16 11" {...common} />
+          <circle cx="10" cy="6" r="1.5" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'commerce' && (
+        <>
+          <rect x="4" y="6" width="12" height="9" rx="2" {...common} />
+          <path d="M7 6V4.8C7 4 7.7 3.3 8.5 3.3H11.5C12.3 3.3 13 4 13 4.8V6" {...common} />
+          <circle cx="14.8" cy="11" r="1.2" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'finance' && (
+        <>
+          <path d="M4 15V10" {...common} />
+          <path d="M8 15V7" {...common} />
+          <path d="M12 15V9" {...common} />
+          <path d="M16 15V5" {...common} />
+          <circle cx="16" cy="5" r="1.2" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'health' && (
+        <>
+          <rect x="4" y="5" width="12" height="10" rx="2" {...common} />
+          <path d="M10 7V13" {...common} />
+          <path d="M7 10H13" {...common} />
+          <circle cx="5" cy="5" r="1.1" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'auto' && (
+        <>
+          <path d="M4 12L6 8H14L16 12" {...common} />
+          <rect x="4" y="11" width="12" height="4" rx="1.5" {...common} />
+          <circle cx="7" cy="15" r="1" fill="#22d3ee" />
+          <circle cx="13" cy="15" r="1" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'education' && (
+        <>
+          <path d="M3 8L10 5L17 8L10 11L3 8Z" {...common} />
+          <path d="M6 9.5V12.5C6 13.7 7.9 14.7 10 14.7C12.1 14.7 14 13.7 14 12.5V9.5" {...common} />
+          <circle cx="17" cy="8" r="1.1" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'real-estate' && (
+        <>
+          <path d="M4 15V8L10 4L16 8V15" {...common} />
+          <path d="M8.5 15V11H11.5V15" {...common} />
+          <circle cx="15.5" cy="5" r="1.2" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'legal' && (
+        <>
+          <path d="M10 5V15" {...common} />
+          <path d="M6 7H14" {...common} />
+          <path d="M5 7L3.5 10H6.5L5 7Z" {...common} />
+          <path d="M15 7L13.5 10H16.5L15 7Z" {...common} />
+          <circle cx="10" cy="4" r="1.1" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'saas' && (
+        <>
+          <rect x="3.5" y="4" width="13" height="12" rx="2" {...common} />
+          <path d="M3.5 7.5H16.5" {...common} />
+          <path d="M6.5 11H9.5" {...common} />
+          <path d="M11 11H13.5" {...common} />
+          <circle cx="6" cy="6" r="0.9" fill="#22d3ee" />
+        </>
+      )}
+      {kind === 'crypto' && (
+        <>
+          <circle cx="10" cy="10" r="5.2" {...common} />
+          <path d="M8.2 8.1H10.8C11.4 8.1 11.9 8.5 11.9 9.1C11.9 9.7 11.4 10.1 10.8 10.1H9.3C8.6 10.1 8.1 10.6 8.1 11.2C8.1 11.8 8.6 12.2 9.3 12.2H11.8" {...common} />
+          <path d="M10 7V13" {...common} />
+          <circle cx="14.8" cy="6" r="1.1" fill="#22d3ee" />
+        </>
+      )}
+    </svg>
   );
 }

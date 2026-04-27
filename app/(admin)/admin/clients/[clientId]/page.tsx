@@ -1409,9 +1409,20 @@ body {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b">
-          <div className="max-w-7xl mx-auto px-6 py-6">
+      <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+        <style>{`
+          .bg-texture {
+            background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+            background-size: 24px 24px;
+          }
+          .dark .bg-texture {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+            background-size: 24px 24px;
+          }
+        `}</style>
+
+        <div className="px-4 pb-2 pt-4 md:px-8 md:pt-6">
+          <div className="mx-auto w-full max-w-7xl rounded-xl border border-[#d7dde6] bg-white/95 px-4 py-4 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:px-6 md:py-5">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
@@ -1440,22 +1451,33 @@ body {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:px-6">
           <div className="text-center py-12">
             <RefreshCw className="h-12 w-12 animate-spin mx-auto text-blue-600 mb-4" />
             <p className="text-gray-600">Loading client details...</p>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   // Client not found
   if (!client) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b">
-          <div className="max-w-7xl mx-auto px-6 py-6">
+      <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+        <style>{`
+          .bg-texture {
+            background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+            background-size: 24px 24px;
+          }
+          .dark .bg-texture {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+            background-size: 24px 24px;
+          }
+        `}</style>
+
+        <div className="px-4 pb-2 pt-4 md:px-8 md:pt-6">
+          <div className="mx-auto w-full max-w-7xl rounded-xl border border-[#d7dde6] bg-white/95 px-4 py-4 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:px-6 md:py-5">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
@@ -1480,7 +1502,7 @@ body {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:px-6">
           <Card>
             <CardContent className="pt-6">
               <div className="text-center py-12">
@@ -1499,14 +1521,25 @@ body {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+    <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+      <style>{`
+        .bg-texture {
+          background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .dark .bg-texture {
+          background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+
+      <div className="px-4 pb-2 pt-4 md:px-8 md:pt-6">
+        <div className="mx-auto w-full max-w-7xl rounded-xl border border-[#d7dde6] bg-white/95 px-4 py-4 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:px-6 md:py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
@@ -1545,7 +1578,7 @@ body {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:px-6">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Client Overview</h2>
@@ -3232,6 +3265,6 @@ body {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }

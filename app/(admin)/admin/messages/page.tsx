@@ -107,13 +107,13 @@ export default function MessagesPage() {
   const statusBadge = (status: string) => {
     switch (status) {
       case 'read':
-        return <Badge className="bg-blue-100 text-blue-700"><Eye className="h-3 w-3 mr-1" /> Read</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800"><Eye className="h-3 w-3 mr-1" /> Read</Badge>;
       case 'delivered':
-        return <Badge className="bg-green-100 text-green-700"><CheckCircle className="h-3 w-3 mr-1" /> Delivered</Badge>;
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" /> Delivered</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-700"><XCircle className="h-3 w-3 mr-1" /> Failed</Badge>;
+        return <Badge className="bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" /> Failed</Badge>;
       default:
-        return <Badge variant="outline">Sent</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">Sent</Badge>;
     }
   };
 
@@ -126,19 +126,37 @@ export default function MessagesPage() {
     });
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Messages</h1>
-          <p className="text-sm text-muted-foreground">
-            Communications & counterfeit reports
-          </p>
+    <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+      <style>{`
+        .bg-texture {
+          background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .dark .bg-texture {
+          background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+
+      <div className="px-4 pb-2 pt-4 md:px-8 md:pt-6">
+        <div className="mx-auto w-full max-w-7xl rounded-xl border border-[#d7dde6] bg-white/95 px-4 py-4 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:px-6 md:py-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-300">Workspace</p>
+              <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">Messages</h1>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Communications and counterfeit reports</p>
+            </div>
+            <Button
+              onClick={() => setShowSendDialog(true)}
+              className="bg-[#032434] text-white hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
+            >
+              <Send className="mr-2 h-4 w-4" /> Send Message
+            </Button>
+          </div>
         </div>
-        <Button onClick={() => setShowSendDialog(true)} className="bg-cyan-500 hover:bg-cyan-600">
-          <Send className="h-4 w-4 mr-2" /> Send Message
-        </Button>
       </div>
+
+      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
 
       {/* Stats – scrollable on mobile */}
       <div className="flex gap-4 overflow-x-auto pb-2">
@@ -149,14 +167,14 @@ export default function MessagesPage() {
           { label: 'Reports', value: stats.reports, icon: FileWarning },
           { label: 'Unread', value: stats.unread, icon: AlertTriangle },
         ].map((s, i) => (
-          <Card key={i} className="min-w-[160px]">
+          <Card key={i} className="min-w-[160px] rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
             <CardContent className="pt-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                  <p className="text-2xl font-bold">{s.value}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-300">{s.label}</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{s.value}</p>
                 </div>
-                <s.icon className="h-6 w-6 text-gray-400" />
+                <s.icon className="h-6 w-6 text-slate-400 dark:text-slate-300" />
               </div>
             </CardContent>
           </Card>
@@ -164,21 +182,21 @@ export default function MessagesPage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
         <CardHeader className="space-y-4">
-          <CardTitle>Messages</CardTitle>
+          <CardTitle className="text-slate-900 dark:text-slate-100">Messages</CardTitle>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232]"
               />
             </div>
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-full sm:w-[200px]">
+              <SelectTrigger className="w-full border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232] sm:w-[200px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -196,16 +214,16 @@ export default function MessagesPage() {
           {/* MOBILE VIEW */}
           <div className="space-y-4 sm:hidden">
             {messages.map((m) => (
-              <Card key={m._id}>
+              <Card key={m._id} className="rounded-2xl border border-[#d3dae5] bg-white/95 shadow-sm transition-colors hover:bg-gray-50 dark:border-[#5a5a5a] dark:bg-[#3b3b3b]/95 dark:hover:bg-[#454545]">
                 <CardContent className="pt-4 space-y-2">
                   <div className="flex justify-between">
-                    <p className="font-medium">{m.subject}</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">{m.subject}</p>
                     {statusBadge(m.status)}
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     {m.senderRole === 'admin' ? `To ${m.receiverEmail}` : `From ${m.senderEmail}`}
                   </p>
-                  <p className="text-xs text-gray-400">{formatDate(m.createdAt)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(m.createdAt)}</p>
                   <div className="flex gap-2 pt-2">
                     <Button size="sm" variant="outline" onClick={() => setSelectedMessage(m)}>
                       <Eye className="h-4 w-4 mr-1" /> View
@@ -234,10 +252,10 @@ export default function MessagesPage() {
               </TableHeader>
               <TableBody>
                 {messages.map((m) => (
-                  <TableRow key={m._id}>
+                  <TableRow key={m._id} className="border-b transition-colors hover:bg-gray-50 dark:hover:bg-[#454545]">
                     <TableCell>
-                      <div className="font-medium">{m.subject}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-medium text-slate-900 dark:text-slate-100">{m.subject}</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-300">
                         {m.senderRole === 'admin'
                           ? `To ${m.receiverEmail}`
                           : `From ${m.senderEmail}`}
@@ -279,6 +297,8 @@ export default function MessagesPage() {
         </CardContent>
       </Card>
 
+      </div>
+
       <SendMessageDialog
         open={showSendDialog}
         onOpenChange={setShowSendDialog}
@@ -298,6 +318,6 @@ export default function MessagesPage() {
           }}
         />
       )}
-    </div>
+    </main>
   );
 }

@@ -141,8 +141,20 @@ export default function CreateClientPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
+    <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+      <style>{`
+        .bg-texture {
+          background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .dark .bg-texture {
+          background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+
+      <div className="max-w-4xl mx-auto px-4 py-8 md:px-6">
+      <div className="mb-8 rounded-xl border border-[#d7dde6] bg-white/95 p-5 shadow-md backdrop-blur transition-colors dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:p-6">
         <Button 
           variant="ghost" 
           onClick={() => router.push('/admin/clients')}
@@ -151,13 +163,13 @@ export default function CreateClientPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Clients
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight mt-4">Add New Client</h1>
-        <p className="text-gray-500">
+        <h1 className="text-3xl font-black tracking-tight mt-4">Add New Client</h1>
+        <p className="text-slate-600 dark:text-slate-300">
           Register a new pharmaceutical company for QR code generation
         </p>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building className="h-6 w-6" />
@@ -279,7 +291,7 @@ export default function CreateClientPage() {
                 />
               </div>
 
-              <div className="h-px bg-gray-200 my-6"></div>
+              <div className="h-px bg-[#dbe3ee] my-6 dark:bg-[#555555]"></div>
 
               {/* Contact Information */}
               <div className="space-y-4">
@@ -355,7 +367,7 @@ export default function CreateClientPage() {
                 </div>
               </div>
 
-              <div className="h-px bg-gray-200 my-6"></div>
+              <div className="h-px bg-[#dbe3ee] my-6 dark:bg-[#555555]"></div>
 
               {/* Registration & Contract */}
               <div className="space-y-4">
@@ -431,7 +443,7 @@ export default function CreateClientPage() {
                 />
               </div>
 
-              <div className="h-px bg-gray-200 my-6"></div>
+              <div className="h-px bg-[#dbe3ee] my-6 dark:bg-[#555555]"></div>
 
               {/* Additional Information */}
               <div className="space-y-4">
@@ -492,7 +504,7 @@ export default function CreateClientPage() {
               <div className="pt-6">
                 <Button 
                   type="submit" 
-                  className="w-full py-6 text-lg" 
+                  className="w-full py-6 text-lg bg-[#032434] text-white hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]" 
                   disabled={loading}
                   size="lg"
                 >
@@ -514,5 +526,6 @@ export default function CreateClientPage() {
         </CardContent>
       </Card>
     </div>
+    </main>
   );
 }

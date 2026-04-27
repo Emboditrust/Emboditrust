@@ -1,43 +1,49 @@
  'use client';
 
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
-  const handleJoinWaitlist = () => {
-    // Redirect directly to Google Form
-    window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSd3Rx0VAHmR8jNddlyjhSVQtosZnURwM2P2gnQDu1puYXH1KQ/viewform';
-  };
-
   return (
-    <section className="bg-white text-gray-800 pt-24 pb-20 border-b border-gray-100">
-      <div className="container mx-auto px-6 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-          Secure Every Product.<br />
-          <span className="text-emerald-600">Empower Every Customer.</span>
-        </h1>
-        
-        <p className="text-lg md:text-xl mb-8 text-gray-600 max-w-3xl mx-auto font-semibold">
-          Protecting Brands from Counterfeits. Building Trust with Every Scan.
-        </p>
+    <section className="relative bg-gradient-to-b from-slate-950 to-slate-900 text-white pt-32 pb-20 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-600/5 rounded-full blur-3xl"></div>
+      </div>
 
-        <p className="text-base mb-12 font-headerAlt text-gray-500 max-w-4xl mx-auto leading-relaxed">
-          EmbodiTrust is a mobile and blockchain-enabled product authentication platform 
-          that helps brands stop counterfeits and fraud, build consumer trust, and strengthen 
-          loyalty through secure QR technology and real-time engagement.
-        </p>
+      <div className="container mx-auto px-6 md:px-8 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-block mb-6 px-4 py-2 bg-emerald-600/20 border border-emerald-500/30 rounded-full text-sm font-medium text-emerald-300">
+            Product Authentication Platform
+          </div>
 
-        <div className="flex w-full flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="#contact"
-            className="bg-emerald-400 w-full md:w-1/5 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-500 transition-colors duration-300 shadow-lg"
-          >
-            Contact
-          </Link>
-          <a
-            href="#features"
-            className="border-2 w-full md:w-1/5 border-emerald-500 text-emerald-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-emerald-400 hover:border-transparent hover:text-white transition-colors duration-300"
-          >
-            Learn More
-          </a>
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight tracking-tight">
+            Secure Every Product.<br />
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Build Consumer Trust.</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl mb-4 text-slate-300 font-light">
+            Real-time verification and anti-counterfeit intelligence at scale
+          </p>
+
+          <p className="text-base md:text-lg mb-10 text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            EmbodiTrust is an all-in-one platform for product authentication, fraud detection, and consumer engagement. Monitor every scan, detect threats in real-time, and connect with verified customers.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="#contact"
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300"
+            >
+              Get Started <ArrowRight size={18} />
+            </Link>
+            <a
+              href="#features"
+              className="flex items-center gap-2 border border-slate-600 hover:border-emerald-500 text-slate-300 hover:text-emerald-400 px-8 py-3 rounded-lg font-semibold transition-colors duration-300"
+            >
+              Learn More <ArrowRight size={18} />
+            </a>
+          </div>
         </div>
       </div>
     </section>

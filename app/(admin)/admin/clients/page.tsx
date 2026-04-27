@@ -397,14 +397,25 @@ export default function ClientsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+    <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
+      <style>{`
+        .bg-texture {
+          background-image: radial-gradient(circle, rgba(71,85,105,0.2) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+        .dark .bg-texture {
+          background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+          background-size: 24px 24px;
+        }
+      `}</style>
+
+      <div className="px-4 pb-2 pt-4 md:px-8 md:pt-6">
+        <div className="mx-auto w-full max-w-7xl rounded-xl border border-[#d7dde6] bg-white/95 px-4 py-4 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95 md:px-6 md:py-5">
           <div className="md:flex hidden items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Client Management</h1>
-              <p className="text-sm text-gray-500 mt-1">Manage client accounts and verification tracking</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-300">Workspace</p>
+              <h1 className="text-2xl font-black text-slate-900 dark:text-slate-100">Client Management</h1>
+              <p className="text-sm text-slate-600 mt-1 dark:text-slate-300">Manage client accounts and verification tracking</p>
             </div>
             <div className="flex items-center gap-2">
               <img 
@@ -412,13 +423,13 @@ export default function ClientsPage() {
                 alt="Admin User"
                 className="w-8 h-8 rounded-full grayscale object-cover"
               />
-              <span className="font-medium text-[14px] text-gray-900">Admin User</span>
+              <span className="font-medium text-[14px] text-slate-900 dark:text-slate-100">Admin User</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:px-6">
         {/* Overview Section */}
         <div className="mb-8">
           <div className="flex items-center  justify-between mb-6">
@@ -428,12 +439,12 @@ export default function ClientsPage() {
                 <Search className="absolute  left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search clients by name, email, or ID..."
-                  className="pl-10 w-80"
+                  className="pl-10 w-80 border-[#c8d1dd] bg-white/95 dark:border-[#595959] dark:bg-[#323232]"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <Button onClick={() => setAddDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => setAddDialogOpen(true)} className="bg-[#032434] text-white hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Client
               </Button>
@@ -442,7 +453,7 @@ export default function ClientsPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
+            <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                    <HiUserGroup className="h-10 w-10 text-blue-500 opacity-20" />
@@ -463,7 +474,7 @@ export default function ClientsPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                    <Package className="h-10 w-10 text-purple-500 opacity-20" />
@@ -480,7 +491,7 @@ export default function ClientsPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                    <Clock className="h-10 w-10 text-yellow-500 opacity-20" />
@@ -497,7 +508,7 @@ export default function ClientsPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                    <Shield className="h-10 w-10 text-green-500 opacity-20" />
@@ -522,7 +533,7 @@ export default function ClientsPage() {
         </div>
 
         {/* Clients Table */}
-        <Card>
+        <Card className="rounded-2xl border border-[#cfd7e3] bg-white/95 shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]/95">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -1080,6 +1091,6 @@ export default function ClientsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }
