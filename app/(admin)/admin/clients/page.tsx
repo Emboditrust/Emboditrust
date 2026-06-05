@@ -128,7 +128,7 @@ export default function ClientsPage() {
 
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [addDialogOpen]);
 
   const fetchClients = async () => {
     setLoading(true);
