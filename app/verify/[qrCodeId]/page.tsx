@@ -6,6 +6,7 @@ import ProductCode from '@/models/ProductCode';
 import VerificationAttempt from '@/models/VerificationAttempt';
 import Batch from '@/models/Batch';
 import Client from '@/models/Client';
+import Reward from '@/models/Reward';
 import { headers } from 'next/headers';
 
 // Function to get geolocation (same as above)
@@ -100,10 +101,11 @@ export default async function VerificationPage({
     notFound();
   }
 
-  // Get batch and client info
-  const [batch, client] = await Promise.all([
+  // Get batch, client, and reward info
+  const [batch, client, reward] = await Promise.all([
     Batch.findOne({ batchId: productCode.batchId }).lean(),
-    Client.findOne({ manufacturerId: productCode.manufacturerId }).lean()
+    Client.findOne({ manufacturerId: productCode.manufacturerId }).lean(),
+    Reward.findOne({ qrCodeId, status: 'delivered' }).lean(),
   ]);
 
   // Log the QR scan attempt with location
@@ -147,7 +149,12 @@ export default async function VerificationPage({
       registrationNumber: client.registrationNumber,
       website: client.website,
       logoUrl: client.logoUrl || null,
-    } : null
+    } : null,
+    rewardClaimed: reward ? {
+      amount: (reward as any).amount,
+      network: (reward as any).network,
+      deliveredAt: (reward as any).deliveredAt,
+    } : null,
   };
 
   return (

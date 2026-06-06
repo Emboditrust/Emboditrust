@@ -73,6 +73,7 @@ export default function VerificationClientPage({
     `This ${displayProductName} has been successfully verified as authentic.`;
 
   const rewardConfig = verificationData.batch?.rewardConfig || null;
+  const rewardClaimed = verificationData.rewardClaimed || null;
 
   /* ================= STATE ================= */
   const [showScratchDialog, setShowScratchDialog] = useState(true);
@@ -114,7 +115,7 @@ export default function VerificationClientPage({
     let prefix = cleaned;
     if (cleaned.startsWith('234')) prefix = '0' + cleaned.substring(3);
     const first4 = prefix.substring(0, 4);
-    const mtn = ['0803', '0806', '0703', '0706', '0810', '0813', '0814', '0816', '0903', '0906', '0913', '0916'];
+    const mtn = ['0803', '0806', '0703', '0706', '0810', '0813', '0814', '0816', '0903', '0906', '0913', '0916', '0801'];
     const glo = ['0805', '0807', '0811', '0815', '0705', '0905', '0915'];
     const airtel = ['0802', '0808', '0701', '0708', '0812', '0901', '0902', '0907', '0912'];
     const etisalat = ['0809', '0817', '0818', '0909', '0908'];
@@ -478,6 +479,14 @@ export default function VerificationClientPage({
                       This product has been verified before.
                       If you suspect this might be a counterfeit, you report it.
                     </p>
+                    {rewardClaimed && (
+                      <div className="mt-3 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5">
+                        <BadgeCheck className="h-4 w-4 text-green-600 shrink-0" />
+                        <p className="text-sm text-green-700">
+                          Airtime reward of {rewardClaimed.amount} Naira was claimed for this product
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
