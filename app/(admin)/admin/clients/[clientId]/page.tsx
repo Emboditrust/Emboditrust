@@ -95,6 +95,7 @@ import {
   Target,
   Wifi,
   Clock,
+  Code,
   Building2,
   ChevronLeft,
   ChevronRight,
@@ -239,8 +240,12 @@ export default function ClientDetailsPage() {
 
   const isValidUrl = (url: string) => {
     if (!url) return true;
-    try { new URL(url); return true; }
-    catch { return false; }
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   // Fetch all client data
@@ -265,6 +270,8 @@ export default function ClientDetailsPage() {
       const clientStats = clientData.statistics;
 
       setClient(client);
+      console.log(clientData);
+      
 
       // Set edit form data
       setEditFormData({
@@ -543,7 +550,9 @@ export default function ClientDetailsPage() {
     if (!client) return;
 
     if (editFormData.website && !isValidUrl(editFormData.website)) {
-      setEditWebsiteError("Please enter a valid URL (e.g. https://company.com)");
+      setEditWebsiteError(
+        "Please enter a valid URL (e.g. https://company.com)",
+      );
       return;
     }
     setEditWebsiteError("");
@@ -1617,7 +1626,13 @@ body {
                 <RefreshCw className="h-4 w-4" />
                 Refresh
               </Button>
-              <Button onClick={() => { setEditDialogOpen(true); setEditWebsiteError(""); }} className="gap-2">
+              <Button
+                onClick={() => {
+                  setEditDialogOpen(true);
+                  setEditWebsiteError("");
+                }}
+                className="gap-2"
+              >
                 <Edit className="h-4 w-4" />
                 Edit Client
               </Button>
@@ -1661,7 +1676,7 @@ body {
                       {client?.monthlyLimit
                         ? Math.round(
                             ((stats?.totalCodes || 0) / client.monthlyLimit) *
-                              100
+                              100,
                           )
                         : 0}
                       % used
@@ -1838,6 +1853,64 @@ body {
                     </div>
                   </CardContent>
                 </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="h-5 w-5" />
+                      Embed Verification Widget
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-gray-600">
+                      Copy this code and send it to the client. They paste it on
+                      their website to add the EmbodiTrust verification widget.
+                    </p>
+                    <div className="relative">
+                      <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-x-auto leading-relaxed max-h-[320px] overflow-y-auto">
+                        {`<!-- EmbodiTrust Verification Widget -->
+<div id="emboditrust-verify"></div>
+<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"></script>
+<script>
+EmbodiTrust.init({
+  container: "#emboditrust-verify",
+  verificationCode: "QR-${client.brandPrefix}-XXXXXXXX-XXXXX",
+  companyName: "${client.companyName}",
+  logoUrl: "${client.logoUrl || ""}",
+  primaryColor: "#2957FF",
+  secondaryColor: "#0B0F19",
+  accentColor: "#19a35b",
+  supportEmail: "${client.email}",
+  supportPhone: "${client.phone}",
+  verificationHeadline: "Product Verification",
+  verificationDescription: "Verify the authenticity of this product"
+});
+<\/script>`}
+                      </pre>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute top-2 right-2 gap-1.5 h-7 text-xs"
+                        onClick={() => {
+                          const code = `<!-- EmbodiTrust Verification Widget -->\n<div id="emboditrust-verify"></div>\n<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"><\/script>\n<script>\nEmbodiTrust.init({\n  container: "#emboditrust-verify",\n  verificationCode: "QR-${client.brandPrefix}-XXXXXXXX-XXXXX",\n  companyName: "${client.companyName}",\n  logoUrl: "${client.logoUrl || ""}",\n  primaryColor: "#2957FF",\n  secondaryColor: "#0B0F19",\n  accentColor: "#19a35b",\n  supportEmail: "${client.email}",\n  supportPhone: "${client.phone}",\n  verificationHeadline: "Product Verification",\n  verificationDescription: "Verify the authenticity of this product"\n});\n<\/script>`;
+                          navigator.clipboard.writeText(code);
+                          toast.success("Widget code copied to clipboard");
+                        }}
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-xs text-blue-800">
+                        <strong>Note:</strong> Replace{" "}
+                        <code className="bg-blue-100 px-1 rounded">
+                          QR-{client.brandPrefix}-XXXXXXXX-XXXXX
+                        </code>{" "}
+                        with the actual verification code from each product.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="space-y-6">
@@ -1934,7 +2007,7 @@ body {
                               (stats.verificationStats.totalVerifications /
                                 1000) *
                                 100,
-                              100
+                              100,
                             )}
                             className="h-2"
                           />
@@ -2036,7 +2109,7 @@ body {
                                 size="sm"
                                 onClick={() =>
                                   setBatchViewMode(
-                                    batchViewMode === "grid" ? "list" : "grid"
+                                    batchViewMode === "grid" ? "list" : "grid",
                                   )
                                 }
                                 className="gap-2"
@@ -2213,11 +2286,11 @@ body {
                                           code.status === "active"
                                             ? "bg-green-100 text-green-800"
                                             : code.status === "verified"
-                                            ? "bg-blue-100 text-blue-800"
-                                            : code.status ===
-                                              "suspected_counterfeit"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-gray-100 text-gray-800"
+                                              ? "bg-blue-100 text-blue-800"
+                                              : code.status ===
+                                                  "suspected_counterfeit"
+                                                ? "bg-red-100 text-red-800"
+                                                : "bg-gray-100 text-gray-800"
                                         }
                                       >
                                         {code.status}
@@ -2241,7 +2314,10 @@ body {
                                           className="h-8 w-8"
                                           onClick={() =>
                                             copyToClipboard(
-                                              code.scratchCode.replace(/-/g, "")
+                                              code.scratchCode.replace(
+                                                /-/g,
+                                                "",
+                                              ),
                                             )
                                           }
                                         >
@@ -2541,7 +2617,7 @@ body {
                                   {formatDate(
                                     batch?.createdAt ||
                                       batch?.generationDate ||
-                                      new Date().toISOString()
+                                      new Date().toISOString(),
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -2699,7 +2775,7 @@ body {
                     to{" "}
                     {Math.min(
                       pagination.currentPage * pagination.itemsPerPage,
-                      pagination.totalItems
+                      pagination.totalItems,
                     )}{" "}
                     of {pagination.totalItems} attempts
                   </div>
@@ -2729,7 +2805,7 @@ body {
                           <p className="text-xl font-bold text-green-600">
                             {
                               verificationAttempts.filter(
-                                (a) => a.result === "valid"
+                                (a) => a.result === "valid",
                               ).length
                             }
                           </p>
@@ -2739,7 +2815,7 @@ body {
                           <p className="text-xl font-bold text-red-600">
                             {
                               verificationAttempts.filter(
-                                (a) => a.result === "invalid"
+                                (a) => a.result === "invalid",
                               ).length
                             }
                           </p>
@@ -2792,7 +2868,7 @@ body {
                                 <TableCell>
                                   <Badge
                                     className={getVerificationResultBadge(
-                                      attempt.result
+                                      attempt.result,
                                     )}
                                   >
                                     {getVerificationResultText(attempt.result)}
@@ -3031,7 +3107,13 @@ body {
       </div>
 
       {/* Edit Client Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={(open) => { setEditDialogOpen(open); if (!open) setEditWebsiteError(""); }}>
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) setEditWebsiteError("");
+        }}
+      >
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
@@ -3187,11 +3269,18 @@ body {
                   <Input
                     value={editFormData.website}
                     onChange={(e) => {
-                      setEditFormData({ ...editFormData, website: e.target.value });
+                      setEditFormData({
+                        ...editFormData,
+                        website: e.target.value,
+                      });
                       setEditWebsiteError("");
                     }}
                     placeholder="Website URL"
-                    className={editWebsiteError ? "border-red-500 focus-visible:ring-red-500" : ""}
+                    className={
+                      editWebsiteError
+                        ? "border-red-500 focus-visible:ring-red-500"
+                        : ""
+                    }
                   />
                   {editWebsiteError && (
                     <p className="text-sm text-red-600">{editWebsiteError}</p>
@@ -3210,7 +3299,7 @@ body {
                   <Select
                     value={editFormData.status}
                     onValueChange={(
-                      value: "active" | "suspended" | "inactive"
+                      value: "active" | "suspended" | "inactive",
                     ) => setEditFormData({ ...editFormData, status: value })}
                   >
                     <SelectTrigger>
@@ -3252,7 +3341,9 @@ body {
                   <div>
                     <div className="flex items-center gap-2">
                       <Smartphone className="h-4 w-4 text-cyan-600" />
-                      <p className="text-sm font-medium text-gray-900">Airtime Reward</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        Airtime Reward
+                      </p>
                     </div>
                     <p className="text-xs text-gray-500">
                       Give customers airtime when they verify products
@@ -3263,7 +3354,10 @@ body {
                       type="checkbox"
                       checked={editFormData.rewardsEnabled}
                       onChange={(e) =>
-                        setEditFormData({ ...editFormData, rewardsEnabled: e.target.checked })
+                        setEditFormData({
+                          ...editFormData,
+                          rewardsEnabled: e.target.checked,
+                        })
                       }
                       className="sr-only peer"
                     />
@@ -3272,7 +3366,9 @@ body {
                 </div>
                 {editFormData.rewardsEnabled && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Reward Amount (₦)</label>
+                    <label className="text-sm font-medium">
+                      Reward Amount (₦)
+                    </label>
                     <Input
                       value={editFormData.rewardAmount}
                       onChange={(e) =>

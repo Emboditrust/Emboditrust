@@ -59,7 +59,7 @@ export default async function VerificationPage({
   searchParams,
 }: {
   params: Promise<{ qrCodeId: string }>;
-  searchParams: Promise<{ scratch?: string }>;
+  searchParams: Promise<{ scratch?: string; embedded?: string }>;
 }) {
   const { qrCodeId } = await params;
   const { scratch } = await searchParams;
@@ -121,6 +121,27 @@ export default async function VerificationPage({
     location: locationData
   });
 
+  // Collect product metadata (only non-empty fields)
+  const customConfig = (batch as any)?.customSuccessConfig || {};
+  const additional = customConfig.additionalFields || {};
+  const productMetadata: Record<string, string> = {};
+  if (productCode.productName) productMetadata['Product Name'] = productCode.productName;
+  if ((batch as any)?.sku) productMetadata['SKU'] = (batch as any).sku;
+  if (productCode.batchId) productMetadata['Batch'] = productCode.batchId;
+  if ((batch as any)?.serialNumber) productMetadata['Serial'] = (batch as any).serialNumber;
+  if ((batch as any)?.manufacturingDate) productMetadata['Manufacturing Date'] = new Date((batch as any).manufacturingDate).toLocaleDateString();
+  if ((batch as any)?.expiryDate) productMetadata['Expiry Date'] = new Date((batch as any).expiryDate).toLocaleDateString();
+  if ((batch as any)?.category) productMetadata['Category'] = (batch as any).category;
+  if ((batch as any)?.marketRegion) productMetadata['Market Region'] = (batch as any).marketRegion;
+  for (const [key, value] of Object.entries(additional)) {
+    if (value && !productMetadata[key]) {
+      productMetadata[key] = String(value);
+    }
+  }
+
+  // Detect embedded mode from query params or headers
+  const embedded = (await searchParams).embedded === 'true';
+
   // Prepare data for client component
   const verificationData = {
     productCode: {
@@ -141,7 +162,13 @@ export default async function VerificationPage({
       productName: batch.productName,
       generationDate: batch.generationDate,
       quantity: batch.quantity,
-      customSuccessConfig: batch.customSuccessConfig || null,
+      sku: (batch as any).sku || '',
+      serialNumber: (batch as any).serialNumber || '',
+      manufacturingDate: (batch as any).manufacturingDate || null,
+      expiryDate: (batch as any).expiryDate || null,
+      category: (batch as any).category || '',
+      marketRegion: (batch as any).marketRegion || '',
+      customSuccessConfig: customConfig,
       rewardConfig: (batch as any).rewardConfig || null,
     } : null,
     client: client ? {
@@ -155,6 +182,8 @@ export default async function VerificationPage({
       network: (reward as any).network,
       deliveredAt: (reward as any).deliveredAt,
     } : null,
+    productMetadata: Object.keys(productMetadata).length > 0 ? productMetadata : null,
+    embedded,
   };
 
   return (

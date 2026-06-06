@@ -5,6 +5,12 @@ export interface IBatch extends mongoose.Document {
   manufacturerId: string;
   productName: string;
   companyName: string;
+  sku?: string;
+  serialNumber?: string;
+  manufacturingDate?: Date;
+  expiryDate?: Date;
+  category?: string;
+  marketRegion?: string;
   quantity: number;
   generationDate: Date;
   codesGenerated: number;
@@ -43,6 +49,34 @@ const BatchSchema = new mongoose.Schema({
   companyName: {
     type: String,
     required: true,
+  },
+  sku: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  serialNumber: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  manufacturingDate: {
+    type: Date,
+    default: null,
+  },
+  expiryDate: {
+    type: Date,
+    default: null,
+  },
+  category: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  marketRegion: {
+    type: String,
+    trim: true,
+    default: '',
   },
   quantity: {
     type: Number,

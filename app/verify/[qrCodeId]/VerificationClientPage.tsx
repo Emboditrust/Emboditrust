@@ -74,6 +74,7 @@ export default function VerificationClientPage({
 
   const rewardConfig = verificationData.batch?.rewardConfig || null;
   const rewardClaimed = verificationData.rewardClaimed || null;
+  const embedded = verificationData.embedded || false;
 
   /* ================= STATE ================= */
   const [showScratchDialog, setShowScratchDialog] = useState(true);
@@ -379,13 +380,25 @@ export default function VerificationClientPage({
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <div className="p-2 bg-cyan-50 rounded-lg">
-              <Shield className="h-6 w-6 text-cyan-600" />
-            </div>
-            <div>
-              <div className="text-xl font-bold text-gray-900">Emboditrust</div>
-              <div className="text-xs text-gray-500">Product Verification</div>
-            </div>
+            {embedded && displayLogoUrl ? (
+              <Image
+                src={displayLogoUrl}
+                alt={displayCompanyName}
+                width={120}
+                height={40}
+                className="h-8 w-auto object-contain"
+              />
+            ) : (
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-cyan-50 rounded-lg">
+                  <Shield className="h-6 w-6 text-cyan-600" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-gray-900">Emboditrust</div>
+                  <div className="text-xs text-gray-500">Product Verification</div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Scan className="h-5 w-5 text-gray-400" />
@@ -466,6 +479,26 @@ export default function VerificationClientPage({
                 </div>
               </CardContent>
             </Card>
+
+            {verificationData.productMetadata && (
+              <div className="mt-8">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wider">
+                  Product Information
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(verificationData.productMetadata).map(([label, value]) => (
+                    <div key={label} className="bg-white rounded-xl border border-gray-200 p-3">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        {label}
+                      </div>
+                      <div className="text-sm font-semibold text-gray-900 mt-1">
+                        {value as string}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {verificationCount > 1 && (
               <div className="mt-6 rounded-3xl px-5 py-4 shadow-sm">
