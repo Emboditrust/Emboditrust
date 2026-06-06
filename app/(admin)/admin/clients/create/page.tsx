@@ -92,13 +92,14 @@ export default function CreateClientPage() {
     try {
       console.log('Submitting form data:', data);
       
-      // Prepare the data for API
+      // Strip form-only fields and build clean API payload
+      const { rewardsEnabled, rewardAmount, ...apiData } = data;
       const requestData = {
-        ...data,
-        monthlyLimit: Number(data.monthlyLimit),
-        logoUrl: data.logoUrl || '',
-        website: data.website || '',
-        additionalInfo: data.additionalInfo || '',
+        ...apiData,
+        monthlyLimit: Number(apiData.monthlyLimit),
+        logoUrl: apiData.logoUrl || '',
+        website: apiData.website || '',
+        additionalInfo: apiData.additionalInfo || '',
         rewardsConfig: {
           airtime: {
             enabled: data.rewardsEnabled,

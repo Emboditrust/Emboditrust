@@ -90,6 +90,8 @@ import {
   Scan,
   CheckSquare,
   Compass,
+  Gift,
+  Smartphone,
   Target,
   Wifi,
   Clock,
@@ -229,6 +231,8 @@ export default function ClientDetailsPage() {
     status: "active" as "active" | "suspended" | "inactive",
     monthlyLimit: 0,
     website: "",
+    rewardsEnabled: false,
+    rewardAmount: 50,
   });
 
   // Fetch all client data
@@ -267,6 +271,8 @@ export default function ClientDetailsPage() {
         status: client.status || "active",
         monthlyLimit: client.monthlyLimit || 0,
         website: client.website || "",
+        rewardsEnabled: client.rewardsConfig?.airtime?.enabled || false,
+        rewardAmount: client.rewardsConfig?.airtime?.amount || 50,
       });
 
       if (client.manufacturerId) {
@@ -529,13 +535,22 @@ export default function ClientDetailsPage() {
     if (!client) return;
 
     try {
+      const { rewardsEnabled, rewardAmount, ...cleanEditData } = editFormData;
       const response = await fetch(`/api/admin/clients/${client.clientId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify({
+          ...cleanEditData,
+          rewardsConfig: {
+            airtime: {
+              enabled: editFormData.rewardsEnabled,
+              amount: editFormData.rewardAmount,
+            },
+          },
+        }),
       });
 
       if (response.ok) {
@@ -3207,6 +3222,58 @@ body {
                     max={1000000}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Rewards Program */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase">
+                Rewards Program
+              </h3>
+              <div className="space-y-4 rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="h-4 w-4 text-cyan-600" />
+                      <p className="text-sm font-medium text-gray-900">Airtime Reward</p>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Give customers airtime when they verify products
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.rewardsEnabled}
+                      onChange={(e) =>
+                        setEditFormData({ ...editFormData, rewardsEnabled: e.target.checked })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+                {editFormData.rewardsEnabled && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Reward Amount (₦)</label>
+                    <Input
+                      value={editFormData.rewardAmount}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          rewardAmount: parseInt(e.target.value) || 50,
+                        })
+                      }
+                      type="number"
+                      min={10}
+                      max={10000}
+                      className="max-w-[200px]"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Airtime amount customers receive on first verification
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

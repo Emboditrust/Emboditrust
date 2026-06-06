@@ -220,6 +220,7 @@ export default function ClientsPage() {
     e.preventDefault();
     
     try {
+      const { rewardsEnabled, rewardAmount, ...cleanFormData } = formData;
       const response = await fetch('/api/admin/clients', {
         method: 'POST',
         headers: { 
@@ -228,8 +229,8 @@ export default function ClientsPage() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          ...formData,
-          monthlyLimit: Number(formData.monthlyLimit),
+          ...cleanFormData,
+          monthlyLimit: Number(cleanFormData.monthlyLimit),
           rewardsConfig: {
             airtime: {
               enabled: formData.rewardsEnabled,

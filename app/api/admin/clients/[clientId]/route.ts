@@ -184,12 +184,13 @@ export async function PUT(
     try {
       validatedData = updateClientSchema.parse(body);
     } catch (validationError: any) {
-      console.error('Validation error:', validationError.errors);
+      const details = validationError.issues || validationError.errors || validationError;
+      console.error('Validation error:', JSON.stringify(details, null, 2));
       return NextResponse.json(
         { 
           success: false,
           error: 'Validation failed',
-          details: validationError.errors,
+          details,
           message: 'Please check your input values'
         },
         { status: 400 }
