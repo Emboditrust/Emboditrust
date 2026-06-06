@@ -398,7 +398,6 @@ export default function EmbedGuidePage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-6">
           <Link
@@ -424,10 +423,10 @@ export default function EmbedGuidePage() {
               Vue
             </a>
             <Link
-              href="/admin-login"
+              href="https://emboditrust.com/#contact"
               className="rounded-md bg-[#042333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049]"
             >
-              Admin Login
+              Contact Support
             </Link>
           </nav>
         </div>
@@ -539,11 +538,12 @@ export default function EmbedGuidePage() {
             {[
               {
                 q: "Widget does not appear on the page",
-                a: 'Make sure the container element exists in the DOM before calling EmbodiTrust.init(). If you are using a framework like React, initialize the widget inside a useEffect() or onMounted() hook after the component has rendered.',
+                a: "Make sure the container element exists in the DOM before calling EmbodiTrust.init(). If you are using a framework like React, initialize the widget inside a useEffect() or onMounted() hook after the component has rendered.",
               },
               {
                 q: "Cross-Origin Resource Policy (CORS) errors",
-                a: "The widget loads content from " +
+                a:
+                  "The widget loads content from " +
                   APP_URL +
                   " via an iframe. Ensure your Content-Security-Policy allows frame loading from " +
                   APP_URL +
@@ -557,7 +557,8 @@ export default function EmbedGuidePage() {
               },
               {
                 q: "Script is blocked by Content Security Policy",
-                a: "Add " +
+                a:
+                  "Add " +
                   APP_URL +
                   " to your script-src CSP directive: script-src " +
                   APP_URL +
@@ -581,35 +582,6 @@ export default function EmbedGuidePage() {
                 </div>
               </details>
             ))}
-          </div>
-        </section>
-
-        <section className="mt-20">
-          <div className="rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-200 p-8 text-center md:p-12">
-            <Globe className="mx-auto mb-4 h-10 w-10 text-cyan-600" />
-            <h2 className="text-2xl font-bold text-gray-900">
-              Ready to Go Live?
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-gray-600">
-              Generate QR codes for your products in the admin dashboard and
-              share the verification codes with your customers.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/admin-login"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#042333] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#053049]"
-              >
-                Admin Dashboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-              >
-                Visit Homepage
-                <ExternalLink className="h-4 w-4" />
-              </Link>
-            </div>
           </div>
         </section>
       </div>

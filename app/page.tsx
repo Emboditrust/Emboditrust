@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import ContactForm from '@/components/ContactForm';
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import ContactForm from "@/components/ContactForm";
 import {
   ArrowRight,
   Moon,
@@ -12,112 +12,115 @@ import {
   UsersRound,
   Building2,
   CircleHelp,
-} from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { TbBrandLivewire } from 'react-icons/tb';
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { TbBrandLivewire } from "react-icons/tb";
 import EmbodiTrustWidget from "./wig-test";
 
 const featureRows = [
   {
-    title: 'Your Verification Intelligence Agent',
+    title: "Your Verification Intelligence Agent",
     description:
-      'EmbodiTrust works as an autonomous verification agent: it watches product scans, flags suspicious behavior patterns, and tracks trust signals across your regions on autopilot.',
+      "EmbodiTrust works as an autonomous verification agent: it watches product scans, flags suspicious behavior patterns, and tracks trust signals across your regions on autopilot.",
     reverse: false,
   },
   {
-    title: 'Auto-Generated Risk Topics and Queries',
+    title: "Auto-Generated Risk Topics and Queries",
     description:
-      'No manual setup. EmbodiTrust generates counterfeit risk topics from your brand and product context, then continuously evaluates scan behavior and anomaly paths.',
+      "No manual setup. EmbodiTrust generates counterfeit risk topics from your brand and product context, then continuously evaluates scan behavior and anomaly paths.",
     reverse: true,
   },
   {
-    title: 'Real-World Output and Evidence',
+    title: "Real-World Output and Evidence",
     description:
-      'Capture every verification outcome, suspicious attempt, and hotspot signal. See exactly where interventions are needed and which channels are leaking trust.',
+      "Capture every verification outcome, suspicious attempt, and hotspot signal. See exactly where interventions are needed and which channels are leaking trust.",
     reverse: false,
   },
   {
-    title: 'Measure, Compare, Then Grow',
+    title: "Measure, Compare, Then Grow",
     description:
-      'Every verification flow powers analytics. Track Authenticity Health, Suspicious Share, trust trend movement, and campaign outcomes from one dashboard.',
+      "Every verification flow powers analytics. Track Authenticity Health, Suspicious Share, trust trend movement, and campaign outcomes from one dashboard.",
     reverse: true,
   },
 ];
 
 const agentCards = [
   {
-    title: 'Case Builder',
+    title: "Case Builder",
     description:
-      'Turns suspicious scan signals into ready-to-action investigation cases for your operations and compliance team.',
+      "Turns suspicious scan signals into ready-to-action investigation cases for your operations and compliance team.",
   },
   {
-    title: 'UGC Agent',
+    title: "UGC Agent",
     description:
-      'Finds brand-relevant community conversations and suggests trust-safe responses that improve brand confidence.',
+      "Finds brand-relevant community conversations and suggests trust-safe responses that improve brand confidence.",
   },
   {
-    title: 'Content Optimizer',
+    title: "Content Optimizer",
     description:
-      'Improves post-scan education and authenticity content so buyers get clearer verification guidance.',
+      "Improves post-scan education and authenticity content so buyers get clearer verification guidance.",
   },
 ];
 
 const industries = [
-  { name: 'Travel', kind: 'travel' as const },
-  { name: 'Ecommerce', kind: 'commerce' as const },
-  { name: 'Finance', kind: 'finance' as const },
-  { name: 'Healthcare', kind: 'health' as const },
-  { name: 'Automotive', kind: 'auto' as const },
-  { name: 'Education', kind: 'education' as const },
-  { name: 'Real Estate', kind: 'real-estate' as const },
-  { name: 'Legal', kind: 'legal' as const },
-  { name: 'SaaS', kind: 'saas' as const },
-  { name: 'Crypto', kind: 'crypto' as const },
+  { name: "Travel", kind: "travel" as const },
+  { name: "Ecommerce", kind: "commerce" as const },
+  { name: "Finance", kind: "finance" as const },
+  { name: "Healthcare", kind: "health" as const },
+  { name: "Automotive", kind: "auto" as const },
+  { name: "Education", kind: "education" as const },
+  { name: "Real Estate", kind: "real-estate" as const },
+  { name: "Legal", kind: "legal" as const },
+  { name: "SaaS", kind: "saas" as const },
+  { name: "Crypto", kind: "crypto" as const },
 ];
 
 const faqsLeft = [
   {
-    question: 'What is EmbodiTrust?',
-    answer: 'EmbodiTrust is a verification intelligence platform that helps brands and manufacturers prevent counterfeiting and ensure product authenticity. It uses QR and scratch codes with real-time verification capabilities, combined with AI-powered fraud detection, to track every product scan and identify suspicious patterns. The system works by storing hashed codes, performing instant verification via a fast, server-side API call, and flagging anomalies like geolocation mismatches or brute-force attempts.'
+    question: "What is EmbodiTrust?",
+    answer:
+      "EmbodiTrust is a verification intelligence platform that helps brands and manufacturers prevent counterfeiting and ensure product authenticity. It uses QR and scratch codes with real-time verification capabilities, combined with AI-powered fraud detection, to track every product scan and identify suspicious patterns. The system works by storing hashed codes, performing instant verification via a fast, server-side API call, and flagging anomalies like geolocation mismatches or brute-force attempts.",
   },
   {
-    question: 'Who is EmbodiTrust for?',
-    answer: `EmbodiTrust is designed for brands and manufacturers serious about supply chain authenticity and loss prevention. It's ideal for companies subject to NAFDAC or other regulatory compliance requirements, enterprises experiencing significant counterfeiting losses, distributors needing real-time visibility into product flows, and teams that need to identify and investigate suspicious verification patterns. Any brand with a physical product can benefit from EmbodiTrust's intelligence engine.`
+    question: "Who is EmbodiTrust for?",
+    answer: `EmbodiTrust is designed for brands and manufacturers serious about supply chain authenticity and loss prevention. It's ideal for companies subject to NAFDAC or other regulatory compliance requirements, enterprises experiencing significant counterfeiting losses, distributors needing real-time visibility into product flows, and teams that need to identify and investigate suspicious verification patterns. Any brand with a physical product can benefit from EmbodiTrust's intelligence engine.`,
   },
   {
-    question: 'What is the Verification Intelligence Engine?',
-    answer: `The Verification Intelligence Engine is EmbodiTrust's autonomous monitoring system. It works by: (1) Accepting fast, server-side API calls when products are scanned; (2) Instantly checking code status(active, used, suspected_fake, or invalid); (3) Logging every verification attempt with metadata (IP, geolocation, user agent); (4) Detecting suspicious patterns like failed attempt spikes, geolocation mismatches, and duplicate "already used" scans; (5) Generating automated alerts for your admin team to investigate. The engine runs continuously without manual intervention.`
+    question: "What is the Verification Intelligence Engine?",
+    answer: `The Verification Intelligence Engine is EmbodiTrust's autonomous monitoring system. It works by: (1) Accepting fast, server-side API calls when products are scanned; (2) Instantly checking code status(active, used, suspected_fake, or invalid); (3) Logging every verification attempt with metadata (IP, geolocation, user agent); (4) Detecting suspicious patterns like failed attempt spikes, geolocation mismatches, and duplicate "already used" scans; (5) Generating automated alerts for your admin team to investigate. The engine runs continuously without manual intervention.`,
   },
   {
-    question: 'How is EmbodiTrust different from basic QR validators?',
-    answer: `Most QR validators only check if a code exists and is valid. EmbodiTrust goes beyond: it detects counterfeit patterns in real-time (geolocation mismatches, brute-force attempts, suspicious IP patterns), stores hashed codes, so even a database breach doesn't expose raw codes, implements rate limiting (100 req/min globally, 5 failed attempts/min per IP) to prevent attacks, and provides a complete audit trail in the verification_attempts collection. Your team gets a dashboard showing KPIs, heatmaps, and suspicious activity alerts for investigation.`
+    question: "How is EmbodiTrust different from basic QR validators?",
+    answer: `Most QR validators only check if a code exists and is valid. EmbodiTrust goes beyond: it detects counterfeit patterns in real-time (geolocation mismatches, brute-force attempts, suspicious IP patterns), stores hashed codes, so even a database breach doesn't expose raw codes, implements rate limiting (100 req/min globally, 5 failed attempts/min per IP) to prevent attacks, and provides a complete audit trail in the verification_attempts collection. Your team gets a dashboard showing KPIs, heatmaps, and suspicious activity alerts for investigation.`,
   },
   {
     question: `What is EmbodiTrust's roadmap and long-term vision?`,
-    answer: `EmbodiTrust is building a full verification agent ecosystem. Currently live is the Verification Intelligence Engine (core verification and fraud detection). Coming in 2026: (1) Case Builder – automatically turns suspicious signals into investigation cases for your ops team; (2) UGC Agent – finds brand-relevant community conversations and suggests trust-safe responses; (3) Content Optimizer – improves post-scan education to give buyers clearer verification guidance. The vision is to make verification autonomous and continuous, not a one-time check.`
+    answer: `EmbodiTrust is building a full verification agent ecosystem. Currently live is the Verification Intelligence Engine (core verification and fraud detection). Coming in 2026: (1) Case Builder – automatically turns suspicious signals into investigation cases for your ops team; (2) UGC Agent – finds brand-relevant community conversations and suggests trust-safe responses; (3) Content Optimizer – improves post-scan education to give buyers clearer verification guidance. The vision is to make verification autonomous and continuous, not a one-time check.`,
   },
 ];
 
 const faqsRight = [
   {
-    question: 'Which verification channels does EmbodiTrust support?',
-    answer: 'EmbodiTrust supports two verification channels: (1) QR codes – customers scan a QR code embedded on the product or packaging; (2) Scratch codes – customers manually enter a 12-character alphanumeric code (e.g., ABC4H8K2M9X01) from a scratch-off panel. Both channels feed into the same verification API endpoint (/api/verify), which sanitizes input, looks up the code, checks its status, logs the verification attempt, and returns an instant response (valid, invalid, already_used, or suspected_counterfeit).'
+    question: "Which verification channels does EmbodiTrust support?",
+    answer:
+      "EmbodiTrust supports two verification channels: (1) QR codes – customers scan a QR code embedded on the product or packaging; (2) Scratch codes – customers manually enter a 12-character alphanumeric code (e.g., ABC4H8K2M9X01) from a scratch-off panel. Both channels feed into the same verification API endpoint (/api/verify), which sanitizes input, looks up the code, checks its status, logs the verification attempt, and returns an instant response (valid, invalid, already_used, or suspected_counterfeit).",
   },
   {
-    question: 'How do topics and risk queries work?',
-    answer: `Topics are custom verification scenarios defined for your brand and products (e.g., "Genuine Electronics from Authorized Distributor"). Risk queries are automatically generated evaluation rules that check verification behavior against those topics—without manual setup required. For example: a query might flag "multiple 'already used' scans from different IPs on the same code" as a counterfeit signal, or "code verified from Nigeria and then US within 30 minutes" as geolocation anomaly. The engine generates these queries from your brand context and continuously evaluates them.`
+    question: "How do topics and risk queries work?",
+    answer: `Topics are custom verification scenarios defined for your brand and products (e.g., "Genuine Electronics from Authorized Distributor"). Risk queries are automatically generated evaluation rules that check verification behavior against those topics—without manual setup required. For example: a query might flag "multiple 'already used' scans from different IPs on the same code" as a counterfeit signal, or "code verified from Nigeria and then US within 30 minutes" as geolocation anomaly. The engine generates these queries from your brand context and continuously evaluates them.`,
   },
   {
-    question: 'How does EmbodiTrust generate risk queries?',
-    answer: 'EmbodiTrust generates risk queries by analyzing: (1) Your brand and product context (industry, typical geographies, expected scan volumes); (2) The verification data it collects (code status, verification timestamps, IP locations, failed attempt patterns); (3) Industry-known counterfeiting tactics (replay attacks, brute-force code guessing, geolocation spoofing). The system then creates automated rules—no manual configuration needed—that continuously scan incoming verification attempts and flag outliers. For example, if 50 codes from a single batch suddenly fail verification from a single IP in quick succession, that triggers a "failed attempt spike" alert.'
+    question: "How does EmbodiTrust generate risk queries?",
+    answer:
+      'EmbodiTrust generates risk queries by analyzing: (1) Your brand and product context (industry, typical geographies, expected scan volumes); (2) The verification data it collects (code status, verification timestamps, IP locations, failed attempt patterns); (3) Industry-known counterfeiting tactics (replay attacks, brute-force code guessing, geolocation spoofing). The system then creates automated rules—no manual configuration needed—that continuously scan incoming verification attempts and flag outliers. For example, if 50 codes from a single batch suddenly fail verification from a single IP in quick succession, that triggers a "failed attempt spike" alert.',
   },
   // {
   //   question: 'How does EmbodiTrust collect and organize suspicious evidence?',
   //   answer: `EmbodiTrust maintains two collections: (1) codes collection – stores each unique code with: _id, hashedCode, status, batchId, createdAt, firstVerifiedAt, firstVerifiedFromIP (hashed), and firstVerifiedLocation. (2) verification_attempts collection – logs every scan with: timestamp, scannedCode, result (status returned), ipAddress (hashed), userAgent, and approximateLocation. This dual structure lets you track both the lifecycle of a single code and the aggregate traffic patterns. Admins see a "Suspicious Activity" section in the dashboard listing flagged events (geolocation mismatches, failed spikes, duplicate "already used" scans) with evidence links.`
   // },
   {
-    question: 'How do we get started with EmbodiTrust?',
-    answer: `Getting started is simple: (1) Sign up and book a demo at emboditrust.com; (2) Work with our team to define your brand context (products, geographies, compliance needs); (3) Receive API credentials for the /api/verify endpoint and admin dashboard access; (4) Generate your first batch of codes (with 3-letter brand prefix, 6 random chars, 3-digit Luhn checksum mod 36); (5) Distribute codes on products (as QR or scratch); (6) Monitor verification activity and suspicious alerts in your dashboard. The entire setup takes less than a week. Our team provides onboarding and training for your ops and compliance staff.`
+    question: "How do we get started with EmbodiTrust?",
+    answer: `Getting started is simple: (1) Sign up and book a demo at emboditrust.com; (2) Work with our team to define your brand context (products, geographies, compliance needs); (3) Receive API credentials for the /api/verify endpoint and admin dashboard access; (4) Generate your first batch of codes (with 3-letter brand prefix, 6 random chars, 3-digit Luhn checksum mod 36); (5) Distribute codes on products (as QR or scratch); (6) Monitor verification activity and suspicious alerts in your dashboard. The entire setup takes less than a week. Our team provides onboarding and training for your ops and compliance staff.`,
   },
 ];
 
@@ -129,7 +132,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  const isDark = mounted && theme === 'dark';
+  const isDark = mounted && theme === "dark";
 
   return (
     <main className="min-h-screen bg-[#e8ebf0] bg-texture text-[#0b1c2e] transition-colors duration-300 dark:bg-[#333333] dark:text-[#f3f4f6] [font-family:Urbanist,Outfit,Montserrat,ui-sans-serif]">
@@ -613,7 +616,11 @@ export default function Home() {
   );
 }
 
-function FaqColumn({ items }: { items: Array<{ question: string; answer: string }> }) {
+function FaqColumn({
+  items,
+}: {
+  items: Array<{ question: string; answer: string }>;
+}) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
@@ -622,19 +629,23 @@ function FaqColumn({ items }: { items: Array<{ question: string; answer: string 
         <div key={item.question}>
           <button
             type="button"
-            onClick={() => setExpanded(expanded === item.question ? null : item.question)}
+            onClick={() =>
+              setExpanded(expanded === item.question ? null : item.question)
+            }
             className="flex w-full items-center justify-between py-3 text-left text-sm font-semibold text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
           >
             <span>{item.question}</span>
             <Plus
               className={`h-4 w-4 text-slate-500 dark:text-slate-300 transition-transform duration-300 ${
-                expanded === item.question ? 'rotate-45 transform' : ''
+                expanded === item.question ? "rotate-45 transform" : ""
               }`}
             />
           </button>
           {expanded === item.question && (
             <div className="overflow-hidden pb-3 animate-in fade-in slide-in-from-top-2 duration-300">
-              <p className="text-xs leading-6 text-slate-600 dark:text-slate-300">{item.answer}</p>
+              <p className="text-xs leading-6 text-slate-600 dark:text-slate-300">
+                {item.answer}
+              </p>
             </div>
           )}
         </div>
@@ -643,30 +654,36 @@ function FaqColumn({ items }: { items: Array<{ question: string; answer: string 
   );
 }
 
-function TypeWriter({ text, className }: { text: string[]; className: string }) {
-  const [displayText, setDisplayText] = useState('');
+function TypeWriter({
+  text,
+  className,
+}: {
+  text: string[];
+  className: string;
+}) {
+  const [displayText, setDisplayText] = useState("");
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
 
   useEffect(() => {
     if (currentLineIndex < text.length) {
       const line = text[currentLineIndex];
-      
+
       if (currentCharIndex < line.length) {
         const timer = setTimeout(() => {
-          setDisplayText(prev => prev + line[currentCharIndex]);
-          setCurrentCharIndex(prev => prev + 1);
+          setDisplayText((prev) => prev + line[currentCharIndex]);
+          setCurrentCharIndex((prev) => prev + 1);
         }, 30);
-        
+
         return () => clearTimeout(timer);
       } else {
         // Move to next line
         const timer = setTimeout(() => {
-          setDisplayText(prev => prev + '\n');
-          setCurrentLineIndex(prev => prev + 1);
+          setDisplayText((prev) => prev + "\n");
+          setCurrentLineIndex((prev) => prev + 1);
           setCurrentCharIndex(0);
         }, 200);
-        
+
         return () => clearTimeout(timer);
       }
     }
@@ -674,13 +691,15 @@ function TypeWriter({ text, className }: { text: string[]; className: string }) 
 
   return (
     <h1 className={className}>
-      {displayText.split('\n').map((line, idx) => (
+      {displayText.split("\n").map((line, idx) => (
         <span key={idx}>
           {line}
           {idx < text.length - 1 && <br />}
         </span>
       ))}
-      {currentLineIndex < text.length && <span className="animate-pulse">|</span>}
+      {currentLineIndex < text.length && (
+        <span className="animate-pulse">|</span>
+      )}
     </h1>
   );
 }
@@ -688,20 +707,20 @@ function TypeWriter({ text, className }: { text: string[]; className: string }) 
 function FeatureIllustration({ variant }: { variant: number }) {
   const illustrations = [
     {
-      src: '/illustrations/creative-work.svg',
-      alt: 'Team collaborating on verification intelligence',
+      src: "/illustrations/creative-work.svg",
+      alt: "Team collaborating on verification intelligence",
     },
     {
-      src: '/illustrations/businessman-with-a-suitcase.svg',
-      alt: 'Engineer reviewing automated risk queries',
+      src: "/illustrations/businessman-with-a-suitcase.svg",
+      alt: "Engineer reviewing automated risk queries",
     },
     {
-      src: '/illustrations/sales.svg',
-      alt: 'Operational team working with verification evidence',
+      src: "/illustrations/sales.svg",
+      alt: "Operational team working with verification evidence",
     },
     {
-      src: '/illustrations/shaking-hands (1).svg',
-      alt: 'Business growth driven by authenticity insights',
+      src: "/illustrations/shaking-hands (1).svg",
+      alt: "Business growth driven by authenticity insights",
     },
   ];
 
@@ -720,30 +739,92 @@ function FeatureIllustration({ variant }: { variant: number }) {
 function AgentIllustration({ variant }: { variant: number }) {
   if (variant === 0) {
     return (
-      <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
-        <ellipse cx="138" cy="128" rx="104" ry="84" fill="#ff4d4f" opacity="0.9" />
+      <svg
+        viewBox="0 0 340 220"
+        preserveAspectRatio="xMidYMid meet"
+        className="h-auto w-full max-h-[220px]"
+        aria-hidden="true"
+      >
+        <ellipse
+          cx="138"
+          cy="128"
+          rx="104"
+          ry="84"
+          fill="#ff4d4f"
+          opacity="0.9"
+        />
         <ellipse cx="166" cy="160" rx="88" ry="52" fill="#c7f1ef" />
-        <circle cx="142" cy="90" r="24" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
-        <rect x="96" y="116" width="98" height="62" rx="20" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+        <circle
+          cx="142"
+          cy="90"
+          r="24"
+          fill="#fff"
+          stroke="#0d1f31"
+          strokeWidth="2"
+        />
+        <rect
+          x="96"
+          y="116"
+          width="98"
+          height="62"
+          rx="20"
+          fill="#fff"
+          stroke="#0d1f31"
+          strokeWidth="2"
+        />
       </svg>
     );
   }
 
   if (variant === 1) {
     return (
-      <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
+      <svg
+        viewBox="0 0 340 220"
+        preserveAspectRatio="xMidYMid meet"
+        className="h-auto w-full max-h-[220px]"
+        aria-hidden="true"
+      >
         <ellipse cx="200" cy="126" rx="108" ry="84" fill="#a6a7ff" />
-        <path d="M140 172 C170 102, 232 92, 256 156" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
-        <circle cx="192" cy="96" r="22" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+        <path
+          d="M140 172 C170 102, 232 92, 256 156"
+          fill="#fff"
+          stroke="#0d1f31"
+          strokeWidth="2"
+        />
+        <circle
+          cx="192"
+          cy="96"
+          r="22"
+          fill="#fff"
+          stroke="#0d1f31"
+          strokeWidth="2"
+        />
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 340 220" preserveAspectRatio="xMidYMid meet" className="h-auto w-full max-h-[220px]" aria-hidden="true">
+    <svg
+      viewBox="0 0 340 220"
+      preserveAspectRatio="xMidYMid meet"
+      className="h-auto w-full max-h-[220px]"
+      aria-hidden="true"
+    >
       <ellipse cx="166" cy="134" rx="96" ry="80" fill="#c9d2df" />
-      <path d="M112 174 C128 114, 200 108, 220 168" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
-      <circle cx="170" cy="94" r="22" fill="#fff" stroke="#0d1f31" strokeWidth="2" />
+      <path
+        d="M112 174 C128 114, 200 108, 220 168"
+        fill="#fff"
+        stroke="#0d1f31"
+        strokeWidth="2"
+      />
+      <circle
+        cx="170"
+        cy="94"
+        r="22"
+        fill="#fff"
+        stroke="#0d1f31"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -752,42 +833,45 @@ function IndustryTileIcon({
   kind,
 }: {
   kind:
-    | 'travel'
-    | 'commerce'
-    | 'finance'
-    | 'health'
-    | 'auto'
-    | 'education'
-    | 'real-estate'
-    | 'legal'
-    | 'saas'
-    | 'crypto';
+    | "travel"
+    | "commerce"
+    | "finance"
+    | "health"
+    | "auto"
+    | "education"
+    | "real-estate"
+    | "legal"
+    | "saas"
+    | "crypto";
 }) {
   const common = {
-    stroke: '#0d1f31',
+    stroke: "#0d1f31",
     strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    fill: 'none',
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    fill: "none",
   };
 
   return (
     <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" aria-hidden="true">
-      {kind === 'travel' && (
+      {kind === "travel" && (
         <>
           <path d="M3 14H17" {...common} />
           <path d="M4 11L10 6L16 11" {...common} />
           <circle cx="10" cy="6" r="1.5" fill="#22d3ee" />
         </>
       )}
-      {kind === 'commerce' && (
+      {kind === "commerce" && (
         <>
           <rect x="4" y="6" width="12" height="9" rx="2" {...common} />
-          <path d="M7 6V4.8C7 4 7.7 3.3 8.5 3.3H11.5C12.3 3.3 13 4 13 4.8V6" {...common} />
+          <path
+            d="M7 6V4.8C7 4 7.7 3.3 8.5 3.3H11.5C12.3 3.3 13 4 13 4.8V6"
+            {...common}
+          />
           <circle cx="14.8" cy="11" r="1.2" fill="#22d3ee" />
         </>
       )}
-      {kind === 'finance' && (
+      {kind === "finance" && (
         <>
           <path d="M4 15V10" {...common} />
           <path d="M8 15V7" {...common} />
@@ -796,7 +880,7 @@ function IndustryTileIcon({
           <circle cx="16" cy="5" r="1.2" fill="#22d3ee" />
         </>
       )}
-      {kind === 'health' && (
+      {kind === "health" && (
         <>
           <rect x="4" y="5" width="12" height="10" rx="2" {...common} />
           <path d="M10 7V13" {...common} />
@@ -804,7 +888,7 @@ function IndustryTileIcon({
           <circle cx="5" cy="5" r="1.1" fill="#22d3ee" />
         </>
       )}
-      {kind === 'auto' && (
+      {kind === "auto" && (
         <>
           <path d="M4 12L6 8H14L16 12" {...common} />
           <rect x="4" y="11" width="12" height="4" rx="1.5" {...common} />
@@ -812,21 +896,24 @@ function IndustryTileIcon({
           <circle cx="13" cy="15" r="1" fill="#22d3ee" />
         </>
       )}
-      {kind === 'education' && (
+      {kind === "education" && (
         <>
           <path d="M3 8L10 5L17 8L10 11L3 8Z" {...common} />
-          <path d="M6 9.5V12.5C6 13.7 7.9 14.7 10 14.7C12.1 14.7 14 13.7 14 12.5V9.5" {...common} />
+          <path
+            d="M6 9.5V12.5C6 13.7 7.9 14.7 10 14.7C12.1 14.7 14 13.7 14 12.5V9.5"
+            {...common}
+          />
           <circle cx="17" cy="8" r="1.1" fill="#22d3ee" />
         </>
       )}
-      {kind === 'real-estate' && (
+      {kind === "real-estate" && (
         <>
           <path d="M4 15V8L10 4L16 8V15" {...common} />
           <path d="M8.5 15V11H11.5V15" {...common} />
           <circle cx="15.5" cy="5" r="1.2" fill="#22d3ee" />
         </>
       )}
-      {kind === 'legal' && (
+      {kind === "legal" && (
         <>
           <path d="M10 5V15" {...common} />
           <path d="M6 7H14" {...common} />
@@ -835,7 +922,7 @@ function IndustryTileIcon({
           <circle cx="10" cy="4" r="1.1" fill="#22d3ee" />
         </>
       )}
-      {kind === 'saas' && (
+      {kind === "saas" && (
         <>
           <rect x="3.5" y="4" width="13" height="12" rx="2" {...common} />
           <path d="M3.5 7.5H16.5" {...common} />
@@ -844,10 +931,13 @@ function IndustryTileIcon({
           <circle cx="6" cy="6" r="0.9" fill="#22d3ee" />
         </>
       )}
-      {kind === 'crypto' && (
+      {kind === "crypto" && (
         <>
           <circle cx="10" cy="10" r="5.2" {...common} />
-          <path d="M8.2 8.1H10.8C11.4 8.1 11.9 8.5 11.9 9.1C11.9 9.7 11.4 10.1 10.8 10.1H9.3C8.6 10.1 8.1 10.6 8.1 11.2C8.1 11.8 8.6 12.2 9.3 12.2H11.8" {...common} />
+          <path
+            d="M8.2 8.1H10.8C11.4 8.1 11.9 8.5 11.9 9.1C11.9 9.7 11.4 10.1 10.8 10.1H9.3C8.6 10.1 8.1 10.6 8.1 11.2C8.1 11.8 8.6 12.2 9.3 12.2H11.8"
+            {...common}
+          />
           <path d="M10 7V13" {...common} />
           <circle cx="14.8" cy="6" r="1.1" fill="#22d3ee" />
         </>

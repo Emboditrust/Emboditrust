@@ -44,6 +44,80 @@ export default function WidgetClientPage({ widgetData }: WidgetProps) {
   const secondary = d.branding.secondaryColor;
   const accent = d.branding.accentColor;
 
+  /* ================= REWARD CLAIM ================= */
+  const [showRewardClaim, setShowRewardClaim] = useState(false);
+  const [rewardPhone, setRewardPhone] = useState('');
+  const [isClaimingReward, setIsClaimingReward] = useState(false);
+  const [rewardResult, setRewardResult] = useState<{ success: boolean; message: string; alreadyClaimed?: boolean } | null>(null);
+  const [detectedNetwork, setDetectedNetwork] = useState<string | null>(null);
+
+  const detectNetworkFromPrefix = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    let prefix = cleaned;
+    if (cleaned.startsWith('234')) prefix = '0' + cleaned.substring(3);
+    const first4 = prefix.substring(0, 4);
+    const mtn = ['0803', '0806', '0703', '0706', '0810', '0813', '0814', '0816', '0903', '0906', '0913', '0916', '0801'];
+    const glo = ['0805', '0807', '0811', '0815', '0705', '0905', '0915'];
+    const airtel = ['0802', '0808', '0701', '0708', '0812', '0901', '0902', '0907', '0912'];
+    const etisalat = ['0809', '0817', '0818', '0909', '0908'];
+    if (mtn.includes(first4)) return 'MTN Nigeria';
+    if (glo.includes(first4)) return 'Glo Mobile';
+    if (airtel.includes(first4)) return 'Airtel Nigeria';
+    if (etisalat.includes(first4)) return '9mobile';
+    return null;
+  };
+
+  const handlePhoneChange = (val: string) => {
+    const cleaned = val.replace(/[^0-9+]/g, '');
+    if (cleaned.length <= 15) {
+      setRewardPhone(cleaned);
+      if (cleaned.replace(/\D/g, '').length >= 10) {
+        setDetectedNetwork(detectNetworkFromPrefix(cleaned));
+      } else {
+        setDetectedNetwork(null);
+      }
+    }
+  };
+
+  const claimReward = async () => {
+    const cleaned = rewardPhone.replace(/\D/g, '');
+    if (cleaned.length < 10) {
+      setErrorMsg('Please enter a valid phone number');
+      return;
+    }
+
+    setIsClaimingReward(true);
+    setRewardResult(null);
+
+    try {
+      const res = await fetch('/api/rewards/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrCodeId: d.qrCodeId, phoneNumber: cleaned }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setRewardResult({ success: true, message: data.message || 'Airtime reward sent successfully' });
+      } else if (data.alreadyClaimed) {
+        setRewardResult({ success: false, alreadyClaimed: true, message: data.message });
+      } else {
+        setRewardResult({ success: false, message: data.message || 'Failed to claim reward' });
+      }
+    } catch {
+      setRewardResult({ success: false, message: 'Network error. Please try again.' });
+    } finally {
+      setIsClaimingReward(false);
+    }
+  };
+
+  const resetRewardClaim = () => {
+    setRewardResult(null);
+    setRewardPhone('');
+    setDetectedNetwork(null);
+  };
+
   const handleScratchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (val.length <= 12) setScratchInput(val);
@@ -80,6 +154,9 @@ export default function WidgetClientPage({ widgetData }: WidgetProps) {
       if (data.verified) {
         setVerifiedCount(data.verificationCount);
         setStep('success');
+        if (data.verificationCount === 1 && d.hasReward) {
+          setShowRewardClaim(true);
+        }
       } else {
         setStep('fail');
       }
@@ -87,7 +164,7 @@ export default function WidgetClientPage({ widgetData }: WidgetProps) {
       setErrorMsg('Network error. Please try again.');
       setStep('input');
     }
-  }, [scratchInput, d.scratchCode, d.qrCodeId]);
+  }, [scratchInput, d.scratchCode, d.qrCodeId, d.hasReward]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -291,6 +368,137 @@ export default function WidgetClientPage({ widgetData }: WidgetProps) {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Reward Claim */}
+            {d.hasReward && showRewardClaim && (
+              <div style={{
+                borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white',
+                overflow: 'hidden', marginBottom: '16px'
+              }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '8px',
+                      background: `${primary}12`, display: 'flex', alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                      </svg>
+                    </div>
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>Airtime Reward</div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>
+                        Receive {d.rewardAmount} Naira airtime for verifying this product
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {!rewardResult && (
+                  <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        value={rewardPhone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        placeholder="Enter phone number (e.g. 08012345678)"
+                        disabled={isClaimingReward}
+                        style={{
+                          width: '100%', padding: '10px 12px 10px 36px',
+                          borderRadius: '8px', border: '1px solid #d1d5db',
+                          fontSize: '14px', outline: 'none', boxSizing: 'border-box'
+                        }}
+                      />
+                      <svg
+                        style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }}
+                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                      >
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                        <line x1="12" y1="18" x2="12.01" y2="18" />
+                      </svg>
+                    </div>
+                    {detectedNetwork && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: '#6b7280' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                          <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        <span>{detectedNetwork} detected</span>
+                      </div>
+                    )}
+                    <button
+                      onClick={claimReward}
+                      disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
+                      style={{
+                        width: '100%', padding: '10px', borderRadius: '8px',
+                        background: secondary, color: 'white', border: 'none',
+                        fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+                        opacity: isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10 ? 0.5 : 1,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                      }}
+                    >
+                      {isClaimingReward ? (
+                        <>
+                          <div className="et-spinner" />
+                          Sending airtime...
+                        </>
+                      ) : (
+                        <>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                          </svg>
+                          Claim {d.rewardAmount} Naira Airtime
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {rewardResult && !rewardResult.alreadyClaimed && rewardResult.success && (
+                  <div style={{ padding: '16px 20px' }}>
+                    <div style={{ borderRadius: '8px', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '12px', textAlign: 'center' }}>
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" style={{ margin: '0 auto 6px', display: 'block' }}>
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#166534', margin: 0 }}>{rewardResult.message}</p>
+                      {detectedNetwork && (
+                        <p style={{ fontSize: '12px', color: '#16a34a', marginTop: '4px' }}>
+                          Credited as {d.rewardAmount} Naira airtime via {detectedNetwork}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {rewardResult && rewardResult.alreadyClaimed && (
+                  <div style={{ padding: '16px 20px' }}>
+                    <div style={{ borderRadius: '8px', background: '#fffbeb', border: '1px solid #fde68a', padding: '12px', textAlign: 'center' }}>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#92400e', margin: 0 }}>{rewardResult.message}</p>
+                    </div>
+                  </div>
+                )}
+
+                {rewardResult && !rewardResult.success && !rewardResult.alreadyClaimed && (
+                  <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ borderRadius: '8px', background: '#fef2f2', border: '1px solid #fecaca', padding: '12px', textAlign: 'center' }}>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#991b1b', margin: 0 }}>{rewardResult.message}</p>
+                      <p style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>You can retry or use a different number</p>
+                    </div>
+                    <button
+                      onClick={resetRewardClaim}
+                      style={{
+                        width: '100%', padding: '8px', borderRadius: '8px',
+                        background: 'white', color: '#374151', border: '1px solid #d1d5db',
+                        fontSize: '13px', fontWeight: 500, cursor: 'pointer'
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
