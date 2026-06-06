@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { TbBrandLivewire } from "react-icons/tb";
-import EmbodiTrustWidget from "./wig-test";
 
 const featureRows = [
   {
@@ -226,7 +225,6 @@ export default function Home() {
           background-size: 24px 24px;
         }
       `}</style>
-      {/* <EmbodiTrustWidget verificationCode="QR-THC-1780734956053-000006-10AJ" /> */}
       <div className="sticky top-0 z-50 mx-auto w-full max-w-6xl px-5 pt-4 md:px-8 md:pt-5">
         <header className="rounded-xl border border-[#d7dde6] bg-white/95 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95">
           <div className="flex h-14 items-center justify-between px-4 md:h-16 md:px-5">
