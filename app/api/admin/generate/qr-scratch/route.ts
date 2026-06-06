@@ -285,6 +285,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Map client's rewards config to batch format
+    const batchRewardConfig = client.rewardsConfig?.airtime?.enabled
+      ? { enabled: true, amount: client.rewardsConfig.airtime.amount }
+      : undefined;
+
     // Start transaction - create batch first
     await Batch.create({
       batchId,
@@ -295,6 +300,7 @@ export async function POST(request: NextRequest) {
       generationDate: new Date(),
       codesGenerated: quantity,
       createdBy: 'admin', // You should get this from session
+      rewardConfig: batchRewardConfig,
       customSuccessConfig: enableCustomPage ? {
         logoUrl: customLogoUrl || client.logoUrl || '',
         companyName,

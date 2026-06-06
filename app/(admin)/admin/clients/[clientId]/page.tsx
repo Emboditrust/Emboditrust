@@ -235,6 +235,14 @@ export default function ClientDetailsPage() {
     rewardAmount: 50,
   });
 
+  const [editWebsiteError, setEditWebsiteError] = useState("");
+
+  const isValidUrl = (url: string) => {
+    if (!url) return true;
+    try { new URL(url); return true; }
+    catch { return false; }
+  };
+
   // Fetch all client data
   const fetchClientDetails = async () => {
     setLoading(true);
@@ -534,6 +542,12 @@ export default function ClientDetailsPage() {
   const handleEditSubmit = async () => {
     if (!client) return;
 
+    if (editFormData.website && !isValidUrl(editFormData.website)) {
+      setEditWebsiteError("Please enter a valid URL (e.g. https://company.com)");
+      return;
+    }
+    setEditWebsiteError("");
+
     try {
       const { rewardsEnabled, rewardAmount, ...cleanEditData } = editFormData;
       const response = await fetch(`/api/admin/clients/${client.clientId}`, {
@@ -556,6 +570,7 @@ export default function ClientDetailsPage() {
       if (response.ok) {
         toast.success("Client updated successfully");
         setEditDialogOpen(false);
+        setEditWebsiteError("");
         fetchClientDetails();
       } else {
         const error = await response.json();
@@ -1602,7 +1617,7 @@ body {
                 <RefreshCw className="h-4 w-4" />
                 Refresh
               </Button>
-              <Button onClick={() => setEditDialogOpen(true)} className="gap-2">
+              <Button onClick={() => { setEditDialogOpen(true); setEditWebsiteError(""); }} className="gap-2">
                 <Edit className="h-4 w-4" />
                 Edit Client
               </Button>
@@ -3016,7 +3031,7 @@ body {
       </div>
 
       {/* Edit Client Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+      <Dialog open={editDialogOpen} onOpenChange={(open) => { setEditDialogOpen(open); if (!open) setEditWebsiteError(""); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
@@ -3171,14 +3186,16 @@ body {
                   <label className="text-sm font-medium">Website</label>
                   <Input
                     value={editFormData.website}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        website: e.target.value,
-                      })
-                    }
+                    onChange={(e) => {
+                      setEditFormData({ ...editFormData, website: e.target.value });
+                      setEditWebsiteError("");
+                    }}
                     placeholder="Website URL"
+                    className={editWebsiteError ? "border-red-500 focus-visible:ring-red-500" : ""}
                   />
+                  {editWebsiteError && (
+                    <p className="text-sm text-red-600">{editWebsiteError}</p>
+                  )}
                 </div>
               </div>
             </div>

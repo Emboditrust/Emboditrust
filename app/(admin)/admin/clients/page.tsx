@@ -128,6 +128,18 @@ export default function ClientsPage() {
     rewardAmount: '50',
   });
 
+  const [websiteError, setWebsiteError] = useState('');
+
+  const isValidUrl = (url: string) => {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     fetchClients();
   }, [addDialogOpen]);
@@ -218,7 +230,13 @@ export default function ClientsPage() {
 
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
+    if (formData.website && !isValidUrl(formData.website)) {
+      setWebsiteError('Please enter a valid URL (e.g. https://company.com)');
+      return;
+    }
+    setWebsiteError('');
+
     try {
       const { rewardsEnabled, rewardAmount, ...cleanFormData } = formData;
       const response = await fetch('/api/admin/clients', {
@@ -245,6 +263,7 @@ export default function ClientsPage() {
       if (response.ok && result.success) {
         toast.success('Client created successfully');
         setAddDialogOpen(false);
+        setWebsiteError('');
         setFormData({
           companyName: '',
           contactPerson: '',
@@ -770,7 +789,7 @@ export default function ClientsPage() {
       </div>
 
       {/* Add Client Dialog */}
-      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+      <Dialog open={addDialogOpen} onOpenChange={(open) => { setAddDialogOpen(open); if (!open) setWebsiteError(""); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
@@ -877,9 +896,16 @@ export default function ClientsPage() {
                   <label className="text-sm font-medium">Website (Optional)</label>
                   <Input
                     value={formData.website}
-                    onChange={(e) => setFormData({...formData, website: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, website: e.target.value});
+                      setWebsiteError('');
+                    }}
                     placeholder="https://company.com"
+                    className={websiteError ? 'border-red-500 focus-visible:ring-red-500' : ''}
                   />
+                  {websiteError && (
+                    <p className="text-sm text-red-600">{websiteError}</p>
+                  )}
                 </div>
               </div>
             </div>
