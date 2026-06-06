@@ -124,6 +124,8 @@ export default function ClientsPage() {
     logoUrl: '',
     website: '',
     additionalInfo: '',
+    rewardsEnabled: false,
+    rewardAmount: '50',
   });
 
   useEffect(() => {
@@ -228,6 +230,12 @@ export default function ClientsPage() {
         body: JSON.stringify({
           ...formData,
           monthlyLimit: Number(formData.monthlyLimit),
+          rewardsConfig: {
+            airtime: {
+              enabled: formData.rewardsEnabled,
+              amount: Number(formData.rewardAmount),
+            },
+          },
         }),
       });
 
@@ -252,6 +260,8 @@ export default function ClientsPage() {
           logoUrl: '',
           website: '',
           additionalInfo: '',
+          rewardsEnabled: false,
+          rewardAmount: '50',
         });
         fetchClients();
       } else {
@@ -915,6 +925,42 @@ export default function ClientsPage() {
                   max={1000000}
                 />
                 <p className="text-xs text-gray-500">Maximum codes per month (100 - 1,000,000)</p>
+              </div>
+            </div>
+
+            {/* Rewards Program */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase">Rewards Program</h3>
+              <div className="space-y-4 rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Airtime Reward</p>
+                    <p className="text-xs text-gray-500">Give customers airtime when they verify products</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.rewardsEnabled}
+                      onChange={(e) => setFormData({...formData, rewardsEnabled: e.target.checked})}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-cyan-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-600"></div>
+                  </label>
+                </div>
+                {formData.rewardsEnabled && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Reward Amount (₦)</label>
+                    <Input
+                      value={formData.rewardAmount}
+                      onChange={(e) => setFormData({...formData, rewardAmount: e.target.value})}
+                      type="number"
+                      min={10}
+                      max={10000}
+                      className="max-w-[200px]"
+                    />
+                    <p className="text-xs text-gray-500">Airtime amount customers receive on first verification</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

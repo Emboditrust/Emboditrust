@@ -29,6 +29,12 @@ const updateClientSchema = z.object({
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
   additionalInfo: z.string().optional(),
+  rewardsConfig: z.object({
+    airtime: z.object({
+      enabled: z.boolean(),
+      amount: z.number().min(10).max(10000),
+    }),
+  }).optional(),
 }).refine(data => {
   if (data.contractStartDate && data.contractEndDate) {
     return new Date(data.contractEndDate) > new Date(data.contractStartDate);
@@ -242,6 +248,11 @@ export async function PUT(
           { status: 400 }
         );
       }
+    }
+
+    // Handle rewards config
+    if (validatedData.rewardsConfig !== undefined) {
+      client.rewardsConfig = validatedData.rewardsConfig;
     }
 
     await client.save();

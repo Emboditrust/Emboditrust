@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Building, User, Mail, Phone, MapPin, Shield, FileText, Calendar, Globe, Upload } from "lucide-react";
+import { Loader2, ArrowLeft, Building, User, Mail, Phone, MapPin, Shield, FileText, Calendar, Globe, Upload, Gift, Smartphone } from "lucide-react";
 import { z } from "zod";
 
 // Validation schema matching the API
@@ -48,6 +49,10 @@ const clientSchema = z.object({
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
   additionalInfo: z.string().optional(),
+  rewardsEnabled: z.boolean(),
+  rewardAmount: z.number()
+    .min(10, 'Minimum reward amount is ₦10')
+    .max(10000, 'Maximum reward amount is ₦10,000'),
 }).refine(data => new Date(data.contractEndDate) > new Date(data.contractStartDate), {
   message: "Contract end date must be after start date",
   path: ["contractEndDate"],
@@ -77,6 +82,8 @@ export default function CreateClientPage() {
       logoUrl: '',
       website: '',
       additionalInfo: '',
+      rewardsEnabled: false,
+      rewardAmount: 50,
     },
   });
 
@@ -92,6 +99,12 @@ export default function CreateClientPage() {
         logoUrl: data.logoUrl || '',
         website: data.website || '',
         additionalInfo: data.additionalInfo || '',
+        rewardsConfig: {
+          airtime: {
+            enabled: data.rewardsEnabled,
+            amount: Number(data.rewardAmount),
+          },
+        },
       };
 
       const response = await fetch('/api/admin/clients', {
@@ -499,6 +512,79 @@ export default function CreateClientPage() {
                   )}
                 />
               </div>
+
+            <div className="h-px bg-[#dbe3ee] my-6 dark:bg-[#555555]"></div>
+
+            {/* Rewards Program */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Gift className="h-5 w-5" />
+                Rewards Program
+              </h3>
+              <div className="rounded-lg border border-gray-200 p-6 space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Smartphone className="h-4 w-4 text-cyan-600" />
+                      <p className="text-sm font-medium text-gray-900">Airtime Reward</p>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Give customers airtime when they verify products by scanning the QR code and entering the scratch code.
+                    </p>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="rewardsEnabled"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex items-center gap-2">
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              id="rewardsEnabled"
+                            />
+                            <label htmlFor="rewardsEnabled" className="text-sm font-medium cursor-pointer">
+                              {field.value ? 'Enabled' : 'Disabled'}
+                            </label>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {form.watch('rewardsEnabled') && (
+                  <FormField
+                    control={form.control}
+                    name="rewardAmount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reward Amount (₦)</FormLabel>
+                        <FormControl>
+                          <div className="relative max-w-[200px]">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">₦</span>
+                            <Input
+                              type="number"
+                              min={10}
+                              max={10000}
+                              step={10}
+                              className="pl-8 font-mono"
+                              {...field}
+                              onChange={e => field.onChange(parseInt(e.target.value) || 50)}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Airtime amount credited to customers on their first successful product verification
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
 
               {/* Submit Button */}
               <div className="pt-6">

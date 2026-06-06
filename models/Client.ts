@@ -20,6 +20,12 @@ export interface IClient extends mongoose.Document {
   logoUrl?: string;
   website?: string;
   additionalInfo?: Record<string, any>;
+  rewardsConfig?: {
+    airtime: {
+      enabled: boolean;
+      amount: number;
+    };
+  };
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -153,6 +159,12 @@ const ClientSchema = new mongoose.Schema({
   additionalInfo: {
     type: mongoose.Schema.Types.Mixed,
     default: {},
+  },
+  rewardsConfig: {
+    airtime: {
+      enabled: { type: Boolean, default: false },
+      amount: { type: Number, default: 50 },
+    },
   },
   createdBy: {
     type: String,

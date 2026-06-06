@@ -18,6 +18,10 @@ export interface IBatch extends mongoose.Document {
     batchNumber?: string;
     additionalFields?: Record<string, string>;
   };
+  rewardConfig?: {
+    enabled: boolean;
+    amount: number;
+  };
 }
 
 const BatchSchema = new mongoose.Schema({
@@ -64,6 +68,10 @@ const BatchSchema = new mongoose.Schema({
     productImageUrl: String,
     batchNumber: String,
     additionalFields: mongoose.Schema.Types.Mixed,
+  },
+  rewardConfig: {
+    enabled: { type: Boolean, default: false },
+    amount: { type: Number, default: 50 },
   },
 }, {
   timestamps: false,

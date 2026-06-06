@@ -7,7 +7,7 @@ import {
   Check, X, Shield, Package, Upload, Menu, 
   Scan, AlertTriangle, Clock, MapPin, Mail, Phone, 
   Info, Camera, ArrowRight, Home, Key, Image as ImageIcon,
-  BadgeCheck
+  BadgeCheck, Gift, Smartphone
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -72,6 +72,8 @@ export default function VerificationClientPage({
     customFields.description ||
     `This ${displayProductName} has been successfully verified as authentic.`;
 
+  const rewardConfig = verificationData.batch?.rewardConfig || null;
+
   /* ================= STATE ================= */
   const [showScratchDialog, setShowScratchDialog] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -92,6 +94,48 @@ export default function VerificationClientPage({
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
+  /* ================= REWARD CLAIM ================= */
+  const [showRewardClaim, setShowRewardClaim] = useState(false);
+  const [rewardPhone, setRewardPhone] = useState('');
+  const [isClaimingReward, setIsClaimingReward] = useState(false);
+  const [rewardResult, setRewardResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const claimReward = async () => {
+    const cleaned = rewardPhone.replace(/\D/g, '');
+    if (cleaned.length < 10) {
+      toast.error('Please enter a valid phone number');
+      return;
+    }
+
+    setIsClaimingReward(true);
+    setRewardResult(null);
+
+    try {
+      const res = await fetch('/api/rewards/claim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrCodeId: productCode.qrCodeId, phoneNumber: cleaned }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setRewardResult({ success: true, message: data.message || 'Reward claimed successfully!' });
+        toast.success(data.message);
+      } else if (data.alreadyClaimed) {
+        setRewardResult({ success: true, message: data.message });
+      } else {
+        setRewardResult({ success: false, message: data.message || 'Failed to claim reward' });
+        toast.error(data.message);
+      }
+    } catch {
+      setRewardResult({ success: false, message: 'Network error. Please try again.' });
+      toast.error('Failed to claim reward. Please try again.');
+    } finally {
+      setIsClaimingReward(false);
+    }
+  };
 
   /* ================= REPORT UNLOCK TIMER ================= */
   const [reportUnlockTimer, setReportUnlockTimer] = useState(0);
@@ -142,6 +186,9 @@ export default function VerificationClientPage({
       setVerificationCount(data.verificationCount);
       setShowScratchDialog(false);
       setShowSuccessDialog(true);
+      if (data.verificationCount === 1 && rewardConfig?.enabled) {
+        setShowRewardClaim(true);
+      }
 
       if (data.verificationCount > 1) {
         setReportUnlockTimer(5);
@@ -413,6 +460,73 @@ export default function VerificationClientPage({
                   </Button>
                 )}
               </div>
+            )}
+
+            {rewardConfig?.enabled && showRewardClaim && (
+              <Card className="mt-6 overflow-hidden rounded-3xl border border-[#e0eaff] bg-[#f5f9ff] shadow-none">
+                <CardHeader className="pb-3 pt-5">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-cyan-50 rounded-full">
+                      <Gift className="h-5 w-5 text-cyan-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg font-semibold text-[#1a365d]">
+                        Claim Your Airtime Reward
+                      </CardTitle>
+                      <CardDescription className="text-sm text-gray-600 mt-1">
+                        Congratulations! Enter your phone number to receive ₦{rewardConfig.amount} airtime.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {!rewardResult ? (
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          value={rewardPhone}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9+]/g, '');
+                            if (val.length <= 15) setRewardPhone(val);
+                          }}
+                          className="pl-10 h-12 text-base border-gray-300"
+                          placeholder="08012345678"
+                          disabled={isClaimingReward}
+                        />
+                      </div>
+                      <Button
+                        onClick={claimReward}
+                        disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
+                        className="w-full h-12 bg-cyan-600 hover:bg-cyan-700 text-white font-medium disabled:opacity-50"
+                      >
+                        {isClaimingReward ? (
+                          <>
+                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                            Sending Airtime...
+                          </>
+                        ) : (
+                          <>
+                            <Gift className="h-4 w-4 mr-2" />
+                            Claim ₦{rewardConfig.amount} Airtime
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className={`rounded-2xl p-4 text-center ${rewardResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      {rewardResult.success ? (
+                        <BadgeCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                      ) : (
+                        <X className="h-8 w-8 text-red-600 mx-auto mb-2" />
+                      )}
+                      <p className={`text-sm font-medium ${rewardResult.success ? 'text-green-800' : 'text-red-800'}`}>
+                        {rewardResult.message}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             )}
 
             <div className="mt-6 flex justify-center">

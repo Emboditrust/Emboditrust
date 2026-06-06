@@ -26,6 +26,12 @@ const createClientSchema = z.object({
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
   additionalInfo: z.string().optional(),
+  rewardsConfig: z.object({
+    airtime: z.object({
+      enabled: z.boolean(),
+      amount: z.number().min(10).max(10000),
+    }),
+  }).optional(),
 });
 
 // GET: Fetch clients with pagination and filtering
@@ -228,6 +234,9 @@ export async function POST(request: NextRequest) {
       additionalInfo: validatedData.additionalInfo 
         ? JSON.parse(validatedData.additionalInfo)
         : {},
+      rewardsConfig: validatedData.rewardsConfig || {
+        airtime: { enabled: false, amount: 50 },
+      },
       createdBy: session.user.id,
     };
 

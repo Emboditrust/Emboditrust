@@ -140,6 +140,7 @@ export default async function VerificationPage({
       generationDate: batch.generationDate,
       quantity: batch.quantity,
       customSuccessConfig: batch.customSuccessConfig || null,
+      rewardConfig: (batch as any).rewardConfig || null,
     } : null,
     client: client ? {
       companyName: client.companyName,
