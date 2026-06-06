@@ -3,7 +3,7 @@ import { RiHome5Line, RiVerifiedBadgeLine } from "react-icons/ri";
 import { HiOutlineChatBubbleLeftEllipsis, HiOutlineGiftTop, HiOutlineUserGroup } from "react-icons/hi2";
 import { LiaSmsSolid } from "react-icons/lia";
 import { LuMessageSquareText, LuSettings  } from "react-icons/lu";
-import { TbClipboardText, TbCreditCard, TbUserEdit } from "react-icons/tb";
+import { TbClipboardText, TbCreditCard, TbUserEdit, TbCode } from "react-icons/tb";
 
 
 export interface AdminSideBarType {
@@ -24,6 +24,6 @@ export const AdminSideBar: AdminSideBarType[] = [
   { path: 'billings', name: 'Billing & Subscription', icon: TbCreditCard },
   { path: 'settings', name: 'Settings', icon: LuSettings  },
   { path: 'support', name: 'Support Inbox', icon: HiOutlineChatBubbleLeftEllipsis }, 
-   
+  { path: 'embed-guide', name: 'Integration Guide', icon: TbCode },
    
   ];

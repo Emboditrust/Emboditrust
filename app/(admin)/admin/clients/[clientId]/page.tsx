@@ -1862,8 +1862,7 @@ body {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-gray-600">
-                      Copy this code and send it to the client. They paste it on
-                      their website to add the EmbodiTrust verification widget.
+                      Copy this code and send it to the client. They paste it on their website to add the EmbodiTrust verification widget. See the <a href="/embed-guide" target="_blank" className="text-cyan-600 hover:text-cyan-700 underline font-medium">full integration guide &rarr;</a> for framework examples and advanced usage.
                     </p>
                     <div className="relative">
                       <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-x-auto leading-relaxed max-h-[320px] overflow-y-auto">

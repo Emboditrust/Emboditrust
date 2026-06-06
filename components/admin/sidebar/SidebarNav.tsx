@@ -13,6 +13,9 @@ export const AdminSideBarComponent = ({ findpath, currentChatId }: Isidebar) => 
   const { setShowSideBar } = useContext(CommonDashboardContext);
 
   const getHref = (item: AdminSideBarType) => {
+    if (item.path === 'embed-guide') {
+      return '/embed-guide';
+    }
     if (item.dynamicPath && currentChatId) {
       return `/admin-dashboard/${item.dynamicPath.replace('[chatId]', currentChatId)}`;
     }
@@ -20,6 +23,7 @@ export const AdminSideBarComponent = ({ findpath, currentChatId }: Isidebar) => 
   };
 
   const isActive = (item: AdminSideBarType) => {
+    if (item.path === 'embed-guide') return false;
     if (item.dynamicPath) {
       return findpath.includes('chat');
     }
@@ -32,6 +36,8 @@ export const AdminSideBarComponent = ({ findpath, currentChatId }: Isidebar) => 
         <Link
           onClick={() => setShowSideBar(false)}
           href={getHref(item)}
+          target={item.path === 'embed-guide' ? '_blank' : undefined}
+          rel={item.path === 'embed-guide' ? 'noopener noreferrer' : undefined}
           className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 text-sm ${
             isActive(item)
               ? "bg-[#80CBE8] bg-opacity-10 text-[#80CBE8] font-semibold border border-[#80CBE8]"
