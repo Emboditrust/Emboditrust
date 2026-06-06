@@ -7,7 +7,7 @@ import {
   Check, X, Shield, Package, Upload, Menu, 
   Scan, AlertTriangle, Clock, MapPin, Mail, Phone, 
   Info, Camera, ArrowRight, Home, Key, Image as ImageIcon,
-  BadgeCheck, Gift, Smartphone
+  BadgeCheck, Gift, Smartphone, Zap
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -99,7 +99,43 @@ export default function VerificationClientPage({
   const [showRewardClaim, setShowRewardClaim] = useState(false);
   const [rewardPhone, setRewardPhone] = useState('');
   const [isClaimingReward, setIsClaimingReward] = useState(false);
-  const [rewardResult, setRewardResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [rewardResult, setRewardResult] = useState<{ success: boolean; message: string; alreadyClaimed?: boolean } | null>(null);
+  const [detectedNetwork, setDetectedNetwork] = useState<string | null>(null);
+
+  const networkLabels: Record<string, string> = {
+    mtn: 'MTN Nigeria',
+    glo: 'Glo Mobile',
+    airtel: 'Airtel Nigeria',
+    etisalat: '9mobile',
+  };
+
+  const detectNetworkFromPrefix = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    let prefix = cleaned;
+    if (cleaned.startsWith('234')) prefix = '0' + cleaned.substring(3);
+    const first4 = prefix.substring(0, 4);
+    const mtn = ['0803', '0806', '0703', '0706', '0810', '0813', '0814', '0816', '0903', '0906', '0913', '0916'];
+    const glo = ['0805', '0807', '0811', '0815', '0705', '0905', '0915'];
+    const airtel = ['0802', '0808', '0701', '0708', '0812', '0901', '0902', '0907', '0912'];
+    const etisalat = ['0809', '0817', '0818', '0909', '0908'];
+    if (mtn.includes(first4)) return 'MTN Nigeria';
+    if (glo.includes(first4)) return 'Glo Mobile';
+    if (airtel.includes(first4)) return 'Airtel Nigeria';
+    if (etisalat.includes(first4)) return '9mobile';
+    return null;
+  };
+
+  const handlePhoneChange = (val: string) => {
+    const cleaned = val.replace(/[^0-9+]/g, '');
+    if (cleaned.length <= 15) {
+      setRewardPhone(cleaned);
+      if (cleaned.replace(/\D/g, '').length >= 10) {
+        setDetectedNetwork(detectNetworkFromPrefix(cleaned));
+      } else {
+        setDetectedNetwork(null);
+      }
+    }
+  };
 
   const claimReward = async () => {
     const cleaned = rewardPhone.replace(/\D/g, '');
@@ -121,20 +157,23 @@ export default function VerificationClientPage({
       const data = await res.json();
 
       if (data.success) {
-        setRewardResult({ success: true, message: data.message || 'Reward claimed successfully!' });
-        toast.success(data.message);
+        setRewardResult({ success: true, message: data.message || 'Airtime reward sent successfully' });
       } else if (data.alreadyClaimed) {
-        setRewardResult({ success: true, message: data.message });
+        setRewardResult({ success: false, alreadyClaimed: true, message: data.message });
       } else {
         setRewardResult({ success: false, message: data.message || 'Failed to claim reward' });
-        toast.error(data.message);
       }
     } catch {
       setRewardResult({ success: false, message: 'Network error. Please try again.' });
-      toast.error('Failed to claim reward. Please try again.');
     } finally {
       setIsClaimingReward(false);
     }
+  };
+
+  const resetRewardClaim = () => {
+    setRewardResult(null);
+    setRewardPhone('');
+    setDetectedNetwork(null);
   };
 
   /* ================= REPORT UNLOCK TIMER ================= */
@@ -463,70 +502,99 @@ export default function VerificationClientPage({
             )}
 
             {rewardConfig?.enabled && showRewardClaim && (
-              <Card className="mt-6 overflow-hidden rounded-3xl border border-[#e0eaff] bg-[#f5f9ff] shadow-none">
-                <CardHeader className="pb-3 pt-5">
+              <div className="mt-8 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div className="px-6 py-5 border-b border-gray-100">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-cyan-50 rounded-full">
-                      <Gift className="h-5 w-5 text-cyan-600" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50">
+                      <Zap className="h-5 w-5 text-cyan-600" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg font-semibold text-[#1a365d]">
-                        Claim Your Airtime Reward
-                      </CardTitle>
-                      <CardDescription className="text-sm text-gray-600 mt-1">
-                        Congratulations! Enter your phone number to receive ₦{rewardConfig.amount} airtime.
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {!rewardResult ? (
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          value={rewardPhone}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9+]/g, '');
-                            if (val.length <= 15) setRewardPhone(val);
-                          }}
-                          className="pl-10 h-12 text-base border-gray-300"
-                          placeholder="08012345678"
-                          disabled={isClaimingReward}
-                        />
-                      </div>
-                      <Button
-                        onClick={claimReward}
-                        disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
-                        className="w-full h-12 bg-cyan-600 hover:bg-cyan-700 text-white font-medium disabled:opacity-50"
-                      >
-                        {isClaimingReward ? (
-                          <>
-                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                            Sending Airtime...
-                          </>
-                        ) : (
-                          <>
-                            <Gift className="h-4 w-4 mr-2" />
-                            Claim ₦{rewardConfig.amount} Airtime
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className={`rounded-2xl p-4 text-center ${rewardResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                      {rewardResult.success ? (
-                        <BadgeCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      ) : (
-                        <X className="h-8 w-8 text-red-600 mx-auto mb-2" />
-                      )}
-                      <p className={`text-sm font-medium ${rewardResult.success ? 'text-green-800' : 'text-red-800'}`}>
-                        {rewardResult.message}
+                      <h3 className="text-base font-semibold text-gray-900">Airtime Reward</h3>
+                      <p className="text-sm text-gray-500">
+                        Receive {rewardConfig.amount} Naira airtime for verifying this product
                       </p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                  </div>
+                </div>
+
+                {!rewardResult && (
+                  <div className="px-6 py-5 space-y-4">
+                    <div className="relative">
+                      <Smartphone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        value={rewardPhone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        className="pl-10 h-11 text-sm border-gray-300 focus:border-cyan-500 focus:ring-cyan-500"
+                        placeholder="Enter phone number (e.g. 08012345678)"
+                        disabled={isClaimingReward}
+                      />
+                    </div>
+                    {detectedNetwork && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <BadgeCheck className="h-3.5 w-3.5 text-green-500" />
+                        <span>{detectedNetwork} detected</span>
+                      </div>
+                    )}
+                    <Button
+                      onClick={claimReward}
+                      disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
+                      className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium disabled:opacity-50"
+                    >
+                      {isClaimingReward ? (
+                        <>
+                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2.5" />
+                          Sending airtime...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="h-4 w-4 mr-2" />
+                          Claim {rewardConfig.amount} Naira Airtime
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {rewardResult && !rewardResult.alreadyClaimed && rewardResult.success && (
+                  <div className="px-6 py-5">
+                    <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
+                      <BadgeCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                      <p className="text-sm font-medium text-green-800">{rewardResult.message}</p>
+                      {detectedNetwork && (
+                        <p className="text-xs text-green-600 mt-1.5">
+                          Credited as {rewardConfig.amount} Naira airtime via {detectedNetwork}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {rewardResult && rewardResult.alreadyClaimed && (
+                  <div className="px-6 py-5">
+                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
+                      <Shield className="h-8 w-8 text-amber-600 mx-auto mb-2" />
+                      <p className="text-sm font-medium text-amber-800">{rewardResult.message}</p>
+                    </div>
+                  </div>
+                )}
+
+                {rewardResult && !rewardResult.success && !rewardResult.alreadyClaimed && (
+                  <div className="px-6 py-5 space-y-4">
+                    <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-center">
+                      <X className="h-8 w-8 text-red-600 mx-auto mb-2" />
+                      <p className="text-sm font-medium text-red-800">{rewardResult.message}</p>
+                      <p className="text-xs text-red-600 mt-1.5">You can retry or use a different number</p>
+                    </div>
+                    <Button
+                      onClick={resetRewardClaim}
+                      variant="outline"
+                      className="w-full h-11 text-sm border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="mt-6 flex justify-center">

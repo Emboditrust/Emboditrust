@@ -20,8 +20,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const productCode = await ProductCode.findOne({ qrCodeId }).lean();
+    const cleanedPhone = phoneNumber.replace(/\D/g, '');
 
+    const network = VTPassService.detectNetwork(cleanedPhone);
+    if (!network) {
+      return NextResponse.json(
+        { success: false, message: 'Could not detect network from phone number. Please enter a valid Nigerian phone number.' },
+        { status: 400 }
+      );
+    }
+
+    const productCode = await ProductCode.findOne({ qrCodeId }).lean();
     if (!productCode) {
       return NextResponse.json(
         { success: false, message: 'Product code not found' },
@@ -36,27 +45,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingReward = await Reward.findOne({ qrCodeId, status: { $in: ['pending', 'processing', 'delivered'] } }).lean();
-
-    if (existingReward) {
-      return NextResponse.json({
-        success: true,
-        alreadyClaimed: true,
-        status: existingReward.status,
-        message: existingReward.status === 'delivered'
-          ? 'Reward already claimed and delivered'
-          : 'Reward claim is already being processed',
-      });
-    }
-
-    const network = VTPassService.detectNetwork(phoneNumber);
-    if (!network) {
-      return NextResponse.json(
-        { success: false, message: 'Could not detect network from phone number. Please enter a valid Nigerian phone number.' },
-        { status: 400 }
-      );
-    }
-
     const batch = productCode.batchId
       ? await Batch.findOne({ batchId: productCode.batchId }).lean()
       : null;
@@ -66,22 +54,44 @@ export async function POST(request: NextRequest) {
       : DEFAULT_REWARD_AMOUNT;
 
     const requestId = VTPassService.generateRequestId();
+    const rewardId = `REW-${qrCodeId}-${Date.now()}`;
 
-    const reward = await Reward.create({
-      rewardId: `REW-${qrCodeId}-${Date.now()}`,
-      productCodeId: productCode._id,
-      qrCodeId,
-      phoneNumber,
-      network,
-      amount: rewardAmount,
-      status: 'processing',
-      vtpassRequestId: requestId,
-      grantedAt: new Date(),
-    });
+    // Atomic insert using the partial unique index on qrCodeId (non-failed only).
+    // Only one concurrent request will succeed — the rest hit duplicate key (11000).
+    // Failed rewards are excluded from the index so retries are allowed.
+    let reward;
+    try {
+      reward = await Reward.create({
+        rewardId,
+        productCodeId: productCode._id,
+        qrCodeId,
+        phoneNumber: cleanedPhone,
+        network,
+        amount: rewardAmount,
+        status: 'processing',
+        vtpassRequestId: requestId,
+        grantedAt: new Date(),
+      });
+    } catch (err: any) {
+      if (err.code === 11000) {
+        const existing = await Reward.findOne({ qrCodeId, status: { $ne: 'failed' } }).lean();
+        if (existing) {
+          return NextResponse.json({
+            success: existing.status === 'delivered',
+            alreadyClaimed: true,
+            status: existing.status,
+            message: existing.status === 'delivered'
+              ? 'A reward has already been claimed for this product'
+              : 'A reward claim is currently being processed for this product',
+          });
+        }
+      }
+      throw err;
+    }
 
     const vtpass = VTPassService.getInstance();
     const result = await vtpass.purchaseAirtime({
-      phone: phoneNumber,
+      phone: cleanedPhone,
       amount: rewardAmount,
       network,
       requestId,
@@ -109,7 +119,7 @@ export async function POST(request: NextRequest) {
       transactionId: result.transactionId,
       vtpassRequestId: requestId,
       message: result.success
-        ? `₦${rewardAmount} airtime reward sent successfully!`
+        ? `${rewardAmount} Naira airtime reward sent successfully`
         : `Reward delivery failed: ${result.error}`,
     });
 

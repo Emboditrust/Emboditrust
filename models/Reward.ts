@@ -81,4 +81,16 @@ RewardSchema.index({ status: 1 });
 RewardSchema.index({ productCodeId: 1, status: 1 });
 RewardSchema.index({ createdAt: -1 });
 
+// Partial unique index: only one non-failed reward per qrCodeId.
+// This is the database-level lock that prevents double-claims
+// even under concurrent requests (race condition protection).
+// Failed rewards are excluded so users can retry.
+RewardSchema.index(
+  { qrCodeId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: { $ne: 'failed' } },
+  }
+);
+
 export default mongoose.models.Reward || mongoose.model<IReward>('Reward', RewardSchema);
