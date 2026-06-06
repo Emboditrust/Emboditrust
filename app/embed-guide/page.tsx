@@ -1,13 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-const SyntaxHighlighter = dynamic(
-  () => import("react-syntax-highlighter").then((mod) => mod.Prism),
-  { ssr: false }
-);
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import {
   ArrowRight,
   ChevronDown,
@@ -24,12 +18,15 @@ import {
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com";
 
+const HIGHLIGHT_CSS = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/atom-one-dark.min.css";
+const HIGHLIGHT_JS = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js";
+
 const code = {
   quickstart: `<!-- 1. Add a container div where the widget should appear -->
 <div id="emboditrust-verify"></div>
 
 <!-- 2. Load the widget script -->
-<script src="${APP_URL}/widget.js"></script>
+<script src="${APP_URL}/widget.js"><\/script>
 
 <!-- 3. Initialize the widget -->
 <script>
@@ -48,14 +45,47 @@ EmbodiTrust.init({
 });
 <\/script>`,
 
+  options: `{
+  // Required: CSS selector for the container element
+  container: "#emboditrust-verify",
+
+  // Required: The product verification code (from QR code)
+  verificationCode: "QR-EMB-XXXXXXXX-XXXXX",
+
+  // Optional: Override the company name shown in the widget
+  companyName: "Your Company",
+
+  // Optional: URL to your company logo image
+  logoUrl: "https://example.com/logo.png",
+
+  // Optional: Primary brand color (hex)
+  primaryColor: "#2957FF",
+
+  // Optional: Secondary brand color (hex)
+  secondaryColor: "#0B0F19",
+
+  // Optional: Accent color for success states (hex)
+  accentColor: "#19a35b",
+
+  // Optional: Support email displayed in the widget
+  supportEmail: "support@yourcompany.com",
+
+  // Optional: Support phone number displayed in the widget
+  supportPhone: "+2348000000000",
+
+  // Optional: Custom headline text
+  verificationHeadline: "Product Verification",
+
+  // Optional: Custom description text
+  verificationDescription: "Verify the authenticity of this product"
+}`,
+
   react: `import { useEffect, useRef } from 'react';
 
-export default function VerifyProduct({ code }) {
-  const containerRef = useRef(null);
+export default function VerifyProduct({ code }: { code: string }) {
   const instanceRef = useRef(null);
 
   useEffect(() => {
-    // Load the widget script dynamically
     const script = document.createElement('script');
     script.src = '${APP_URL}/widget.js';
     script.async = true;
@@ -80,7 +110,7 @@ export default function VerifyProduct({ code }) {
     };
   }, [code]);
 
-  return <div id={'et-widget-' + code} ref={containerRef} />;
+  return <div id={'et-widget-' + code} />;
 }`,
 
   vue: `<template>
@@ -88,7 +118,7 @@ export default function VerifyProduct({ code }) {
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   verificationCode: { type: String, required: true }
@@ -174,7 +204,6 @@ export default function EmbodiTrustWidget({
       document.body.appendChild(script);
     };
 
-    // Wait for the DOM to be ready
     if (document.readyState === 'complete') {
       init();
     } else {
@@ -211,51 +240,13 @@ EmbodiTrust.verify(code, function(err, data) {
   });
 });`,
 
-  options: `{
-  // Required: CSS selector for the container element
-  container: "#emboditrust-verify",
-
-  // Required: The product verification code (from QR code)
-  verificationCode: "QR-EMB-XXXXXXXX-XXXXX",
-
-  // Optional: Override the company name shown in the widget
-  companyName: "Your Company",
-
-  // Optional: URL to your company logo image
-  logoUrl: "https://example.com/logo.png",
-
-  // Optional: URL to favicon (16x16 or 32x32)
-  faviconUrl: "https://example.com/favicon.ico",
-
-  // Optional: Primary brand color (hex)
-  primaryColor: "#2957FF",
-
-  // Optional: Secondary brand color (hex)
-  secondaryColor: "#0B0F19",
-
-  // Optional: Accent color for success states (hex)
-  accentColor: "#19a35b",
-
-  // Optional: Support email displayed in the widget
-  supportEmail: "support@yourcompany.com",
-
-  // Optional: Support phone number displayed in the widget
-  supportPhone: "+2348000000000",
-
-  // Optional: Custom headline text
-  verificationHeadline: "Product Verification",
-
-  // Optional: Custom description text
-  verificationDescription: "Scan the QR code on your product packaging to verify its authenticity."
-}`,
-
   multiple: `<!-- Widget for product A -->
 <div id="verify-product-a"></div>
 
 <!-- Widget for product B -->
 <div id="verify-product-b"></div>
 
-<script src="${APP_URL}/widget.js"></script>
+<script src="${APP_URL}/widget.js"><\/script>
 <script>
 EmbodiTrust.init({
   container: "#verify-product-a",
@@ -270,14 +261,14 @@ EmbodiTrust.init({
 });
 <\/script>`,
 
-  destroy: `// Destroy a specific widget instance
+  destroy: `// Destroy a specific widget instance by container selector
 EmbodiTrust.destroy("#emboditrust-verify");
 
-// Or store the instance and destroy later
+// Store the instance from init() and destroy later
 const widget = EmbodiTrust.init({ ... });
 widget.destroy();
 
-// Destroy all widget instances
+// Destroy all widget instances at once
 EmbodiTrust.destroyAll();`,
 };
 
@@ -292,75 +283,122 @@ interface Section {
 
 const sections: Section[] = [
   {
-    id: 'quickstart',
+    id: "quickstart",
     icon: Terminal,
-    title: 'Quick Start',
-    desc: 'Add the widget to any HTML page in 3 steps.',
+    title: "Quick Start",
+    desc: "Add the widget to any HTML page in 3 steps.",
     code: code.quickstart,
-    lang: 'html',
+    lang: "html",
   },
   {
-    id: 'options',
+    id: "options",
     icon: Palette,
-    title: 'Configuration Options',
-    desc: 'All available options for EmbodiTrust.init().',
+    title: "Configuration Options",
+    desc: "All available options for EmbodiTrust.init().",
     code: code.options,
-    lang: 'javascript',
+    lang: "javascript",
   },
   {
-    id: 'react',
+    id: "react",
     icon: Blocks,
-    title: 'React / Next.js',
-    desc: 'Integrate the widget into a React or Next.js application.',
+    title: "React / Next.js",
+    desc: "Integrate the widget into a React or Next.js application.",
     code: code.react,
-    lang: 'tsx',
+    lang: "typescript",
   },
   {
-    id: 'nextjs-component',
+    id: "nextjs-component",
     icon: Blocks,
-    title: 'Next.js Client Component',
-    desc: 'A reusable Next.js client component for the widget.',
+    title: "Next.js Client Component",
+    desc: "A reusable Next.js client component for the widget.",
     code: code.nextjs,
-    lang: 'tsx',
+    lang: "typescript",
   },
   {
-    id: 'vue',
+    id: "vue",
     icon: Puzzle,
-    title: 'Vue.js',
-    desc: 'Use the widget inside a Vue 3 component.',
+    title: "Vue.js",
+    desc: "Use the widget inside a Vue 3 component.",
     code: code.vue,
-    lang: 'html',
+    lang: "html",
   },
   {
-    id: 'vanilla',
+    id: "vanilla",
     icon: Terminal,
-    title: 'Programmatic Usage',
-    desc: 'Use the API directly without the init helper.',
+    title: "Programmatic Usage",
+    desc: "Use the API directly without the init helper.",
     code: code.vanilla,
-    lang: 'javascript',
+    lang: "javascript",
   },
   {
-    id: 'multiple',
+    id: "multiple",
     icon: Smartphone,
-    title: 'Multiple Widgets',
-    desc: 'Display multiple verification widgets on one page.',
+    title: "Multiple Widgets",
+    desc: "Display multiple verification widgets on one page.",
     code: code.multiple,
-    lang: 'html',
+    lang: "html",
   },
   {
-    id: 'destroy',
+    id: "destroy",
     icon: AlertTriangle,
-    title: 'Cleanup & Destroy',
-    desc: 'Properly destroy widget instances when they are no longer needed.',
+    title: "Cleanup & Destroy",
+    desc: "Properly destroy widget instances when they are no longer needed.",
     code: code.destroy,
-    lang: 'javascript',
+    lang: "javascript",
   },
 ];
 
 export default function EmbedGuidePage() {
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    let link: HTMLLinkElement | null = null;
+    let script: HTMLScriptElement | null = null;
+    let highlightTimer: number | null = null;
+
+    function highlight() {
+      if (!(window as any).hljs) return;
+      document.querySelectorAll("pre code").forEach((el) => {
+        (window as any).hljs.highlightElement(el);
+      });
+    }
+
+    function tryHighlight() {
+      if ((window as any).hljs) {
+        highlight();
+        return;
+      }
+      highlightTimer = window.setTimeout(tryHighlight, 200);
+    }
+
+    link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = HIGHLIGHT_CSS;
+    document.head.appendChild(link);
+
+    script = document.createElement("script");
+    script.src = HIGHLIGHT_JS;
+    script.async = true;
+    script.onload = () => {
+      highlight();
+    };
+    document.body.appendChild(script);
+
+    tryHighlight();
+
+    return () => {
+      if (highlightTimer) clearTimeout(highlightTimer);
+      if (link && document.head.contains(link)) document.head.removeChild(link);
+      if (script && document.body.contains(script)) document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      {/* Hero */}
+
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-6">
           <Link
@@ -385,12 +423,17 @@ export default function EmbedGuidePage() {
             <a href="#vue" className="text-gray-600 hover:text-gray-900">
               Vue
             </a>
+            <Link
+              href="/admin-login"
+              className="rounded-md bg-[#042333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049]"
+            >
+              Admin Login
+            </Link>
           </nav>
         </div>
       </header>
 
       <div className="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-16">
-        {/* Title */}
         <div className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-4 py-1.5 text-sm font-medium text-cyan-700">
             <Code className="h-4 w-4" />
@@ -406,7 +449,6 @@ export default function EmbedGuidePage() {
           </p>
         </div>
 
-        {/* How it works */}
         <div className="mb-16 grid gap-6 md:grid-cols-3">
           {[
             {
@@ -438,7 +480,6 @@ export default function EmbedGuidePage() {
           ))}
         </div>
 
-        {/* Sections */}
         <div className="space-y-20">
           {sections.map((section) => {
             const Icon = section.icon;
@@ -460,38 +501,25 @@ export default function EmbedGuidePage() {
                   </div>
                 </div>
 
-                  <div className="relative">
-                    <CopyButton code={section.code} />
-                    <div className="absolute left-3 top-3 z-10 rounded-md bg-gray-700/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-400">
-                      {section.lang}
-                    </div>
-                    <SyntaxHighlighter
-                      language={section.lang}
-                      style={oneDark}
-                      customStyle={{
-                        borderRadius: '12px',
-                        border: '1px solid #e5e7eb',
-                        padding: '24px',
-                        paddingTop: '36px',
-                        fontSize: '13px',
-                        lineHeight: '1.6',
-                        margin: 0,
-                      }}
-                      codeTagProps={{
-                        style: {
-                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                        }
-                      }}
-                    >
-                      {section.code}
-                    </SyntaxHighlighter>
+                <div className="relative">
+                  <CopyButton code={section.code} />
+                  <div className="absolute left-3 top-3 z-10 rounded-md bg-gray-700/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-400">
+                    {section.lang}
                   </div>
+                  <pre
+                    className="overflow-x-auto rounded-xl border border-gray-200 bg-[#282c34] p-5 pt-10 text-sm leading-6 shadow-sm"
+                    style={{ background: "#282c34" }}
+                  >
+                    <code className={`language-${section.lang}`}>
+                      {section.code}
+                    </code>
+                  </pre>
+                </div>
               </section>
             );
           })}
         </div>
 
-        {/* Troubleshooting */}
         <section className="mt-20 scroll-mt-20" id="troubleshooting">
           <div className="mb-8 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50">
@@ -511,12 +539,11 @@ export default function EmbedGuidePage() {
             {[
               {
                 q: "Widget does not appear on the page",
-                a: "Make sure the container element exists in the DOM before calling EmbodiTrust.init(). If you are using a framework like React, initialize the widget inside a useEffect() or onMounted() hook after the component has rendered.",
+                a: 'Make sure the container element exists in the DOM before calling EmbodiTrust.init(). If you are using a framework like React, initialize the widget inside a useEffect() or onMounted() hook after the component has rendered.',
               },
               {
                 q: "Cross-Origin Resource Policy (CORS) errors",
-                a:
-                  "The widget loads content from " +
+                a: "The widget loads content from " +
                   APP_URL +
                   " via an iframe. Ensure your Content-Security-Policy allows frame loading from " +
                   APP_URL +
@@ -530,8 +557,7 @@ export default function EmbedGuidePage() {
               },
               {
                 q: "Script is blocked by Content Security Policy",
-                a:
-                  "Add " +
+                a: "Add " +
                   APP_URL +
                   " to your script-src CSP directive: script-src " +
                   APP_URL +
@@ -557,9 +583,37 @@ export default function EmbedGuidePage() {
             ))}
           </div>
         </section>
+
+        <section className="mt-20">
+          <div className="rounded-2xl bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-200 p-8 text-center md:p-12">
+            <Globe className="mx-auto mb-4 h-10 w-10 text-cyan-600" />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Ready to Go Live?
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-gray-600">
+              Generate QR codes for your products in the admin dashboard and
+              share the verification codes with your customers.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/admin-login"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#042333] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#053049]"
+              >
+                Admin Dashboard
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                Visit Homepage
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
       </div>
 
-      {/* Footer */}
       <footer className="border-t border-gray-200 bg-white">
         <div className="mx-auto max-w-5xl px-4 py-8 text-center text-sm text-gray-500 md:px-6">
           &copy; {new Date().getFullYear()} EmbodiTrust. All rights reserved.
