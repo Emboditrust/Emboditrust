@@ -129,13 +129,13 @@ export class VTPassService {
 
   static formatPhone(phone: string): string {
     const cleaned = phone.replace(/\D/g, '');
-    if (cleaned.startsWith('0')) {
-      return '234' + cleaned.substring(1);
-    }
     if (cleaned.startsWith('234')) {
+      return '0' + cleaned.substring(3);
+    }
+    if (cleaned.startsWith('0')) {
       return cleaned;
     }
-    return '234' + cleaned;
+    return '0' + cleaned;
   }
 
   async purchaseAirtime(params: AirtimePurchaseParams): Promise<AirtimePurchaseResult> {
