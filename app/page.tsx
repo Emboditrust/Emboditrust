@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { TbBrandLivewire } from 'react-icons/tb';
+import EmbodiTrustWidget from "./wig-test";
 
 const featureRows = [
   {
@@ -222,33 +223,75 @@ export default function Home() {
           background-size: 24px 24px;
         }
       `}</style>
+      <EmbodiTrustWidget verificationCode="QR-THC-1780734956018-000005-K6WL" />
       <div className="sticky top-0 z-50 mx-auto w-full max-w-6xl px-5 pt-4 md:px-8 md:pt-5">
         <header className="rounded-xl border border-[#d7dde6] bg-white/95 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95">
           <div className="flex h-14 items-center justify-between px-4 md:h-16 md:px-5">
-            <Link href="/" className="flex items-center gap-2.5 text-base font-bold md:text-lg">
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">E</span>
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 text-base font-bold md:text-lg"
+            >
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">
+                E
+              </span>
               <span>EmbodiTrust</span>
             </Link>
 
             <nav className="hidden items-center gap-6 text-lg font-bold text-slate-700 dark:text-slate-200 md:flex">
-              <Link href="#engine" className="hover:text-slate-900 dark:hover:text-white">Engine</Link>
-              <Link href="#agent-team" className="hover:text-slate-900 dark:hover:text-white">Agents</Link>
-              <Link href="#industry" className="hover:text-slate-900 dark:hover:text-white">Industries</Link>
-              <Link href="#faqs" className="hover:text-slate-900 dark:hover:text-white">FAQs</Link>
-              <Link href="#contact" className="hover:text-slate-900 dark:hover:text-white">Contact</Link>
+              <Link
+                href="#engine"
+                className="hover:text-slate-900 dark:hover:text-white"
+              >
+                Engine
+              </Link>
+              <Link
+                href="#agent-team"
+                className="hover:text-slate-900 dark:hover:text-white"
+              >
+                Agents
+              </Link>
+              <Link
+                href="#industry"
+                className="hover:text-slate-900 dark:hover:text-white"
+              >
+                Industries
+              </Link>
+              <Link
+                href="#faqs"
+                className="hover:text-slate-900 dark:hover:text-white"
+              >
+                FAQs
+              </Link>
+              <Link
+                href="#contact"
+                className="hover:text-slate-900 dark:hover:text-white"
+              >
+                Contact
+              </Link>
             </nav>
 
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                onClick={() => setTheme(isDark ? "light" : "dark")}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 transition-colors hover:bg-slate-100 dark:border-[#666666] dark:bg-[#444444] dark:text-slate-100 dark:hover:bg-[#505050]"
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={
+                  isDark ? "Switch to light mode" : "Switch to dark mode"
+                }
+                title={isDark ? "Switch to light mode" : "Switch to dark mode"}
               >
-                {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+                {isDark ? (
+                  <Sun className="h-4.5 w-4.5" />
+                ) : (
+                  <Moon className="h-4.5 w-4.5" />
+                )}
               </button>
-              <Link href="#contact" className="rounded-md bg-[#042333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:text-white dark:hover:bg-[#6a6a6a]">Book a Demo</Link>
+              <Link
+                href="#contact"
+                className="rounded-md bg-[#042333] px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:text-white dark:hover:bg-[#6a6a6a]"
+              >
+                Book a Demo
+              </Link>
               {/*
               <Link href="/admin-login" className="rounded-md border border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700">
                 Admin Log In
@@ -261,17 +304,36 @@ export default function Home() {
 
       <section className="mx-auto grid w-full max-w-6xl items-center gap-5 px-5 pb-16 pt-12 md:grid-cols-2 md:px-4 md:pb-20 md:pt-16">
         <div>
-          <TypeWriter 
-            text={['Make Your Products', 'Discoverable', 'As Verified Originals']}
+          <TypeWriter
+            text={[
+              "Make Your Products",
+              "Discoverable",
+              "As Verified Originals",
+            ]}
             className="text-5xl font-black leading-[0.95] md:text-7xl"
           />
-          <p className="mt-6 max-w-md animate-fade-in-up text-base leading-7 text-slate-600 dark:text-slate-300 md:text-lg" style={{ animationDelay: '0.3s' }}>
-            EmbodiTrust helps teams measure, monitor, and improve verification confidence across every channel in the supply chain.
+          <p
+            className="mt-6 max-w-md animate-fade-in-up text-base leading-7 text-slate-600 dark:text-slate-300 md:text-lg"
+            style={{ animationDelay: "0.3s" }}
+          >
+            EmbodiTrust helps teams measure, monitor, and improve verification
+            confidence across every channel in the supply chain.
           </p>
 
-          <div className="mt-6 flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <Link href="#contact" className="rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]">Get a Demo</Link>
-            <Link href="#engine" className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200 dark:hover:text-white">
+          <div
+            className="mt-6 flex items-center gap-3 animate-fade-in-up"
+            style={{ animationDelay: "0.5s" }}
+          >
+            <Link
+              href="#contact"
+              className="rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#053049] dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
+            >
+              Get a Demo
+            </Link>
+            <Link
+              href="#engine"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-200 dark:hover:text-white"
+            >
               Explore Capabilities <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             {/*
@@ -284,10 +346,13 @@ export default function Home() {
 
         <div className="relative illustration-reveal">
           <div className="absolute -left-6 top-8 h-40 w-40 rounded-full bg-[#ffd8df] blur-2xl animate-hero-glow" />
-          <div className="absolute -right-6 bottom-8 h-40 w-40 rounded-full bg-[#c4f4f2] blur-2xl animate-hero-glow" style={{ animationDelay: '0.5s' }} />
+          <div
+            className="absolute -right-6 bottom-8 h-40 w-40 rounded-full bg-[#c4f4f2] blur-2xl animate-hero-glow"
+            style={{ animationDelay: "0.5s" }}
+          />
           <div className="relative   p-4  md:p-6 overflow-hidden">
-            <img 
-              src="/illustrations/engineer (1).svg" 
+            <img
+              src="/illustrations/engineer (1).svg"
               alt="Product verification and authentication"
               className="w-full h-auto rounded-xl object-cover"
             />
@@ -301,7 +366,9 @@ export default function Home() {
           <br />
           prevented with active verification by 2028.
         </h2>
-        <p className="mt-2 text-base text-slate-600 dark:text-slate-300">EmbodiTrust Industry Benchmark</p>
+        <p className="mt-2 text-base text-slate-600 dark:text-slate-300">
+          EmbodiTrust Industry Benchmark
+        </p>
 
         <div className="mx-auto mt-7 max-w-xl rounded-xl border border-[#cfd7e3] bg-white p-6 text-left shadow-sm transition-colors dark:border-[#5b5b5b] dark:bg-[#3d3d3d]">
           <div className="flex items-center gap-3">
@@ -312,25 +379,43 @@ export default function Home() {
             />
             <div>
               <p className="text-lg font-bold">EmbodiTrust Product Team</p>
-              <p className="text-md text-slate-500 dark:text-slate-300">Product & Verification Intelligence</p>
+              <p className="text-md text-slate-500 dark:text-slate-300">
+                Product & Verification Intelligence
+              </p>
             </div>
           </div>
           <p className="mt-2  text-md leading-6 text-slate-700 dark:text-slate-200">
-            Verification should not stop at a successful scan. Teams need continuous monitoring, anomaly detection,
-            and action-ready evidence to protect customers and revenue.
+            Verification should not stop at a successful scan. Teams need
+            continuous monitoring, anomaly detection, and action-ready evidence
+            to protect customers and revenue.
           </p>
         </div>
       </section>
 
-      <section id="engine" className="mx-auto w-full max-w-6xl px-5 pb-10 text-center md:px-8 md:pb-12">
-        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+      <section
+        id="engine"
+        className="mx-auto w-full max-w-6xl px-5 pb-10 text-center md:px-8 md:pb-12"
+      >
+        <div
+          className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200"
+          style={{ animationDelay: "0.08s, 0.85s" }}
+        >
           <TbBrandLivewire className="h-6 w-6" />
           Live
         </div>
-        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
-          Verification Intelligence Engine<span className="text-rose-500">.</span>
+        <h3
+          className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up"
+          style={{ animationDelay: "0.16s" }}
+        >
+          Verification Intelligence Engine
+          <span className="text-rose-500">.</span>
         </h3>
-        <p className="mt-2 text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>Verification signals and authenticity evidence you can trust.</p>
+        <p
+          className="mt-2 text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up"
+          style={{ animationDelay: "0.24s" }}
+        >
+          Verification signals and authenticity evidence you can trust.
+        </p>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-5 pb-12 md:px-8 md:pb-20">
@@ -338,17 +423,21 @@ export default function Home() {
           {featureRows.map((row, index) => (
             <article
               key={row.title}
-              className={`grid items-center gap-6 rounded-2xl p-4 md:grid-cols-2 md:gap-8 md:p-6 transition-all duration-700 ${index % 2 === 1 ? 'bg-[#c9f1ef] dark:bg-[#44514f]' : 'dark:bg-[#3a3a3a]/35'}`}
+              className={`grid items-center gap-6 rounded-2xl p-4 md:grid-cols-2 md:gap-8 md:p-6 transition-all duration-700 ${index % 2 === 1 ? "bg-[#c9f1ef] dark:bg-[#44514f]" : "dark:bg-[#3a3a3a]/35"}`}
               style={{
                 animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.15}s forwards`,
                 opacity: 0,
               }}
             >
-              <div className={row.reverse ? 'md:order-2' : ''}>
-                <h4 className="text-2xl font-black leading-tight md:text-4xl">{row.title}</h4>
-                <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">{row.description}</p>
+              <div className={row.reverse ? "md:order-2" : ""}>
+                <h4 className="text-2xl font-black leading-tight md:text-4xl">
+                  {row.title}
+                </h4>
+                <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">
+                  {row.description}
+                </p>
               </div>
-              <div className={row.reverse ? 'md:order-1' : ''}>
+              <div className={row.reverse ? "md:order-1" : ""}>
                 <div className="transition-all duration-500">
                   <FeatureIllustration variant={index} />
                 </div>
@@ -358,23 +447,36 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="agent-team" className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20">
-        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+      <section
+        id="agent-team"
+        className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20"
+      >
+        <div
+          className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200"
+          style={{ animationDelay: "0.08s, 0.85s" }}
+        >
           <UsersRound className="h-6 w-6" />
           Roadmap
         </div>
-        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+        <h3
+          className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up"
+          style={{ animationDelay: "0.16s" }}
+        >
           Your Verification Agent Team<span className="text-rose-500">.</span>
         </h3>
-        <p className="mx-auto mt-3 max-w-3xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>
-          The future of trust operations is autonomous. We are building verification agents to support enterprise teams.
+        <p
+          className="mx-auto mt-3 max-w-3xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up"
+          style={{ animationDelay: "0.24s" }}
+        >
+          The future of trust operations is autonomous. We are building
+          verification agents to support enterprise teams.
         </p>
 
         <div className="mt-10 space-y-8 text-left">
           {agentCards.map((card, idx) => (
-            <article 
-              key={card.title} 
-              className={`grid items-center gap-6 md:grid-cols-2 transition-all duration-700 ${idx % 2 === 1 ? 'md:[&>div:first-child]:order-2 md:[&>div:last-child]:order-1' : ''}`}
+            <article
+              key={card.title}
+              className={`grid items-center gap-6 md:grid-cols-2 transition-all duration-700 ${idx % 2 === 1 ? "md:[&>div:first-child]:order-2 md:[&>div:last-child]:order-1" : ""}`}
               style={{
                 animation: `fadeInUp 0.8s ease-out ${0.3 + idx * 0.15}s forwards`,
                 opacity: 0,
@@ -384,9 +486,16 @@ export default function Home() {
                 <AgentIllustration variant={idx} />
               </div>
               <div>
-                <h4 className="mt-4 text-3xl font-black md:text-4xl">{card.title}</h4>
-                <p className="mt-3 max-w-lg text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">{card.description}</p>
-                <Link href="#contact" className="mt-4 inline-block rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-slate-400/50 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a] dark:hover:shadow-black/30">
+                <h4 className="mt-4 text-3xl font-black md:text-4xl">
+                  {card.title}
+                </h4>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-slate-700 dark:text-slate-200 md:text-base">
+                  {card.description}
+                </p>
+                <Link
+                  href="#contact"
+                  className="mt-4 inline-block rounded-md bg-[#032434] px-4 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-slate-400/50 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a] dark:hover:shadow-black/30"
+                >
                   Learn More
                 </Link>
               </div>
@@ -395,22 +504,39 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="industry" className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20">
-        <div className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+      <section
+        id="industry"
+        className="mx-auto w-full max-w-6xl px-5 pb-14 text-center md:px-8 md:pb-20"
+      >
+        <div
+          className="section-intro-pill mx-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200"
+          style={{ animationDelay: "0.08s, 0.85s" }}
+        >
           <Building2 className="h-6 w-6" />
           Industry Solutions
         </div>
-        <h3 className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
-          Verification Intelligence For Every Industry<span className="text-rose-500">.</span>
+        <h3
+          className="mt-4 text-4xl font-black md:text-5xl animate-fade-in-up"
+          style={{ animationDelay: "0.16s" }}
+        >
+          Verification Intelligence For Every Industry
+          <span className="text-rose-500">.</span>
         </h3>
-        <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up" style={{ animationDelay: '0.24s' }}>
-          EmbodiTrust serves forward-looking brands that are serious about winning product trust.
+        <p
+          className="mx-auto mt-3 max-w-2xl text-lg text-slate-600 dark:text-slate-300 animate-fade-in-up"
+          style={{ animationDelay: "0.24s" }}
+        >
+          EmbodiTrust serves forward-looking brands that are serious about
+          winning product trust.
         </p>
 
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {industries.map((item) => {
             return (
-              <article key={item.name} className="rounded-xl border border-[#d3dbe7] bg-white p-4 text-left shadow-sm transition-colors dark:border-[#575757] dark:bg-[#3d3d3d]">
+              <article
+                key={item.name}
+                className="rounded-xl border border-[#d3dbe7] bg-white p-4 text-left shadow-sm transition-colors dark:border-[#575757] dark:bg-[#3d3d3d]"
+              >
                 <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-md bg-cyan-50 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-200">
                   <IndustryTileIcon kind={item.kind} />
                 </div>
@@ -424,12 +550,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="faqs" className="mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24">
-        <div className="section-intro-pill mx-auto mb-4 inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200" style={{ animationDelay: '0.08s, 0.85s' }}>
+      <section
+        id="faqs"
+        className="mx-auto w-full max-w-6xl px-5 pb-16 md:px-8 md:pb-24"
+      >
+        <div
+          className="section-intro-pill mx-auto mb-4 inline-flex items-center gap-1.5 rounded-full border border-cyan-400 bg-cyan-50 px-[4rem] py-[1rem] text-[16px] font-semibold text-cyan-700 dark:border-cyan-300/50 dark:bg-cyan-500/15 dark:text-cyan-200"
+          style={{ animationDelay: "0.08s, 0.85s" }}
+        >
           <CircleHelp className="h-6 w-6" />
           FAQs
         </div>
-        <h3 className="text-center text-4xl font-black md:text-5xl animate-fade-in-up" style={{ animationDelay: '0.16s' }}>
+        <h3
+          className="text-center text-4xl font-black md:text-5xl animate-fade-in-up"
+          style={{ animationDelay: "0.16s" }}
+        >
           Read The FAQs<span className="text-rose-500">.</span>
         </h3>
 
@@ -441,21 +576,36 @@ export default function Home() {
 
       <ContactForm />
 
-      <footer id="demo" className="bg-[#032434] text-white transition-colors dark:bg-[#2f2f2f]">
+      <footer
+        id="demo"
+        className="bg-[#032434] text-white transition-colors dark:bg-[#2f2f2f]"
+      >
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] md:px-8 md:py-12">
           <div>
             <div className="flex items-center gap-2 text-3xl font-black">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-sm font-black text-[#032434]">E</span>
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-sm font-black text-[#032434]">
+                E
+              </span>
               EmbodiTrust
             </div>
-            <p className="mt-3 text-slate-200">Measure and grow your product authenticity visibility.</p>
+            <p className="mt-3 text-slate-200">
+              Measure and grow your product authenticity visibility.
+            </p>
           </div>
 
           <div className="flex items-end gap-4 text-sm text-slate-200">
-            <Link href="#" className="hover:text-white">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white">Terms & Conditions</Link>
-            <Link href="#" className="hover:text-white">Cookie Policy</Link>
-            <Link href="#" className="hover:text-white">Contact</Link>
+            <Link href="#" className="hover:text-white">
+              Privacy Policy
+            </Link>
+            <Link href="#" className="hover:text-white">
+              Terms & Conditions
+            </Link>
+            <Link href="#" className="hover:text-white">
+              Cookie Policy
+            </Link>
+            <Link href="#" className="hover:text-white">
+              Contact
+            </Link>
           </div>
         </div>
       </footer>

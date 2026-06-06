@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var BASE_URL = 'https://emboditrust.com';
+  var BASE_URL = "http://localhost:8870";
   var WIDGET_STYLES_LOADED = false;
 
   function loadStyles() {
