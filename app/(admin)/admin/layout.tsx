@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   title: "Emboditrust - Admin Dashboard",
   description: "",
   icons: {
-   icon: "/favicon.ico",
-  shortcut: "/favicon.ico",
+   icon: "/logo.png",
+  shortcut: "/logo.png",
   apple: "/apple-touch-icon.png",
   },
 };

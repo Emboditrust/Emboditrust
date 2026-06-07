@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   title: "EmbodiTrust - Pharmaceutical Anti-Counterfeiting System",
   description: "Comprehensive solution to combat counterfeit pharmaceuticals in Nigeria",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
     apple: "/apple-touch-icon.png",
   },
 };
