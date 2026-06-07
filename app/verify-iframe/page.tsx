@@ -1,5 +1,4 @@
 // app/verify/[qrCodeId]/page.tsx - Updated to include location
-import { notFound } from "next/navigation";
 import VerificationClientPage from "./clientPage";
 import connectDB from "@/lib/mongodb";
 import ProductCode from "@/models/ProductCode";
@@ -60,13 +59,11 @@ async function getGeolocationFromIP(ipAddress: string) {
 }
 
 export default async function VerificationPage({
-  params,
   searchParams,
 }: {
-  params: Promise<{ qrCodeId: string }>;
-  searchParams: Promise<{ scratch?: string; embedded?: string }>;
+  searchParams: Promise<{ id?: string }>;
 }) {
-  const { qrCodeId } = await params; 
+  const { id: qrCodeId } = await searchParams;
 
   // Get client IP and user agent
   const headersList = await headers();
@@ -103,73 +100,73 @@ export default async function VerificationPage({
       userAgent: userAgent,
       location: locationData,
     });
-   return (
-     <div
-       style={{
-         fontFamily:
-           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-         minHeight: "280px",
-         display: "flex",
-         alignItems: "center",
-         justifyContent: "center",
-         borderRadius: "16px",
-         padding: "32px",
-         marginTop: "5rem",
-       }}
-     >
-       <div style={{ textAlign: "center", maxWidth: "360px" }}>
-         <div
-           style={{
-             width: "56px",
-             height: "56px",
-             borderRadius: "16px",
-             background: "#fef2f2",
-             display: "flex",
-             alignItems: "center",
-             justifyContent: "center",
-             margin: "0 auto 16px",
-           }}
-         >
-           <svg
-             width="24"
-             height="24"
-             viewBox="0 0 24 24"
-             fill="none"
-             stroke="#ef4444"
-             strokeWidth="2"
-             strokeLinecap="round"
-             strokeLinejoin="round"
-           >
-             <circle cx="12" cy="12" r="10" />
-             <line x1="12" y1="8" x2="12" y2="12" />
-             <line x1="12" y1="16" x2="12.01" y2="16" />
-           </svg>
-         </div>
-         <h2
-           style={{
-             fontSize: "18px",
-             fontWeight: 700,
-             color: "#0f172a",
-             margin: 0,
-           }}
-         >
-           Verification Code Not Found
-         </h2>
-         <p
-           style={{
-             fontSize: "14px",
-             color: "#64748b",
-             marginTop: "8px",
-             lineHeight: 1.6,
-           }}
-         >
-           The QR code you scanned does not match any product. Please check that
-           the code was entered correctly or contact the manufacturer for
-           assistance.
-         </p>
-       </div>
-     </div>
-   );
+    return (
+      <div
+        style={{
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          minHeight: "280px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "16px",
+          padding: "32px",
+          marginTop: "5rem",
+        }}
+      >
+        <div style={{ textAlign: "center", maxWidth: "360px" }}>
+          <div
+            style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "16px",
+              background: "#fef2f2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ef4444"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <h2
+            style={{
+              fontSize: "18px",
+              fontWeight: 700,
+              color: "#0f172a",
+              margin: 0,
+            }}
+          >
+            Verification Code Not Found
+          </h2>
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#64748b",
+              marginTop: "8px",
+              lineHeight: 1.6,
+            }}
+          >
+            The QR code you scanned does not match any product. Please check
+            that the code was entered correctly or contact the manufacturer for
+            assistance.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // Get batch, client, and reward info
@@ -221,7 +218,7 @@ export default async function VerificationPage({
   }
 
   // Detect embedded mode from query params or headers
-  const embedded = (await searchParams).embedded === "true";
+  const embedded = true;
 
   // Prepare data for client component
   const verificationData = {
@@ -277,7 +274,7 @@ export default async function VerificationPage({
   return (
     <VerificationClientPage
       verificationData={verificationData}
-      qrCodeId={qrCodeId}
+      qrCodeId={qrCodeId || "boohoo"}
     />
   );
 }
