@@ -137,6 +137,11 @@ export default function CookieConsent() {
     return null;
   }
 
+  const path = window.location.pathname;
+  if (path.startsWith('/verify/') || path.startsWith('/widget/') || path === '/test') {
+    return null;
+  }
+
   return (
     <>
       {isBannerOpen && (
