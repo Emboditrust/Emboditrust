@@ -138,7 +138,11 @@ export default function CookieConsent() {
   }
 
   const path = window.location.pathname;
-  if (path.startsWith('/verify/') || path.startsWith('/widget/') || path === '/test') {
+  if (
+    path.startsWith("/verify") ||
+    path.startsWith("/widget/") ||
+    path === "/test"
+  ) {
     return null;
   }
 
