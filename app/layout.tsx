@@ -13,6 +13,11 @@ import CookieConsent from "@/components/CookieConsent";
 export const metadata: Metadata = {
   title: "EmbodiTrust - Pharmaceutical Anti-Counterfeiting System",
   description: "Comprehensive solution to combat counterfeit pharmaceuticals in Nigeria",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

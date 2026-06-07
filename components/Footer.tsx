@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Footer() {
   return (
     <footer className="bg-[#0f172a] py-14 text-slate-200">
@@ -5,7 +7,7 @@ export default function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.2fr_repeat(4,1fr)]">
           <div>
             <div className="mb-4 flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-emerald-600" />
+              <Image src="/logo.png" alt="EmbodiTrust" width={32} height={32} className="h-8 w-8" />
               <span className="text-lg font-semibold text-white">EmbodiTrust</span>
             </div>
             <p className="max-w-xs text-sm leading-6 text-slate-400">

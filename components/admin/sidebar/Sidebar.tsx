@@ -41,10 +41,10 @@ const Sidebar = ({ dashboard }: { dashboard: string }) => {
     <div className="flex flex-col w-[240px] gap-6 py-2 px-4 bg-white border-r border-gray-300">
       {/* the logo */}
       <div className="">
-        <Link href="/" className="flex items-center">
-          <div className="text-[16px] font-header  font-bold text-[#80CBE8]">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7" />
+          <div className="text-[16px] font-header font-bold text-[#80CBE8]">
             Emboditrust
-           
           </div>
         </Link>
       </div>

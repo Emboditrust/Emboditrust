@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -20,7 +21,7 @@ export default function MarketingHeader() {
       <header className="rounded-xl border border-[#d7dde6] bg-white/95 shadow-md backdrop-blur transition-colors duration-300 dark:border-[#5a5a5a] dark:bg-[#3a3a3a]/95">
         <div className="flex h-14 items-center justify-between px-4 md:h-16 md:px-5">
           <Link href="/" className="flex items-center gap-2.5 text-base font-bold md:text-lg">
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">E</span>
+            <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7 rounded-full" />
             <span>EmbodiTrust</span>
           </Link>
 

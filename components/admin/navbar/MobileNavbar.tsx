@@ -15,14 +15,14 @@ const MobileNav = () => {
   return (
     <div className="sm:hidden w-full justify-between fixed top-0 left-0 h-[70px] px-4 bg-white border-b border-gray-300 mb-10 flex items-center z-50">
       <div className="">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7" />
           <div className="text-2xl font-bold text-black">
            <div>
-                     <div className=" font-header  font-bold text-[#80CBE8]">
-                       Emboditrust
-                      
-                     </div>
-                   </div>
+                      <div className=" font-header  font-bold text-[#80CBE8]">
+                        Emboditrust
+                      </div>
+                    </div>
           </div>
         </Link>
       </div>

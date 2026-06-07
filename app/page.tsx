@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import ContactForm from "@/components/ContactForm";
 import {
@@ -232,9 +233,7 @@ export default function Home() {
               href="/"
               className="flex items-center gap-2.5 text-base font-bold md:text-lg"
             >
-              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">
-                E
-              </span>
+              <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7 rounded-full" />
               <span>EmbodiTrust</span>
             </Link>
 
@@ -584,9 +583,7 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] md:px-8 md:py-12">
           <div>
             <div className="flex items-center gap-2 text-3xl font-black">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-sm font-black text-[#032434]">
-                E
-              </span>
+              <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7 rounded-full" />
               EmbodiTrust
             </div>
             <p className="mt-3 text-slate-200">

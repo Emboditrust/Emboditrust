@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
@@ -19,7 +20,7 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-4 md:px-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600" />
+            <Image src="/logo.png" alt="EmbodiTrust" width={32} height={32} className="h-8 w-8" />
             <span className="text-lg font-bold text-white">EmbodiTrust</span>
           </div>
           
