@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   ChevronDown,
@@ -404,9 +405,7 @@ export default function EmbedGuidePage() {
             href="/"
             className="flex items-center gap-2.5 text-base font-bold"
           >
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-400 text-[11px] font-black text-slate-900">
-              E
-            </span>
+            <Image src="/logo.png" alt="EmbodiTrust" width={28} height={28} className="h-7 w-7 rounded-full" />
             <span>EmbodiTrust</span>
           </Link>
           <nav className="flex items-center gap-4 text-sm">
