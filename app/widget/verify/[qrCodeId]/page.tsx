@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import connectDB from '@/lib/mongodb';
 import ProductCode from '@/models/ProductCode';
 import Batch from '@/models/Batch';
@@ -27,9 +26,15 @@ export default async function WidgetVerifyPage({
 
   await connectDB();
 
-  const productCode = await ProductCode.findOne({ qrCodeId }).lean();
+  let productCode;
+  try {
+    productCode = await ProductCode.findOne({ qrCodeId }).lean();
+  } catch {
+    return <WidgetClientPage widgetData={null} />;
+  }
+
   if (!productCode) {
-    notFound();
+    return <WidgetClientPage widgetData={null} />;
   }
 
   const [batch, client] = await Promise.all([
