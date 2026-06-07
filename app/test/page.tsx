@@ -413,10 +413,10 @@ export default function TestPage() {
         <div
           id={containerId}
           style={{
-            background: "white",
-            borderRadius: "16px",
-            boxShadow:
-              "0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)",
+            // background: "white",
+            // borderRadius: "16px",
+            // boxShadow:
+            //   "0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)",
             overflow: "hidden",
             minHeight: loadedCode && !loading ? "auto" : "200px",
             display: "flex",
