@@ -457,7 +457,7 @@ export default function VerificationClientPage({ verificationData }: Props) {
   };
 
   const handleBackToHome = () => {
-    router.push("/");
+    window.location.pathname = "/";
   };
 
   return (
