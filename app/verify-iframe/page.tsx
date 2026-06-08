@@ -6,7 +6,7 @@ import VerificationAttempt from "@/models/VerificationAttempt";
 import Batch from "@/models/Batch";
 import Client from "@/models/Client";
 import Reward from "@/models/Reward";
-import { headers } from "next/headers";
+import { headers } from "next/headers"; 
 
 // Function to get geolocation (same as above)
 async function getGeolocationFromIP(ipAddress: string) {
@@ -63,6 +63,7 @@ export default async function VerificationPage({
 }: {
   searchParams: Promise<{ id?: string }>;
 }) {
+
   const { id: qrCodeId } = await searchParams;
 
   // Get client IP and user agent
@@ -89,7 +90,7 @@ export default async function VerificationPage({
 
   if (!productCode) {
     // Log invalid attempt with QR code and location
-    const locationData = await getGeolocationFromIP(ipAddress);
+    const locationData = await getGeolocationFromIP(ipAddress); 
 
     await VerificationAttempt.create({
       timestamp: new Date(),
@@ -280,14 +281,14 @@ export default async function VerificationPage({
 }
 
 export async function generateMetadata({
-  params,
+  searchParams,
 }: {
-  params: Promise<{ qrCodeId: string }>;
+  searchParams: Promise<{ qrCodeId: string }>;
 }) {
-  const { qrCodeId } = await params;
+  const { qrCodeId: id } = await searchParams;
 
   await connectDB();
-  const productCode = await ProductCode.findOne({ qrCodeId }).lean();
+  const productCode = await ProductCode.findOne({ qrCodeId: id }).lean();
 
   if (!productCode) {
     return {
