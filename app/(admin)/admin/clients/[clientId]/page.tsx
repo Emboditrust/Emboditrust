@@ -1959,7 +1959,7 @@ EmbodiTrust.init({
                             className="ml-auto shrink-0 gap-1.5 text-xs"
                             onClick={() => {
                               const a = document.createElement("a");
-                              a.href = "/wc-verify.html";
+                              a.href = "/product-verify.html";
                               a.download = "product-verify.html";
                               document.body.appendChild(a);
                               a.click();
