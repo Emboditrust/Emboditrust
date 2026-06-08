@@ -122,6 +122,7 @@ interface Client {
   codesGenerated: number;
   lastBatchDate?: string;
   logoUrl?: string;
+  domain?: string;
   website?: string;
   createdAt: string;
   updatedAt: string;
@@ -1862,15 +1863,36 @@ body {
                       Embed Verification Widget
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm text-gray-600">
-                      Copy this code and send it to the client. They paste it on their website to add the EmbodiTrust verification widget. See the <a href="/embed-guide" target="_blank" className="text-cyan-600 hover:text-cyan-700 underline font-medium">full integration guide &rarr;</a> for framework examples and advanced usage.
-                    </p>
-                    <div className="relative">
-                      <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-x-auto leading-relaxed max-h-[320px] overflow-y-auto">
-                        {`<!-- EmbodiTrust Verification Widget -->
+                  <CardContent className="space-y-5">
+                    {/* Option 1: JS Snippet */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-50 text-[10px] font-bold text-cyan-600">
+                          1
+                        </span>
+                        Add snippet to any page
+                      </h4>
+                      <p className="text-xs text-gray-600 mb-2">
+                        Paste this code into the{" "}
+                        <code className="bg-gray-100 px-1 rounded">
+                          &lt;body&gt;
+                        </code>{" "}
+                        of any webpage. Works with any site builder (HTML,
+                        React, Shopify, WordPress, etc.). See the{" "}
+                        <a
+                          href="/embed-guide"
+                          target="_blank"
+                          className="text-cyan-600 hover:underline font-medium"
+                        >
+                          full guide &rarr;
+                        </a>{" "}
+                        for framework examples.
+                      </p>
+                      <div className="relative">
+                        <pre className="bg-gray-900 text-gray-100 text-xs rounded-lg p-4 overflow-x-auto leading-relaxed max-h-[240px] overflow-y-auto">
+                          {`<!-- EmbodiTrust Verification Widget -->
 <div id="emboditrust-verify"></div>
-<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"></script>
+<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"><\/script>
 <script>
 EmbodiTrust.init({
   container: "#emboditrust-verify",
@@ -1886,30 +1908,103 @@ EmbodiTrust.init({
   verificationDescription: "Verify the authenticity of this product"
 });
 <\/script>`}
-                      </pre>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="absolute top-2 right-2 gap-1.5 h-7 text-xs"
-                        onClick={() => {
-                          const code = `<!-- EmbodiTrust Verification Widget -->\n<div id="emboditrust-verify"></div>\n<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"><\/script>\n<script>\nEmbodiTrust.init({\n  container: "#emboditrust-verify",\n  verificationCode: "QR-${client.brandPrefix}-XXXXXXXX-XXXXX",\n  companyName: "${client.companyName}",\n  logoUrl: "${client.logoUrl || ""}",\n  primaryColor: "#2957FF",\n  secondaryColor: "#0B0F19",\n  accentColor: "#19a35b",\n  supportEmail: "${client.email}",\n  supportPhone: "${client.phone}",\n  verificationHeadline: "Product Verification",\n  verificationDescription: "Verify the authenticity of this product"\n});\n<\/script>`;
-                          navigator.clipboard.writeText(code);
-                          toast.success("Widget code copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3 w-3" />
-                        Copy
-                      </Button>
+                        </pre>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="absolute top-2 right-2 gap-1.5 h-7 text-xs"
+                          onClick={() => {
+                            const code = `<!-- EmbodiTrust Verification Widget -->\n<div id="emboditrust-verify"></div>\n<script src="${process.env.NEXT_PUBLIC_APP_URL || "https://emboditrust.com"}/widget.js"><\/script>\n<script>\nEmbodiTrust.init({\n  container: "#emboditrust-verify",\n  verificationCode: "QR-${client.brandPrefix}-XXXXXXXX-XXXXX",\n  companyName: "${client.companyName}",\n  logoUrl: "${client.logoUrl || ""}",\n  primaryColor: "#2957FF",\n  secondaryColor: "#0B0F19",\n  accentColor: "#19a35b",\n  supportEmail: "${client.email}",\n  supportPhone: "${client.phone}",\n  verificationHeadline: "Product Verification",\n  verificationDescription: "Verify the authenticity of this product"\n});\n<\/script>`;
+                            navigator.clipboard.writeText(code);
+                            toast.success("Widget code copied to clipboard");
+                          }}
+                        >
+                          <Copy className="h-3 w-3" />
+                          Copy
+                        </Button>
+                      </div>
                     </div>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-xs text-blue-800">
-                        <strong>Note:</strong> Replace{" "}
-                        <code className="bg-blue-100 px-1 rounded">
-                          QR-{client.brandPrefix}-XXXXXXXX-XXXXX
-                        </code>{" "}
-                        with the actual verification code from each product.
+
+                    {/* Option 2: Hosted HTML file (simplest) */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600">
+                          2
+                        </span>
+                        Host the HTML file (easiest)
+                      </h4>
+                      <p className="text-xs text-gray-600 mb-2">
+                        Download the file below, rename it to{" "}
+                        <code className="bg-gray-100 px-1 rounded">
+                          product-verify.html
+                        </code>
+                        , and upload it to the root of your website. That&#39;s
+                        it — no code to write.
                       </p>
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 shrink-0">
+                            <Download className="h-5 w-5 text-emerald-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-900">
+                              verify.html
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Standalone verification page
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="ml-auto shrink-0 gap-1.5 text-xs"
+                            onClick={() => {
+                              const a = document.createElement("a");
+                              a.href = "/wc-verify.html";
+                              a.download = "product-verify.html";
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              toast.success(
+                                "File downloaded. Rename to product-verify.html and upload to your website root.",
+                              );
+                            }}
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                            Download
+                          </Button>
+                        </div>
+                        <div className="bg-amber-90 border border-amber-200 rounded-lg p-3">
+                          <p className="text-xs text-amber-800">
+                            <strong>How it works:</strong> QR codes will point
+                            to{" "}
+                            <code className="bg-amber-100 px-1 rounded">
+                              https://
+                              <span className="font-semibold">
+                                {client.domain || "client-site.com"}
+                              </span>
+                              /product-verify.html?id=QR-CODE
+                            </code>
+                            . The page automatically loads the verification
+                            widget. No additional setup needed.
+                          </p>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Quick Reference */}
+                    {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1.5">
+                      <p className="text-xs font-semibold text-blue-800">Quick Reference</p>
+                      <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                        <li>Replace <code className="bg-blue-100 px-1 rounded">QR-{client.brandPrefix}-XXXXXXXX-XXXXX</code> with each product&#39;s actual QR code.</li>
+                        {client.domain && (
+                          <li>Your domain <strong>{client.domain}</strong> is configured. QR codes will link there automatically.</li>
+                        )}
+                        {!client.domain && (
+                          <li>Set a <strong>Domain</strong> above for QR codes to point to your client&#39;s website instead of ours.</li>
+                        )}
+                        <li>See the <a href="/embed-guide" target="_blank" className="underline font-medium">full integration guide</a> for React, Vue, Next.js examples.</li>
+                      </ul>
+                    </div> */}
                   </CardContent>
                 </Card>
               </div>
@@ -3300,7 +3395,8 @@ EmbodiTrust.init({
                     placeholder="omega-phamacerticals.com"
                   />
                   <p className="text-xs text-gray-500">
-                    QR codes will point to the client&#39;s domain instead of EmbodiTrust.
+                    QR codes will point to the client&#39;s domain instead of
+                    EmbodiTrust.
                   </p>
                 </div>
               </div>

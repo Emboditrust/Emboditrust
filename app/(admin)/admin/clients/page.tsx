@@ -70,6 +70,7 @@ interface Client {
   codesGenerated: number;
   lastBatchDate?: string;
   logoUrl?: string;
+  domain?: string;
   website?: string;
   createdAt: string;
   updatedAt: string;
@@ -123,6 +124,7 @@ export default function ClientsPage() {
     monthlyLimit: '10000',
     logoUrl: '',
     website: '',
+    domain: '',
     additionalInfo: '',
     rewardsEnabled: false,
     rewardAmount: '50',
@@ -249,6 +251,7 @@ export default function ClientsPage() {
         body: JSON.stringify({
           ...cleanFormData,
           monthlyLimit: Number(cleanFormData.monthlyLimit),
+          domain: formData.domain || '',
           rewardsConfig: {
             airtime: {
               enabled: formData.rewardsEnabled,
@@ -279,6 +282,7 @@ export default function ClientsPage() {
           monthlyLimit: '10000',
           logoUrl: '',
           website: '',
+          domain: '',
           additionalInfo: '',
           rewardsEnabled: false,
           rewardAmount: '50',
@@ -906,6 +910,17 @@ export default function ClientsPage() {
                   {websiteError && (
                     <p className="text-sm text-red-600">{websiteError}</p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Domain (Optional)</label>
+                  <Input
+                    value={formData.domain}
+                    onChange={(e) => setFormData({...formData, domain: e.target.value})}
+                    placeholder="omega-phamacerticals.com"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Client&#39;s website domain. QR codes will point here instead of EmbodiTrust.
+                  </p>
                 </div>
               </div>
             </div>
