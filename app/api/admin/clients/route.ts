@@ -25,6 +25,10 @@ const createClientSchema = z.object({
     .max(1000000, 'Maximum monthly limit is 1,000,000'),
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  domain: z.string()
+    .regex(/^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/, 'Invalid domain format (e.g. example.com)')
+    .optional()
+    .or(z.literal('')),
   additionalInfo: z.string().optional(),
   rewardsConfig: z.object({
     airtime: z.object({
@@ -232,6 +236,7 @@ export async function POST(request: NextRequest) {
       codesGenerated: 0,
       logoUrl: validatedData.logoUrl?.trim() || undefined,
       website: validatedData.website?.trim() || undefined,
+      domain: validatedData.domain?.toLowerCase().trim() || undefined,
       additionalInfo: validatedData.additionalInfo 
         ? JSON.parse(validatedData.additionalInfo)
         : {},
@@ -267,6 +272,7 @@ export async function POST(request: NextRequest) {
       contractEndDate: client.contractEndDate,
       logoUrl: client.logoUrl,
       website: client.website,
+      domain: client.domain,
       createdAt: client.createdAt,
     };
 

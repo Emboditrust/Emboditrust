@@ -28,6 +28,10 @@ const updateClientSchema = z.object({
     .optional(),
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  domain: z.string()
+    .regex(/^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/, 'Invalid domain format (e.g. example.com)')
+    .optional()
+    .or(z.literal('')),
   additionalInfo: z.string().optional(),
   rewardsConfig: z.object({
     airtime: z.object({
@@ -125,6 +129,7 @@ export async function GET(
         lastBatchDate: client.lastBatchDate,
         logoUrl: client.logoUrl || '',
         website: client.website || '',
+        domain: client.domain || '',
         additionalInfo: client.additionalInfo || {},
         createdAt: client.createdAt,
         updatedAt: client.updatedAt,
@@ -228,6 +233,7 @@ export async function PUT(
     if (validatedData.monthlyLimit !== undefined) client.monthlyLimit = validatedData.monthlyLimit;
     if (validatedData.logoUrl !== undefined) client.logoUrl = validatedData.logoUrl?.trim() || undefined;
     if (validatedData.website !== undefined) client.website = validatedData.website?.trim() || undefined;
+    if (validatedData.domain !== undefined) client.domain = validatedData.domain?.toLowerCase().trim() || undefined;
     
     // Handle dates
     if (validatedData.contractStartDate !== undefined) {
@@ -278,6 +284,7 @@ export async function PUT(
         contractEndDate: client.contractEndDate,
         logoUrl: client.logoUrl,
         website: client.website,
+        domain: client.domain,
         createdAt: client.createdAt,
         updatedAt: client.updatedAt,
       },

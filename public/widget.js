@@ -42,7 +42,7 @@
     iframe.style.overflow = 'hidden';
     iframe.style.boxShadow = '0 4px 24px rgba(0,0,0,0.08)';
     iframe.style.background = 'transparent';
-    iframe.style.minHeight = '400px';
+    iframe.style.minHeight = "550px";
     return iframe;
   }
 

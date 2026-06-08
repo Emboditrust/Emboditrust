@@ -18,6 +18,7 @@ export interface IClient extends mongoose.Document {
   codesGenerated: number;
   lastBatchDate?: Date;
   logoUrl?: string;
+  domain?: string;
   website?: string;
   additionalInfo?: Record<string, any>;
   rewardsConfig?: {
@@ -154,6 +155,12 @@ const ClientSchema = new mongoose.Schema({
     type: String,
     trim: true,
     match: [/^https?:\/\/.+\..+/, 'Please enter a valid URL'],
+    default: '',
+  },
+  domain: {
+    type: String,
+    trim: true,
+    lowercase: true,
     default: '',
   },
   additionalInfo: {

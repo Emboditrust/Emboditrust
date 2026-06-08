@@ -223,8 +223,10 @@ export async function POST(request: NextRequest) {
       const qrCodeHash = generateHash(qrCodeId);
       
       // Generate verification URL - Your model requires this field
-      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-      const verificationUrl = `${baseUrl}/verify/${qrCodeId}`;
+      const clientDomain = (client as any).domain?.trim();
+      const verificationUrl = clientDomain
+        ? `https://${clientDomain}/product-verify.html?id=${qrCodeId}`
+        : `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/verify/${qrCodeId}`;
       
       // Generate QR code image
       const qrCodeImageData = includeImages ? await generateQRCodeImage(verificationUrl) : '';

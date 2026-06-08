@@ -232,6 +232,7 @@ export default function ClientDetailsPage() {
     status: "active" as "active" | "suspended" | "inactive",
     monthlyLimit: 0,
     website: "",
+    domain: "",
     rewardsEnabled: false,
     rewardAmount: 50,
   });
@@ -286,6 +287,7 @@ export default function ClientDetailsPage() {
         status: client.status || "active",
         monthlyLimit: client.monthlyLimit || 0,
         website: client.website || "",
+        domain: client.domain || "",
         rewardsEnabled: client.rewardsConfig?.airtime?.enabled || false,
         rewardAmount: client.rewardsConfig?.airtime?.amount || 50,
       });
@@ -3284,6 +3286,22 @@ EmbodiTrust.init({
                   {editWebsiteError && (
                     <p className="text-sm text-red-600">{editWebsiteError}</p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Domain</label>
+                  <Input
+                    value={editFormData.domain}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        domain: e.target.value,
+                      })
+                    }
+                    placeholder="omega-phamacerticals.com"
+                  />
+                  <p className="text-xs text-gray-500">
+                    QR codes will point to the client&#39;s domain instead of EmbodiTrust.
+                  </p>
                 </div>
               </div>
             </div>

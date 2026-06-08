@@ -1,53 +1,220 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://emboditrust.com" />
-    <link rel="dns-prefetch" href="https://emboditrust.com" />
-    <title>Verification</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Product Verification</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      /* background: #f1f5f9; */
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .et-wrapper {
+      width: 100%;
+      max-width: 520px;
+    }
+    .et-header {
+      text-align: center;
+      margin-bottom: 24px;
+    } 
+    .et-header h1 {
+      font-size: 20px; font-weight: 800;
+    }
+    .et-header p {
+      font-size: 14px; color: #64748b; margin-top: 4px;
+    }
+    .et-card {
+      background: white; border-radius: 16px;
+      /* box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); */
+      overflow: hidden;
+    }
+    .et-card-content {
+      padding: 24px;
+    }
+    .et-error {
+      display: none;
+    }
+    .et-error.visible {
+      display: block;
+    }
+    .et-error-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: #fef2f2;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .et-error h2 {
+      font-size: 18px; font-weight: 700; text-align: center; color: #0f172a;
+    }
+    .et-error p {
+      font-size: 14px; color: #64748b; text-align: center;
+      margin-top: 8px; line-height: 1.6;
+    }
+    .et-loading {
+      text-align: center; padding: 48px 0;
+    }
+    .et-loading.hidden {
+      display: none;
+    }
+    .et-spinner {
+      width: 36px; height: 36px; border: 4px solid #e2e8f0;
+      border-top-color: #2957FF; border-radius: 50%;
+      animation: et-spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes et-spin { to { transform: rotate(360deg); } }
+    .et-loading p {
+      font-size: 15px; color: #64748b;
+    }
+    .et-widget-container.hidden {
+      display: none;
+    }
+    .et-widget-container iframe {
+      width: 100% !important; border: none !important;
+      border-radius: 0 !important; overflow: hidden !important;
+      background: transparent !important;
+    }
+    .et-footer {
+      text-align: center; margin-top: 16px;
+      font-size: 12px; color: #94a3b8;
+    }
+    .et-footer a {
+      color: #2957FF; text-decoration: none; font-weight: 500;
+    }
+    .et-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      background: #f1f5f9; color: #64748b;
+      font-size: 11px; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="et-wrapper">
+    <div class="et-header">
+     
+      <h1>Product Verification</h1>
+      <p>Verify the authenticity of your product</p>
+    </div>
 
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    <div class="et-card">
+      <div class="et-card-content">
+        <div class="et-loading" id="et-loading">
+          <div class="et-spinner"></div>
+          <p>Loading verification...</p>
+        </div>
+
+        <div class="et-error" id="et-error">
+          <div class="et-error-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <h2 id="et-error-title">Verification Code Missing</h2>
+          <p id="et-error-desc">
+            No verification code was provided. Please scan the QR code on your product packaging to begin verification.
+          </p>
+        </div>
+
+        <div class="et-widget-container hidden" id="et-widget-container">
+          <div id="emboditrust-verify"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="et-footer">
+      Powered by <a href="https://emboditrust.com" target="_blank" rel="noopener">EmbodiTrust</a>
+      <span class="et-badge" style="margin-left: 8px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        Verified Secure
+      </span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get('id');
+
+      var loadingEl = document.getElementById('et-loading');
+      var errorEl = document.getElementById('et-error');
+      var errorTitle = document.getElementById('et-error-title');
+      var errorDesc = document.getElementById('et-error-desc');
+      var widgetContainer = document.getElementById('et-widget-container');
+
+      function showError(title, desc) {
+        loadingEl.classList.add('hidden');
+        errorTitle.textContent = title;
+        errorDesc.textContent = desc;
+        errorEl.classList.add('visible');
       }
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background-color: #f1f5f9;
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+      if (!code) {
+        showError(
+          'Verification Code Missing',
+          'No verification code was provided. Please scan the QR code on your product packaging to begin verification.'
+        );
+        return;
       }
-      #verify-frame {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        border: none;
-        display: block;
+
+      if (!/^[A-Z0-9-]+$/.test(code)) {
+        showError(
+          'Invalid Verification Code',
+          'The verification code format is invalid. Please check the QR code and try again.'
+        );
+        return;
       }
-    </style>
-  </head>
-  <body>
-    <script>
-      (function () {
-        var id = new URLSearchParams(window.location.search).get("id") || "";
-        var iframe = document.createElement("iframe");
-        iframe.id = "verify-frame";
-        iframe.src =
-          "https://emboditrust.com/verify-iframe?id=" + encodeURIComponent(id);
-        iframe.setAttribute("loading", "eager");
-        iframe.setAttribute("importance", "high");
-        iframe.setAttribute("fetchpriority", "high");
-        iframe.setAttribute("allowfullscreen", "");
-        iframe.setAttribute("allow", "same-origin");
-        document.body.appendChild(iframe);
-      })();
-    </script>
-  </body>
+
+      function initWidget() {
+        if (window.EmbodiTrust) {
+          widgetContainer.classList.remove('hidden');
+          loadingEl.classList.add('hidden');
+          window.EmbodiTrust.init({
+            container: '#emboditrust-verify',
+            verificationCode: code,
+            verificationHeadline: 'Product Verification',
+            verificationDescription: 'Verifying product authenticity...'
+          });
+          return;
+        }
+        setTimeout(initWidget, 200);
+      }
+
+      var script = document.createElement('script');
+      script.src = 'https://emboditrust.com/widget.js';
+      script.async = true;
+      script.onload = function () {
+        widgetContainer.classList.remove('hidden');
+        loadingEl.classList.add('hidden');
+        window.EmbodiTrust.init({
+          container: '#emboditrust-verify',
+          verificationCode: code,
+          verificationHeadline: 'Product Verification',
+          verificationDescription: 'Verifying product authenticity...'
+        });
+      };
+      script.onerror = function () {
+        showError(
+          'Unable to Load',
+          'The verification service could not be reached. Please check your internet connection and try again.'
+        );
+      };
+      document.head.appendChild(script);
+
+      initWidget();
+    })();
+  </script>
+</body>
 </html>

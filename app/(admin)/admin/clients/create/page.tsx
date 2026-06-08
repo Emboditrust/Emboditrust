@@ -48,6 +48,10 @@ const clientSchema = z.object({
     .max(1000000, 'Maximum monthly limit is 1,000,000'),
   logoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   website: z.string().url('Invalid URL format').optional().or(z.literal('')),
+  domain: z.string()
+    .regex(/^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/, 'Invalid domain (e.g. example.com)')
+    .optional()
+    .or(z.literal('')),
   additionalInfo: z.string().optional(),
   rewardsEnabled: z.boolean(),
   rewardAmount: z.number()
@@ -81,6 +85,7 @@ export default function CreateClientPage() {
       monthlyLimit: 10000,
       logoUrl: '',
       website: '',
+      domain: '',
       additionalInfo: '',
       rewardsEnabled: false,
       rewardAmount: 50,
@@ -99,6 +104,7 @@ export default function CreateClientPage() {
         monthlyLimit: Number(apiData.monthlyLimit),
         logoUrl: apiData.logoUrl || '',
         website: apiData.website || '',
+        domain: apiData.domain || '',
         additionalInfo: apiData.additionalInfo || '',
         rewardsConfig: {
           airtime: {
@@ -374,6 +380,25 @@ export default function CreateClientPage() {
                         <FormControl>
                           <Input {...field} placeholder="https://company.com" />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="domain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Globe className="h-4 w-4" />
+                          Domain (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="omega-phamacerticals.com" />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          The client&#39;s website domain. QR codes will point to their site instead of EmbodiTrust.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
