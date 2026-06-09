@@ -1,21 +1,45 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner'; // Add sonner for toasts
-import { 
-  Check, X, Shield, Package, Upload, Menu, 
-  Scan, AlertTriangle, Clock, MapPin, Mail, Phone, 
-  Info, Camera, ArrowRight, Home, Key, Image as ImageIcon,
-  BadgeCheck, Gift, Smartphone, Zap
-} from 'lucide-react';
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner"; // Add sonner for toasts
+import {
+  Check,
+  X,
+  Shield,
+  Package,
+  Upload,
+  Menu,
+  Scan,
+  AlertTriangle,
+  Clock,
+  MapPin,
+  Mail,
+  Phone,
+  Info,
+  Camera,
+  ArrowRight,
+  Home,
+  Key,
+  Image as ImageIcon,
+  BadgeCheck,
+  Gift,
+  Smartphone,
+  Zap,
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 import {
   Dialog,
@@ -24,12 +48,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import Image from 'next/image';
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
 
 interface Props {
   verificationData: any;
@@ -37,9 +61,7 @@ interface Props {
   scratchCodeParam?: string;
 }
 
-export default function VerificationClientPage({
-  verificationData,
-}: Props) {
+export default function VerificationClientPage({ verificationData }: Props) {
   const router = useRouter();
 
   if (!verificationData || !verificationData.productCode) {
@@ -57,15 +79,19 @@ export default function VerificationClientPage({
   const customConfig = verificationData.batch?.customSuccessConfig || {};
   const customFields = customConfig.additionalFields || {};
   const displayCompanyName =
-    customConfig.companyName || verificationData.client?.companyName || productCode.companyName;
-  const displayProductName = customConfig.productName || productCode.productName;
-  const displayLogoUrl = customConfig.logoUrl || verificationData.client?.logoUrl || '';
+    customConfig.companyName ||
+    verificationData.client?.companyName ||
+    productCode.companyName;
+  const displayProductName =
+    customConfig.productName || productCode.productName;
+  const displayLogoUrl =
+    customConfig.logoUrl || verificationData.client?.logoUrl || "";
   const displayProductImage =
     customConfig.productImageUrl ||
     customFields.productImageUrl ||
     customFields.imageUrl ||
     customFields.productImage ||
-    '';
+    "";
   const displayDescription =
     customConfig.productDescription ||
     customFields.productDescription ||
@@ -82,15 +108,15 @@ export default function VerificationClientPage({
   const [showNotAuthenticDialog, setShowNotAuthenticDialog] = useState(false);
   const [showFakeReportDialog, setShowFakeReportDialog] = useState(false);
 
-  const [scratchCodeInput, setScratchCodeInput] = useState('');
+  const [scratchCodeInput, setScratchCodeInput] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationCount, setVerificationCount] = useState(0);
 
   const [reportData, setReportData] = useState({
-    email: '', // Changed from reporterEmail to match API
-    phone: '', // Changed from reporterPhone to match API
-    purchaseLocation: '',
-    additionalInfo: '',
+    email: "", // Changed from reporterEmail to match API
+    phone: "", // Changed from reporterPhone to match API
+    purchaseLocation: "",
+    additionalInfo: "",
     productPhoto: null as File | null,
   });
 
@@ -99,39 +125,67 @@ export default function VerificationClientPage({
 
   /* ================= REWARD CLAIM ================= */
   const [showRewardClaim, setShowRewardClaim] = useState(false);
-  const [rewardPhone, setRewardPhone] = useState('');
+  const [rewardPhone, setRewardPhone] = useState("");
   const [isClaimingReward, setIsClaimingReward] = useState(false);
-  const [rewardResult, setRewardResult] = useState<{ success: boolean; message: string; alreadyClaimed?: boolean } | null>(null);
+  const [rewardResult, setRewardResult] = useState<{
+    success: boolean;
+    message: string;
+    alreadyClaimed?: boolean;
+  } | null>(null);
   const [detectedNetwork, setDetectedNetwork] = useState<string | null>(null);
 
   const networkLabels: Record<string, string> = {
-    mtn: 'MTN Nigeria',
-    glo: 'Glo Mobile',
-    airtel: 'Airtel Nigeria',
-    etisalat: '9mobile',
+    mtn: "MTN Nigeria",
+    glo: "Glo Mobile",
+    airtel: "Airtel Nigeria",
+    etisalat: "9mobile",
   };
 
   const detectNetworkFromPrefix = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
+    const cleaned = phone.replace(/\D/g, "");
     let prefix = cleaned;
-    if (cleaned.startsWith('234')) prefix = '0' + cleaned.substring(3);
+    if (cleaned.startsWith("234")) prefix = "0" + cleaned.substring(3);
     const first4 = prefix.substring(0, 4);
-    const mtn = ['0803', '0806', '0703', '0706', '0810', '0813', '0814', '0816', '0903', '0906', '0913', '0916', '0801'];
-    const glo = ['0805', '0807', '0811', '0815', '0705', '0905', '0915'];
-    const airtel = ['0802', '0808', '0701', '0708', '0812', '0901', '0902', '0907', '0912'];
-    const etisalat = ['0809', '0817', '0818', '0909', '0908'];
-    if (mtn.includes(first4)) return 'MTN Nigeria';
-    if (glo.includes(first4)) return 'Glo Mobile';
-    if (airtel.includes(first4)) return 'Airtel Nigeria';
-    if (etisalat.includes(first4)) return '9mobile';
+    const mtn = [
+      "0803",
+      "0806",
+      "0703",
+      "0706",
+      "0810",
+      "0813",
+      "0814",
+      "0816",
+      "0903",
+      "0906",
+      "0913",
+      "0916",
+      "0801",
+    ];
+    const glo = ["0805", "0807", "0811", "0815", "0705", "0905", "0915"];
+    const airtel = [
+      "0802",
+      "0808",
+      "0701",
+      "0708",
+      "0812",
+      "0901",
+      "0902",
+      "0907",
+      "0912",
+    ];
+    const etisalat = ["0809", "0817", "0818", "0909", "0908"];
+    if (mtn.includes(first4)) return "MTN Nigeria";
+    if (glo.includes(first4)) return "Glo Mobile";
+    if (airtel.includes(first4)) return "Airtel Nigeria";
+    if (etisalat.includes(first4)) return "9mobile";
     return null;
   };
 
   const handlePhoneChange = (val: string) => {
-    const cleaned = val.replace(/[^0-9+]/g, '');
+    const cleaned = val.replace(/[^0-9+]/g, "");
     if (cleaned.length <= 15) {
       setRewardPhone(cleaned);
-      if (cleaned.replace(/\D/g, '').length >= 10) {
+      if (cleaned.replace(/\D/g, "").length >= 10) {
         setDetectedNetwork(detectNetworkFromPrefix(cleaned));
       } else {
         setDetectedNetwork(null);
@@ -140,9 +194,9 @@ export default function VerificationClientPage({
   };
 
   const claimReward = async () => {
-    const cleaned = rewardPhone.replace(/\D/g, '');
+    const cleaned = rewardPhone.replace(/\D/g, "");
     if (cleaned.length < 10) {
-      toast.error('Please enter a valid phone number');
+      toast.error("Please enter a valid phone number");
       return;
     }
 
@@ -150,23 +204,39 @@ export default function VerificationClientPage({
     setRewardResult(null);
 
     try {
-      const res = await fetch('/api/rewards/claim', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qrCodeId: productCode.qrCodeId, phoneNumber: cleaned }),
+      const res = await fetch("/api/rewards/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          qrCodeId: productCode.qrCodeId,
+          phoneNumber: cleaned,
+        }),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        setRewardResult({ success: true, message: data.message || 'Airtime reward sent successfully' });
+        setRewardResult({
+          success: true,
+          message: data.message || "Airtime reward sent successfully",
+        });
       } else if (data.alreadyClaimed) {
-        setRewardResult({ success: false, alreadyClaimed: true, message: data.message });
+        setRewardResult({
+          success: false,
+          alreadyClaimed: true,
+          message: data.message,
+        });
       } else {
-        setRewardResult({ success: false, message: data.message || 'Failed to claim reward' });
+        setRewardResult({
+          success: false,
+          message: data.message || "Failed to claim reward",
+        });
       }
     } catch {
-      setRewardResult({ success: false, message: 'Network error. Please try again.' });
+      setRewardResult({
+        success: false,
+        message: "Network error. Please try again.",
+      });
     } finally {
       setIsClaimingReward(false);
     }
@@ -174,7 +244,7 @@ export default function VerificationClientPage({
 
   const resetRewardClaim = () => {
     setRewardResult(null);
-    setRewardPhone('');
+    setRewardPhone("");
     setDetectedNetwork(null);
   };
 
@@ -183,28 +253,36 @@ export default function VerificationClientPage({
   const unlockRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ================= HANDLE DIALOG CLOSE ================= */
-  const handleDialogClose = (open: boolean, setter: (open: boolean) => void) => {
+  const handleDialogClose = (
+    open: boolean,
+    setter: (open: boolean) => void,
+  ) => {
     if (!open) {
-      router.push('/');
+      router.push("/");
     }
     setter(open);
   };
 
   const handleXClick = () => {
-    router.push('/');
+    router.push("/");
   };
 
   /* ================= VERIFY ================= */
   const verifyScratchCode = async () => {
-    const sanitizedInput = scratchCodeInput.trim().toUpperCase().replace(/\s/g, '');
-    
+    const sanitizedInput = scratchCodeInput
+      .trim()
+      .toUpperCase()
+      .replace(/\s/g, "");
+
     if (sanitizedInput.length !== 12) {
-      toast.error('Please enter a valid 12-digit scratch code');
+      toast.error("Please enter a valid 12-digit scratch code");
       return;
     }
 
     if (!/^[A-Z0-9]{12}$/.test(sanitizedInput)) {
-      toast.error('Scratch code must be exactly 12 characters (letters or numbers)');
+      toast.error(
+        "Scratch code must be exactly 12 characters (letters or numbers)",
+      );
       return;
     }
 
@@ -217,9 +295,9 @@ export default function VerificationClientPage({
         return;
       }
 
-      const res = await fetch('/api/verify/update-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/verify/update-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qrCodeId: productCode.qrCodeId }),
       });
 
@@ -234,7 +312,7 @@ export default function VerificationClientPage({
       if (data.verificationCount > 1) {
         setReportUnlockTimer(5);
         unlockRef.current = setInterval(() => {
-          setReportUnlockTimer(prev => {
+          setReportUnlockTimer((prev) => {
             if (prev <= 1) {
               clearInterval(unlockRef.current!);
               return 0;
@@ -243,9 +321,8 @@ export default function VerificationClientPage({
           });
         }, 1000);
       }
-
     } catch (error) {
-      toast.error('Verification failed. Please try again.');
+      toast.error("Verification failed. Please try again.");
     } finally {
       setIsVerifying(false);
     }
@@ -258,13 +335,13 @@ export default function VerificationClientPage({
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+      toast.error("Image size should be less than 5MB");
       return;
     }
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
       return;
     }
 
@@ -285,12 +362,12 @@ export default function VerificationClientPage({
   const submitFakeReport = async () => {
     // Validate at least one contact method
     if (!reportData.email.trim() && !reportData.phone.trim()) {
-      toast.error('Please provide either email or phone number');
+      toast.error("Please provide either email or phone number");
       return;
     }
 
     if (!reportData.purchaseLocation.trim()) {
-      toast.error('Purchase location is required');
+      toast.error("Purchase location is required");
       return;
     }
 
@@ -298,59 +375,69 @@ export default function VerificationClientPage({
 
     try {
       const formData = new FormData();
-      formData.append('productName', productCode.productName);
-      formData.append('qrCodeId', productCode.qrCodeId);
-      formData.append('scratchCode', productCode.scratchCode);
-      
+      formData.append("productName", productCode.productName);
+      formData.append("qrCodeId", productCode.qrCodeId);
+      formData.append("scratchCode", productCode.scratchCode);
+
       // Use correct field names that match the API
-      if (reportData.email.trim()) formData.append('email', reportData.email.trim());
-      if (reportData.phone.trim()) formData.append('phone', reportData.phone.trim());
-      
-      formData.append('purchaseLocation', reportData.purchaseLocation.trim());
+      if (reportData.email.trim())
+        formData.append("email", reportData.email.trim());
+      if (reportData.phone.trim())
+        formData.append("phone", reportData.phone.trim());
+
+      formData.append("purchaseLocation", reportData.purchaseLocation.trim());
       if (reportData.additionalInfo.trim()) {
-        formData.append('additionalInfo', reportData.additionalInfo.trim());
+        formData.append("additionalInfo", reportData.additionalInfo.trim());
       }
       if (reportData.productPhoto) {
-        formData.append('productPhoto', reportData.productPhoto);
+        formData.append("productPhoto", reportData.productPhoto);
       }
       // Add current date as purchase date
-      formData.append('purchaseDate', new Date().toISOString());
+      formData.append("purchaseDate", new Date().toISOString());
 
-      const res = await fetch('/api/reports/fake-product', {
-        method: 'POST',
+      const res = await fetch("/api/reports/fake-product", {
+        method: "POST",
         body: formData,
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || data.message || 'Report submission failed');
+        throw new Error(
+          data.error || data.message || "Report submission failed",
+        );
       }
 
       if (data.success) {
-        toast.success('Report submitted successfully! Thank you for helping combat counterfeits.', {
-          duration: 5000,
-        });
-        
+        toast.success(
+          "Report submitted successfully! Thank you for helping combat counterfeits.",
+          {
+            duration: 5000,
+          },
+        );
+
         // Reset form data
         setReportData({
-          email: '',
-          phone: '',
-          purchaseLocation: '',
-          additionalInfo: '',
+          email: "",
+          phone: "",
+          purchaseLocation: "",
+          additionalInfo: "",
           productPhoto: null,
         });
         setImagePreview(null);
-        
-        setShowFakeReportDialog(false);
-        router.push('/');
-      } else {
-        throw new Error(data.message || 'Report submission failed');
-      }
 
+        setShowFakeReportDialog(false);
+        router.push("/");
+      } else {
+        throw new Error(data.message || "Report submission failed");
+      }
     } catch (error) {
-      console.error('Report submission error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to submit report. Please try again.');
+      console.error("Report submission error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to submit report. Please try again.",
+      );
     } finally {
       setIsSubmittingReport(false);
     }
@@ -358,7 +445,7 @@ export default function VerificationClientPage({
 
   /* ================= FORMAT SCRATCH CODE INPUT ================= */
   const handleScratchCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     if (value.length <= 12) {
       setScratchCodeInput(value);
     }
@@ -371,7 +458,7 @@ export default function VerificationClientPage({
   };
 
   const handleBackToHome = () => {
-    router.push('/');
+    router.push("/");
   };
 
   return (
@@ -394,8 +481,12 @@ export default function VerificationClientPage({
                   <Shield className="h-6 w-6 text-cyan-600" />
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-gray-900">Emboditrust</div>
-                  <div className="text-xs text-gray-500">Product Verification</div>
+                  <div className="text-xl font-bold text-gray-900">
+                    Emboditrust
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Product Verification
+                  </div>
                 </div>
               </div>
             )}
@@ -422,7 +513,9 @@ export default function VerificationClientPage({
               ) : (
                 <div className="flex items-center gap-3 text-[#11467a]">
                   <Shield className="h-10 w-10" />
-                  <div className="text-3xl font-bold tracking-tight">{displayCompanyName}</div>
+                  <div className="text-3xl font-bold tracking-tight">
+                    {displayCompanyName}
+                  </div>
                 </div>
               )}
             </div>
@@ -465,16 +558,28 @@ export default function VerificationClientPage({
               <CardContent>
                 <div className="grid grid-cols-3 gap-3 border-t border-[#dbe1ec] pt-4">
                   <div className="rounded-2xl bg-white px-3 py-5 text-center shadow-sm">
-                    <div className="text-sm leading-5 text-[#546174]">Total Scans</div>
-                    <div className="mt-2 text-2xl font-bold leading-none text-[#18253b]">{verificationCount}</div>
+                    <div className="text-sm leading-5 text-[#546174]">
+                      Total Scans
+                    </div>
+                    <div className="mt-2 text-2xl font-bold leading-none text-[#18253b]">
+                      {verificationCount}
+                    </div>
                   </div>
                   <div className="rounded-2xl bg-white px-3 py-5 text-center shadow-sm">
-                    <div className="text-sm leading-5 text-[#546174]">Status</div>
-                    <div className="mt-3 text-xl font-bold leading-none text-[#19a35b]">Authentic</div>
+                    <div className="text-sm leading-5 text-[#546174]">
+                      Status
+                    </div>
+                    <div className="mt-3 text-xl font-bold leading-none text-[#19a35b]">
+                      Authentic
+                    </div>
                   </div>
                   <div className="rounded-2xl bg-white px-3 py-5 text-center shadow-sm">
-                    <div className="text-sm leading-5 text-[#546174]">Your Scan</div>
-                    <div className="mt-3 text-xl font-semibold leading-none text-[#18253b]">Now</div>
+                    <div className="text-sm leading-5 text-[#546174]">
+                      Your Scan
+                    </div>
+                    <div className="mt-3 text-xl font-semibold leading-none text-[#18253b]">
+                      Now
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -486,16 +591,21 @@ export default function VerificationClientPage({
                   Product Information
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(verificationData.productMetadata).map(([label, value]) => (
-                    <div key={label} className="bg-white rounded-xl border border-gray-200 p-3">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        {label}
+                  {Object.entries(verificationData.productMetadata).map(
+                    ([label, value]) => (
+                      <div
+                        key={label}
+                        className="bg-white rounded-xl border border-gray-200 p-3"
+                      >
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          {label}
+                        </div>
+                        <div className="text-sm font-semibold text-gray-900 mt-1">
+                          {value as string}
+                        </div>
                       </div>
-                      <div className="text-sm font-semibold text-gray-900 mt-1">
-                        {value as string}
-                      </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </div>
             )}
@@ -509,14 +619,15 @@ export default function VerificationClientPage({
                       Previously Scanned {verificationCount - 1} Time(s)
                     </p>
                     <p className="mt-2 text-md leading-8 text-[#6b7280]">
-                      This product has been verified before.
-                      If you suspect this might be a counterfeit, you report it.
+                      This product has been verified before. If you suspect this
+                      might be a counterfeit, you report it.
                     </p>
                     {rewardClaimed && (
                       <div className="mt-3 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5">
                         <BadgeCheck className="h-4 w-4 text-green-600 shrink-0" />
                         <p className="text-sm text-green-700">
-                          Airtime reward of {rewardClaimed.amount} Naira was claimed for this product
+                          Airtime reward of {rewardClaimed.amount} Naira was
+                          claimed for this product
                         </p>
                       </div>
                     )}
@@ -525,9 +636,13 @@ export default function VerificationClientPage({
 
                 {reportUnlockTimer > 0 ? (
                   <div className="mt-4 text-center space-y-2">
-                    <Progress value={(5 - reportUnlockTimer) * 20} className="h-2" />
+                    <Progress
+                      value={(5 - reportUnlockTimer) * 20}
+                      className="h-2"
+                    />
                     <p className="text-sm text-gray-600">
-                      Report option available in <span className="font-bold">{reportUnlockTimer}s</span>
+                      Report option available in{" "}
+                      <span className="font-bold">{reportUnlockTimer}s</span>
                     </p>
                   </div>
                 ) : (
@@ -544,98 +659,151 @@ export default function VerificationClientPage({
             )}
 
             {rewardConfig?.enabled && showRewardClaim && (
-              <div className="mt-8 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50">
-                      <Zap className="h-5 w-5 text-cyan-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-900">Airtime Reward</h3>
-                      <p className="text-sm text-gray-500">
-                        Receive {rewardConfig.amount} Naira airtime for verifying this product
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="mt-8 overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm dark:border-[#5a5a5a] dark:bg-[#3a3a3a]">
                 {!rewardResult && (
-                  <div className="px-6 py-5 space-y-4">
+                  <div>
                     <div className="relative">
-                      <Smartphone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        value={rewardPhone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="pl-10 h-11 text-sm border-gray-300 focus:border-cyan-500 focus:ring-cyan-500"
-                        placeholder="Enter phone number (e.g. 08012345678)"
-                        disabled={isClaimingReward}
+                      <img
+                        src="/images/rewards/reward-hero.svg"
+                        alt="Airtime reward illustration showing a phone receiving credit"
+                        className="w-full h-40 object-cover"
                       />
-                    </div>
-                    {detectedNetwork && (
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <BadgeCheck className="h-3.5 w-3.5 text-green-500" />
-                        <span>{detectedNetwork} detected</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-[#3a3a3a]" />
+                      <div className="absolute bottom-3 left-6">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          Reward
+                        </p>
+                        <p className="text-2xl font-bold text-[#0b1c2e] dark:text-white">
+                          {rewardConfig.amount} Naira Airtime
+                        </p>
                       </div>
-                    )}
-                    <Button
-                      onClick={claimReward}
-                      disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
-                      className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium disabled:opacity-50"
-                    >
-                      {isClaimingReward ? (
-                        <>
-                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2.5" />
-                          Sending airtime...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="h-4 w-4 mr-2" />
-                          Claim {rewardConfig.amount} Naira Airtime
-                        </>
+                    </div>
+
+                    <div className="px-6 pb-6 pt-4 space-y-4">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          Phone Number
+                        </label>
+                        <div className="relative mt-1.5">
+                          <Input
+                            value={rewardPhone}
+                            onChange={(e) => handlePhoneChange(e.target.value)}
+                            className="h-11 w-full rounded-xl border-[#e2e8f0] bg-white pl-4 pr-4 text-sm placeholder:text-slate-400 focus:border-[#2957FF] focus:ring-[#2957FF]/20 dark:border-[#5a5a5a] dark:bg-[#444444] dark:text-white"
+                            placeholder="0801 234 5678"
+                            disabled={isClaimingReward}
+                          />
+                        </div>
+                      </div>
+
+                      {detectedNetwork && (
+                        <div className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 dark:border-[#5a5a5a] dark:bg-[#444444]/50">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Network Detected
+                          </span>
+                          <img
+                            src={
+                              detectedNetwork === "MTN Nigeria"
+                                ? "/images/rewards/carrier-mtn.png"
+                                : detectedNetwork === "Glo Mobile"
+                                  ? "/images/rewards/carrier-glo.png"
+                                  : detectedNetwork === "Airtel Nigeria"
+                                    ? "/images/rewards/carrier-airtel.png"
+                                    : "/images/rewards/carrier-9mobile.svg"
+                            }
+                            alt={detectedNetwork}
+                            className="h-8 w-auto"
+                          />
+                        </div>
                       )}
-                    </Button>
+
+                      <Button
+                        onClick={claimReward}
+                        disabled={
+                          isClaimingReward ||
+                          rewardPhone.replace(/\D/g, "").length < 10
+                        }
+                        className="w-full h-11 rounded-xl bg-[#042333] text-sm font-semibold text-white transition-all hover:bg-[#053049] disabled:opacity-40 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
+                      >
+                        {isClaimingReward ? (
+                          <span className="flex items-center gap-2.5">
+                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Sending...
+                          </span>
+                        ) : (
+                          <span>Get {rewardConfig.amount} Naira Airtime</span>
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 )}
 
-                {rewardResult && !rewardResult.alreadyClaimed && rewardResult.success && (
-                  <div className="px-6 py-5">
-                    <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
-                      <BadgeCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-green-800">{rewardResult.message}</p>
+                {rewardResult &&
+                  !rewardResult.alreadyClaimed &&
+                  rewardResult.success && (
+                    <div className="px-6 py-8 text-center">
+                      <img
+                        src="/images/rewards/reward-success.svg"
+                        alt="Reward claimed successfully"
+                        className="mx-auto h-24 w-24 mb-4"
+                      />
+                      <p className="text-base font-semibold text-[#19a35b] dark:text-emerald-300">
+                        {rewardResult.message}
+                      </p>
                       {detectedNetwork && (
-                        <p className="text-xs text-green-600 mt-1.5">
-                          Credited as {rewardConfig.amount} Naira airtime via {detectedNetwork}
-                        </p>
+                        <div className="mt-3 flex items-center justify-center gap-2">
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            via
+                          </span>
+                          <img
+                            src={
+                              detectedNetwork === "MTN Nigeria"
+                                ? "/images/rewards/carrier-mtn.svg"
+                                : detectedNetwork === "Glo Mobile"
+                                  ? "/images/rewards/carrier-glo.svg"
+                                  : detectedNetwork === "Airtel Nigeria"
+                                    ? "/images/rewards/carrier-airtel.svg"
+                                    : "/images/rewards/carrier-9mobile.svg"
+                            }
+                            alt={detectedNetwork}
+                            className="h-7 w-auto"
+                          />
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {rewardResult && rewardResult.alreadyClaimed && (
-                  <div className="px-6 py-5">
-                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
-                      <Shield className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-amber-800">{rewardResult.message}</p>
-                    </div>
+                  <div className="px-6 py-8 text-center">
+                    <img
+                      src="/images/rewards/reward-claimed.svg"
+                      alt="Reward already claimed"
+                      className="mx-auto h-20 w-20 mb-4"
+                    />
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      {rewardResult.message}
+                    </p>
                   </div>
                 )}
 
-                {rewardResult && !rewardResult.success && !rewardResult.alreadyClaimed && (
-                  <div className="px-6 py-5 space-y-4">
-                    <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-center">
-                      <X className="h-8 w-8 text-red-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-red-800">{rewardResult.message}</p>
-                      <p className="text-xs text-red-600 mt-1.5">You can retry or use a different number</p>
+                {rewardResult &&
+                  !rewardResult.success &&
+                  !rewardResult.alreadyClaimed && (
+                    <div className="px-6 py-6 text-center space-y-4">
+                      <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                        {rewardResult.message}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Don't worry, your reward is safe. Try again.
+                      </p>
+                      <Button
+                        onClick={resetRewardClaim}
+                        variant="outline"
+                        className="h-10 rounded-xl border-[#e2e8f0] text-sm font-medium text-[#0b1c2e] hover:bg-slate-50 dark:border-[#5a5a5a] dark:text-white dark:hover:bg-[#444444]"
+                      >
+                        Try Again
+                      </Button>
                     </div>
-                    <Button
-                      onClick={resetRewardClaim}
-                      variant="outline"
-                      className="w-full h-11 text-sm border-gray-300 text-gray-700 hover:bg-gray-50"
-                    >
-                      Retry
-                    </Button>
-                  </div>
-                )}
+                  )}
               </div>
             )}
 
@@ -652,8 +820,14 @@ export default function VerificationClientPage({
         )}
 
         {/* Scratch Code Dialog */}
-        <Dialog open={showScratchDialog} onOpenChange={(open) => handleDialogClose(open, setShowScratchDialog)}>
-          <DialogContent className="sm:max-w-md border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+        <Dialog
+          open={showScratchDialog}
+          onOpenChange={(open) => handleDialogClose(open, setShowScratchDialog)}
+        >
+          <DialogContent
+            className="sm:max-w-md border-0 shadow-xl"
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <button
               onClick={handleXClick}
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
@@ -670,14 +844,18 @@ export default function VerificationClientPage({
                   Enter Scratch Code
                 </DialogTitle>
                 <DialogDescription className="text-center text-gray-600 mt-2">
-                  Enter the 12-digit code from the scratch panel to verify authenticity
+                  Enter the 12-digit code from the scratch panel to verify
+                  authenticity
                 </DialogDescription>
               </div>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
               <div className="space-y-2">
-                <Label htmlFor="scratch-code" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="scratch-code"
+                  className="text-sm font-medium text-gray-700"
+                >
                   12-Digit Scratch Code
                 </Label>
                 <div className="relative">
@@ -723,8 +901,16 @@ export default function VerificationClientPage({
         </Dialog>
 
         {/* Not Authentic Dialog */}
-        <Dialog open={showNotAuthenticDialog} onOpenChange={(open) => handleDialogClose(open, setShowNotAuthenticDialog)}>
-          <DialogContent className="sm:max-w-md border-0 shadow-xl" onPointerDownOutside={(e) => e.preventDefault()}>
+        <Dialog
+          open={showNotAuthenticDialog}
+          onOpenChange={(open) =>
+            handleDialogClose(open, setShowNotAuthenticDialog)
+          }
+        >
+          <DialogContent
+            className="sm:max-w-md border-0 shadow-xl"
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <button
               onClick={handleXClick}
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
@@ -744,10 +930,11 @@ export default function VerificationClientPage({
                   Verification Failed
                 </DialogTitle>
                 <DialogDescription className="text-gray-600 mt-2">
-                  The scratch code entered does not match our records. This product may be counterfeit.
+                  The scratch code entered does not match our records. This
+                  product may be counterfeit.
                 </DialogDescription>
               </div>
-              
+
               <Button
                 onClick={handleBackToHome}
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white"
@@ -759,8 +946,16 @@ export default function VerificationClientPage({
         </Dialog>
 
         {/* Report Dialog with Scroll Area */}
-        <Dialog open={showFakeReportDialog} onOpenChange={(open) => handleDialogClose(open, setShowFakeReportDialog)}>
-          <DialogContent className="sm:max-w-lg border-0 shadow-xl max-h-[85vh] p-0 overflow-hidden" onPointerDownOutside={(e) => e.preventDefault()}>
+        <Dialog
+          open={showFakeReportDialog}
+          onOpenChange={(open) =>
+            handleDialogClose(open, setShowFakeReportDialog)
+          }
+        >
+          <DialogContent
+            className="sm:max-w-lg border-0 shadow-xl max-h-[85vh] p-0 overflow-hidden"
+            onPointerDownOutside={(e) => e.preventDefault()}
+          >
             <button
               onClick={handleXClick}
               className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
@@ -775,7 +970,9 @@ export default function VerificationClientPage({
                     <AlertTriangle className="h-6 w-6 text-red-600" />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl text-gray-900">Report Suspected Counterfeit</DialogTitle>
+                    <DialogTitle className="text-xl text-gray-900">
+                      Report Suspected Counterfeit
+                    </DialogTitle>
                     <DialogDescription className="text-gray-600">
                       Help us fight counterfeits by providing details
                     </DialogDescription>
@@ -796,21 +993,35 @@ export default function VerificationClientPage({
                     <CardContent className="space-y-2">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-xs text-gray-500">Product</Label>
-                          <p className="text-sm font-medium">{productCode.productName}</p>
+                          <Label className="text-xs text-gray-500">
+                            Product
+                          </Label>
+                          <p className="text-sm font-medium">
+                            {productCode.productName}
+                          </p>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-500">Manufacturer</Label>
-                          <p className="text-sm font-medium">{productCode.companyName}</p>
+                          <Label className="text-xs text-gray-500">
+                            Manufacturer
+                          </Label>
+                          <p className="text-sm font-medium">
+                            {productCode.companyName}
+                          </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-xs text-gray-500">Batch ID</Label>
-                          <p className="text-sm font-medium">{productCode.batchId}</p>
+                          <Label className="text-xs text-gray-500">
+                            Batch ID
+                          </Label>
+                          <p className="text-sm font-medium">
+                            {productCode.batchId}
+                          </p>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-500">Code Entered</Label>
+                          <Label className="text-xs text-gray-500">
+                            Code Entered
+                          </Label>
                           <p className="text-sm font-mono bg-white px-2 py-1 rounded border">
                             {formatScratchCode(scratchCodeInput)}
                           </p>
@@ -822,7 +1033,10 @@ export default function VerificationClientPage({
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="email"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           <Mail className="inline h-4 w-4 mr-1 text-gray-500" />
                           Email Address
                         </Label>
@@ -832,13 +1046,19 @@ export default function VerificationClientPage({
                           placeholder="your.email@example.com"
                           value={reportData.email}
                           onChange={(e) =>
-                            setReportData({ ...reportData, email: e.target.value })
+                            setReportData({
+                              ...reportData,
+                              email: e.target.value,
+                            })
                           }
                           className="border-gray-300"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="phone"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           <Phone className="inline h-4 w-4 mr-1 text-gray-500" />
                           Phone Number
                         </Label>
@@ -848,7 +1068,10 @@ export default function VerificationClientPage({
                           placeholder="+1 (555) 123-4567"
                           value={reportData.phone}
                           onChange={(e) =>
-                            setReportData({ ...reportData, phone: e.target.value })
+                            setReportData({
+                              ...reportData,
+                              phone: e.target.value,
+                            })
                           }
                           className="border-gray-300"
                         />
@@ -856,7 +1079,10 @@ export default function VerificationClientPage({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                      <Label
+                        htmlFor="location"
+                        className="text-sm font-medium text-gray-700"
+                      >
                         <MapPin className="inline h-4 w-4 mr-1 text-gray-500" />
                         Purchase Location *
                       </Label>
@@ -865,7 +1091,10 @@ export default function VerificationClientPage({
                         placeholder="Store name, address, or online retailer"
                         value={reportData.purchaseLocation}
                         onChange={(e) =>
-                          setReportData({ ...reportData, purchaseLocation: e.target.value })
+                          setReportData({
+                            ...reportData,
+                            purchaseLocation: e.target.value,
+                          })
                         }
                         className="border-amber-300 focus:border-amber-500 focus:ring-amber-200"
                         required
@@ -876,7 +1105,10 @@ export default function VerificationClientPage({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="additional-info" className="text-sm font-medium text-gray-700">
+                      <Label
+                        htmlFor="additional-info"
+                        className="text-sm font-medium text-gray-700"
+                      >
                         <Info className="inline h-4 w-4 mr-1 text-gray-500" />
                         Additional Information
                       </Label>
@@ -888,7 +1120,10 @@ export default function VerificationClientPage({
 • Any other concerns or observations?"
                         value={reportData.additionalInfo}
                         onChange={(e) =>
-                          setReportData({ ...reportData, additionalInfo: e.target.value })
+                          setReportData({
+                            ...reportData,
+                            additionalInfo: e.target.value,
+                          })
                         }
                         rows={4}
                         className="border-gray-300 resize-none"
@@ -906,10 +1141,10 @@ export default function VerificationClientPage({
                       setShowFakeReportDialog(false);
                       // Reset form
                       setReportData({
-                        email: '',
-                        phone: '',
-                        purchaseLocation: '',
-                        additionalInfo: '',
+                        email: "",
+                        phone: "",
+                        purchaseLocation: "",
+                        additionalInfo: "",
                         productPhoto: null,
                       });
                       setImagePreview(null);
@@ -921,7 +1156,11 @@ export default function VerificationClientPage({
                   </Button>
                   <Button
                     onClick={submitFakeReport}
-                    disabled={isSubmittingReport || (!reportData.email.trim() && !reportData.phone.trim()) || !reportData.purchaseLocation.trim()}
+                    disabled={
+                      isSubmittingReport ||
+                      (!reportData.email.trim() && !reportData.phone.trim()) ||
+                      !reportData.purchaseLocation.trim()
+                    }
                     className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmittingReport ? (
@@ -930,7 +1169,7 @@ export default function VerificationClientPage({
                         Submitting...
                       </>
                     ) : (
-                      'Submit Report'
+                      "Submit Report"
                     )}
                   </Button>
                 </div>

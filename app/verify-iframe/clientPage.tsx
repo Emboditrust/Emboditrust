@@ -658,117 +658,120 @@ export default function VerificationClientPage({ verificationData }: Props) {
             )}
 
             {rewardConfig?.enabled && showRewardClaim && (
-              <div className="mt-8 rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-50">
-                      <Zap className="h-5 w-5 text-cyan-600" />
+              <div className="mt-8 overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm dark:border-[#5a5a5a] dark:bg-[#3a3a3a]">
+                {!rewardResult && (
+                  <div>
+                    <div className="relative">
+                      <img
+                        src="/images/rewards/reward-hero.svg"
+                        alt="Airtime reward illustration showing a phone receiving credit"
+                        className="w-full h-40 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-[#3a3a3a]" />
+                      <div className="absolute bottom-3 left-6">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Reward</p>
+                        <p className="text-2xl font-bold text-[#0b1c2e] dark:text-white">{rewardConfig.amount} Naira Airtime</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-900">
-                        Airtime Reward
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Receive {rewardConfig.amount} Naira airtime for
-                        verifying this product
-                      </p>
+
+                    <div className="px-6 pb-6 pt-4 space-y-4">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">Phone Number</label>
+                        <div className="relative mt-1.5">
+                          <Input
+                            value={rewardPhone}
+                            onChange={(e) => handlePhoneChange(e.target.value)}
+                            className="h-11 w-full rounded-xl border-[#e2e8f0] bg-white pl-4 pr-4 text-sm placeholder:text-slate-400 focus:border-[#2957FF] focus:ring-[#2957FF]/20 dark:border-[#5a5a5a] dark:bg-[#444444] dark:text-white"
+                            placeholder="0801 234 5678"
+                            disabled={isClaimingReward}
+                          />
+                        </div>
+                      </div>
+
+                      {detectedNetwork && (
+                        <div className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 dark:border-[#5a5a5a] dark:bg-[#444444]/50">
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Network Detected</span>
+                          <img
+                            src={
+                              detectedNetwork === 'MTN Nigeria' ? '/images/rewards/carrier-mtn.svg' :
+                              detectedNetwork === 'Glo Mobile' ? '/images/rewards/carrier-glo.svg' :
+                              detectedNetwork === 'Airtel Nigeria' ? '/images/rewards/carrier-airtel.svg' :
+                              '/images/rewards/carrier-9mobile.svg'
+                            }
+                            alt={detectedNetwork}
+                            className="h-8 w-auto"
+                          />
+                        </div>
+                      )}
+
+                      <Button
+                        onClick={claimReward}
+                        disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
+                        className="w-full h-11 rounded-xl bg-[#042333] text-sm font-semibold text-white transition-all hover:bg-[#053049] disabled:opacity-40 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
+                      >
+                        {isClaimingReward ? (
+                          <span className="flex items-center gap-2.5">
+                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Sending...
+                          </span>
+                        ) : (
+                          <span>Get {rewardConfig.amount} Naira Airtime</span>
+                        )}
+                      </Button>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {!rewardResult && (
-                  <div className="px-6 py-5 space-y-4">
-                    <div className="relative">
-                      <Smartphone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        value={rewardPhone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="pl-10 h-11 text-sm border-gray-300 focus:border-cyan-500 focus:ring-cyan-500"
-                        placeholder="Enter phone number (e.g. 08012345678)"
-                        disabled={isClaimingReward}
-                      />
-                    </div>
+                {rewardResult && !rewardResult.alreadyClaimed && rewardResult.success && (
+                  <div className="px-6 py-8 text-center">
+                    <img
+                      src="/images/rewards/reward-success.svg"
+                      alt="Reward claimed successfully"
+                      className="mx-auto h-24 w-24 mb-4"
+                    />
+                    <p className="text-base font-semibold text-[#19a35b] dark:text-emerald-300">{rewardResult.message}</p>
                     {detectedNetwork && (
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <BadgeCheck className="h-3.5 w-3.5 text-green-500" />
-                        <span>{detectedNetwork} detected</span>
+                      <div className="mt-3 flex items-center justify-center gap-2">
+                        <span className="text-sm text-slate-500 dark:text-slate-400">via</span>
+                        <img
+                          src={
+                            detectedNetwork === 'MTN Nigeria' ? '/images/rewards/carrier-mtn.svg' :
+                            detectedNetwork === 'Glo Mobile' ? '/images/rewards/carrier-glo.svg' :
+                            detectedNetwork === 'Airtel Nigeria' ? '/images/rewards/carrier-airtel.svg' :
+                            '/images/rewards/carrier-9mobile.svg'
+                          }
+                          alt={detectedNetwork}
+                          className="h-7 w-auto"
+                        />
                       </div>
                     )}
+                  </div>
+                )}
+
+                {rewardResult && rewardResult.alreadyClaimed && (
+                  <div className="px-6 py-8 text-center">
+                    <img
+                      src="/images/rewards/reward-claimed.svg"
+                      alt="Reward already claimed"
+                      className="mx-auto h-20 w-20 mb-4"
+                    />
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{rewardResult.message}</p>
+                  </div>
+                )}
+
+                {rewardResult && !rewardResult.success && !rewardResult.alreadyClaimed && (
+                  <div className="px-6 py-6 text-center space-y-4">
+                    <p className="text-sm font-medium text-red-600 dark:text-red-400">{rewardResult.message}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Don't worry, your reward is safe. Try again.</p>
                     <Button
-                      onClick={claimReward}
-                      disabled={
-                        isClaimingReward ||
-                        rewardPhone.replace(/\D/g, "").length < 10
-                      }
-                      className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium disabled:opacity-50"
+                      onClick={resetRewardClaim}
+                      variant="outline"
+                      className="h-10 rounded-xl border-[#e2e8f0] text-sm font-medium text-[#0b1c2e] hover:bg-slate-50 dark:border-[#5a5a5a] dark:text-white dark:hover:bg-[#444444]"
                     >
-                      {isClaimingReward ? (
-                        <>
-                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2.5" />
-                          Sending airtime...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="h-4 w-4 mr-2" />
-                          Claim {rewardConfig.amount} Naira Airtime
-                        </>
-                      )}
+                      Try Again
                     </Button>
                   </div>
                 )}
-
-                {rewardResult &&
-                  !rewardResult.alreadyClaimed &&
-                  rewardResult.success && (
-                    <div className="px-6 py-5">
-                      <div className="rounded-lg bg-green-50 border border-green-200 p-4 text-center">
-                        <BadgeCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                        <p className="text-sm font-medium text-green-800">
-                          {rewardResult.message}
-                        </p>
-                        {detectedNetwork && (
-                          <p className="text-xs text-green-600 mt-1.5">
-                            Credited as {rewardConfig.amount} Naira airtime via{" "}
-                            {detectedNetwork}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                {rewardResult && rewardResult.alreadyClaimed && (
-                  <div className="px-6 py-5">
-                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 text-center">
-                      <Shield className="h-8 w-8 text-amber-600 mx-auto mb-2" />
-                      <p className="text-sm font-medium text-amber-800">
-                        {rewardResult.message}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {rewardResult &&
-                  !rewardResult.success &&
-                  !rewardResult.alreadyClaimed && (
-                    <div className="px-6 py-5 space-y-4">
-                      <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-center">
-                        <X className="h-8 w-8 text-red-600 mx-auto mb-2" />
-                        <p className="text-sm font-medium text-red-800">
-                          {rewardResult.message}
-                        </p>
-                        <p className="text-xs text-red-600 mt-1.5">
-                          You can retry or use a different number
-                        </p>
-                      </div>
-                      <Button
-                        onClick={resetRewardClaim}
-                        variant="outline"
-                        className="w-full h-11 text-sm border-gray-300 text-gray-700 hover:bg-gray-50"
-                      >
-                        Retry
-                      </Button>
-                    </div>
-                  )}
               </div>
             )}
 

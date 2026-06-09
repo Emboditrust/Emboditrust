@@ -1,0 +1,29 @@
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="200" rx="16" fill="url(#heroGrad)"/>
+  <defs>
+    <linearGradient id="heroGrad" x1="0" y1="0" x2="400" y2="200">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0b1c2e"/>
+    </linearGradient>
+  </defs>
+  <rect x="145" y="30" width="110" height="140" rx="18" fill="#1a1a2e" stroke="#2d2d4a" stroke-width="2"/>
+  <rect x="153" y="42" width="94" height="116" rx="10" fill="#16213e"/>
+  <rect x="165" y="55" width="70" height="4" rx="2" fill="#2957FF" opacity="0.6"/>
+  <rect x="165" y="65" width="70" height="2" rx="1" fill="#4a5568" opacity="0.4"/>
+  <circle cx="200" cy="92" r="16" fill="#2957FF" opacity="0.15"/>
+  <circle cx="200" cy="92" r="10" fill="#2957FF" opacity="0.25"/>
+  <circle cx="200" cy="92" r="5" fill="#2957FF"/>
+  <rect x="168" y="108" width="3" height="6" rx="1" fill="#2957FF" opacity="0.5"/>
+  <rect x="174" y="104" width="3" height="10" rx="1" fill="#2957FF" opacity="0.6"/>
+  <rect x="180" y="100" width="3" height="14" rx="1" fill="#2957FF" opacity="0.7"/>
+  <rect x="186" y="96" width="3" height="18" rx="1" fill="#2957FF" opacity="0.9"/>
+  <text x="200" y="140" text-anchor="middle" fill="#22c55e" font-size="9" font-weight="bold" font-family="sans-serif">+ AIRTIME</text>
+  <text x="200" y="150" text-anchor="middle" fill="#64748b" font-size="6" font-family="sans-serif">Credited</text>
+  <circle cx="140" cy="50" r="2" fill="#2957FF" opacity="0.6"/>
+  <circle cx="260" cy="60" r="1.5" fill="#2957FF" opacity="0.4"/>
+  <circle cx="130" cy="90" r="1.5" fill="#2957FF" opacity="0.5"/>
+  <circle cx="270" cy="100" r="2" fill="#2957FF" opacity="0.3"/>
+  <circle cx="150" cy="130" r="1" fill="#2957FF" opacity="0.4"/>
+  <circle cx="250" cy="140" r="1.5" fill="#2957FF" opacity="0.5"/>
+  <text x="200" y="180" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="600" font-family="sans-serif">AIRTIME REWARD</text>
+</svg>
