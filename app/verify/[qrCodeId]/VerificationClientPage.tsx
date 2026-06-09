@@ -708,7 +708,7 @@ export default function VerificationClientPage({ verificationData }: Props) {
                                   ? "/images/rewards/carrier-glo.png"
                                   : detectedNetwork === "Airtel Nigeria"
                                     ? "/images/rewards/carrier-airtel.png"
-                                    : "/images/rewards/carrier-9mobile.svg"
+                                    : "/images/rewards/carrier-9mobile.png"
                             }
                             alt={detectedNetwork}
                             className="h-8 w-auto"
@@ -757,12 +757,12 @@ export default function VerificationClientPage({ verificationData }: Props) {
                           <img
                             src={
                               detectedNetwork === "MTN Nigeria"
-                                ? "/images/rewards/carrier-mtn.svg"
+                                ? "/images/rewards/carrier-mtn.png"
                                 : detectedNetwork === "Glo Mobile"
-                                  ? "/images/rewards/carrier-glo.svg"
+                                  ? "/images/rewards/carrier-glo.png"
                                   : detectedNetwork === "Airtel Nigeria"
-                                    ? "/images/rewards/carrier-airtel.svg"
-                                    : "/images/rewards/carrier-9mobile.svg"
+                                    ? "/images/rewards/carrier-airtel.png"
+                                    : "/images/rewards/carrier-9mobile.png"
                             }
                             alt={detectedNetwork}
                             className="h-7 w-auto"

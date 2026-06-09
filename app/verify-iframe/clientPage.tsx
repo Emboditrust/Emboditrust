@@ -669,14 +669,20 @@ export default function VerificationClientPage({ verificationData }: Props) {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent dark:from-[#3a3a3a]" />
                       <div className="absolute bottom-3 left-6">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Reward</p>
-                        <p className="text-2xl font-bold text-[#0b1c2e] dark:text-white">{rewardConfig.amount} Naira Airtime</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          Reward
+                        </p>
+                        <p className="text-2xl font-bold text-[#0b1c2e] dark:text-white">
+                          {rewardConfig.amount} Naira Airtime
+                        </p>
                       </div>
                     </div>
 
                     <div className="px-6 pb-6 pt-4 space-y-4">
                       <div>
-                        <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">Phone Number</label>
+                        <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                          Phone Number
+                        </label>
                         <div className="relative mt-1.5">
                           <Input
                             value={rewardPhone}
@@ -690,13 +696,18 @@ export default function VerificationClientPage({ verificationData }: Props) {
 
                       {detectedNetwork && (
                         <div className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 dark:border-[#5a5a5a] dark:bg-[#444444]/50">
-                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Network Detected</span>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Network Detected
+                          </span>
                           <img
                             src={
-                              detectedNetwork === 'MTN Nigeria' ? '/images/rewards/carrier-mtn.svg' :
-                              detectedNetwork === 'Glo Mobile' ? '/images/rewards/carrier-glo.svg' :
-                              detectedNetwork === 'Airtel Nigeria' ? '/images/rewards/carrier-airtel.svg' :
-                              '/images/rewards/carrier-9mobile.svg'
+                              detectedNetwork === "MTN Nigeria"
+                                ? "/images/rewards/carrier-mtn.png"
+                                : detectedNetwork === "Glo Mobile"
+                                  ? "/images/rewards/carrier-glo.png"
+                                  : detectedNetwork === "Airtel Nigeria"
+                                    ? "/images/rewards/carrier-airtel.png"
+                                    : "/images/rewards/carrier-9mobile.png"
                             }
                             alt={detectedNetwork}
                             className="h-8 w-auto"
@@ -706,7 +717,10 @@ export default function VerificationClientPage({ verificationData }: Props) {
 
                       <Button
                         onClick={claimReward}
-                        disabled={isClaimingReward || rewardPhone.replace(/\D/g, '').length < 10}
+                        disabled={
+                          isClaimingReward ||
+                          rewardPhone.replace(/\D/g, "").length < 10
+                        }
                         className="w-full h-11 rounded-xl bg-[#042333] text-sm font-semibold text-white transition-all hover:bg-[#053049] disabled:opacity-40 dark:bg-[#5d5d5d] dark:hover:bg-[#6a6a6a]"
                       >
                         {isClaimingReward ? (
@@ -722,31 +736,40 @@ export default function VerificationClientPage({ verificationData }: Props) {
                   </div>
                 )}
 
-                {rewardResult && !rewardResult.alreadyClaimed && rewardResult.success && (
-                  <div className="px-6 py-8 text-center">
-                    <img
-                      src="/images/rewards/reward-success.svg"
-                      alt="Reward claimed successfully"
-                      className="mx-auto h-24 w-24 mb-4"
-                    />
-                    <p className="text-base font-semibold text-[#19a35b] dark:text-emerald-300">{rewardResult.message}</p>
-                    {detectedNetwork && (
-                      <div className="mt-3 flex items-center justify-center gap-2">
-                        <span className="text-sm text-slate-500 dark:text-slate-400">via</span>
-                        <img
-                          src={
-                            detectedNetwork === 'MTN Nigeria' ? '/images/rewards/carrier-mtn.svg' :
-                            detectedNetwork === 'Glo Mobile' ? '/images/rewards/carrier-glo.svg' :
-                            detectedNetwork === 'Airtel Nigeria' ? '/images/rewards/carrier-airtel.svg' :
-                            '/images/rewards/carrier-9mobile.svg'
-                          }
-                          alt={detectedNetwork}
-                          className="h-7 w-auto"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
+                {rewardResult &&
+                  !rewardResult.alreadyClaimed &&
+                  rewardResult.success && (
+                    <div className="px-6 py-8 text-center">
+                      <img
+                        src="/images/rewards/reward-success.svg"
+                        alt="Reward claimed successfully"
+                        className="mx-auto h-24 w-24 mb-4"
+                      />
+                      <p className="text-base font-semibold text-[#19a35b] dark:text-emerald-300">
+                        {rewardResult.message}
+                      </p>
+                      {detectedNetwork && (
+                        <div className="mt-3 flex items-center justify-center gap-2">
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            via
+                          </span>
+                          <img
+                            src={
+                              detectedNetwork === "MTN Nigeria"
+                                ? "/images/rewards/carrier-mtn.png"
+                                : detectedNetwork === "Glo Mobile"
+                                  ? "/images/rewards/carrier-glo.png"
+                                  : detectedNetwork === "Airtel Nigeria"
+                                    ? "/images/rewards/carrier-airtel.png"
+                                    : "/images/rewards/carrier-9mobile.png"
+                            }
+                            alt={detectedNetwork}
+                            className="h-7 w-auto"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 {rewardResult && rewardResult.alreadyClaimed && (
                   <div className="px-6 py-8 text-center">
@@ -755,23 +778,31 @@ export default function VerificationClientPage({ verificationData }: Props) {
                       alt="Reward already claimed"
                       className="mx-auto h-20 w-20 mb-4"
                     />
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{rewardResult.message}</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      {rewardResult.message}
+                    </p>
                   </div>
                 )}
 
-                {rewardResult && !rewardResult.success && !rewardResult.alreadyClaimed && (
-                  <div className="px-6 py-6 text-center space-y-4">
-                    <p className="text-sm font-medium text-red-600 dark:text-red-400">{rewardResult.message}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Don't worry, your reward is safe. Try again.</p>
-                    <Button
-                      onClick={resetRewardClaim}
-                      variant="outline"
-                      className="h-10 rounded-xl border-[#e2e8f0] text-sm font-medium text-[#0b1c2e] hover:bg-slate-50 dark:border-[#5a5a5a] dark:text-white dark:hover:bg-[#444444]"
-                    >
-                      Try Again
-                    </Button>
-                  </div>
-                )}
+                {rewardResult &&
+                  !rewardResult.success &&
+                  !rewardResult.alreadyClaimed && (
+                    <div className="px-6 py-6 text-center space-y-4">
+                      <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                        {rewardResult.message}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Don't worry, your reward is safe. Try again.
+                      </p>
+                      <Button
+                        onClick={resetRewardClaim}
+                        variant="outline"
+                        className="h-10 rounded-xl border-[#e2e8f0] text-sm font-medium text-[#0b1c2e] hover:bg-slate-50 dark:border-[#5a5a5a] dark:text-white dark:hover:bg-[#444444]"
+                      >
+                        Try Again
+                      </Button>
+                    </div>
+                  )}
               </div>
             )}
 
