@@ -508,7 +508,7 @@ export default function VerificationClientPage({ verificationData }: Props) {
                   alt={displayCompanyName}
                   width={300}
                   height={300}
-                  className="h-24 max-w-[200px] object-cover"
+                  className="h-24 max-w-[200px] object-cover p-5"
                 />
               ) : (
                 <div className="flex items-center gap-3 text-[#11467a]">
